@@ -1,11 +1,11 @@
 <template>
-    <v-app-bar app rounded height="90" color="white" elevation="3">
+    <v-app-bar app height="60" theme="dark" elevation="3">
         <v-container>
             <v-row align="center">
                 <router-link to="/">
                     <img
-                        :src="require('../../public/logo_dark.png')"
-                        height="50"
+                        :src="require('../../public/logo_light.png')"
+                        height="30"
                     />
                 </router-link>
 

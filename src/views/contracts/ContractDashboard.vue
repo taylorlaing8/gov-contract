@@ -12,20 +12,26 @@
                         @click="updateActiveTask(task)"
                     >
                         <StatusIcon size="x-small" :status="task.status"></StatusIcon>
-                        <span class="contract-nav-title">{{task.title}}</span>
+                        <h5 class="contract-nav-title">{{task.title}}</h5>
+                        <span class="contract-nav-spacer"></span>
+                        <v-icon class="contract-nav-expand" :class="openTasks.indexOf(task.slug) >= 0 ? 'expanded' : ''" v-if="task.data.tasks" size="x-small" @click="toggleSubtasks(task.slug)">
+                            mdi-chevron-down
+                        </v-icon>
                     </div>
-                    <template v-if="task.data.tasks">
-                        <div
-                            v-for="subtask in task.data.tasks"
-                            :key="subtask.id"
-                            class="contract-nav-item subtask"
-                            :class="$route.params.task === `${subtask.id}-${subtask.slug}` ? 'active' : ''"
-                            @click="updateActiveTask(subtask)"
-                        >
-                            <StatusIcon size="x-small" :status="subtask.status"></StatusIcon>
-                            <span class="contract-nav-title">{{subtask.title}}</span>
+                    <div class="contract-subtask-wrapper">
+                        <div class="contract-subtasks" :class="openTasks.indexOf(task.slug) >= 0 ? 'expanded' : ''">
+                            <div
+                                v-for="subtask in task.data.tasks"
+                                :key="subtask.id"
+                                class="contract-nav-item subtask"
+                                :class="$route.params.task === `${subtask.id}-${subtask.slug}` ? 'active' : ''"
+                                @click="updateActiveTask(subtask)"
+                            >
+                                <StatusIcon size="x-small" :status="subtask.status"></StatusIcon>
+                                <span class="contract-nav-title">{{subtask.title}}</span>
+                            </div>
                         </div>
-                    </template>
+                    </div>
                 </template>
             </div>
             <!-- <v-navigation-drawer theme="light" permanent width="400">
@@ -341,7 +347,6 @@ export default defineComponent({
         ]
 
         // Calculate Palt Actual as you loop through tasks that have a start and end date
-
         const contract = contractObject
 
         const navAvailable = contract.find((task) => {
@@ -362,7 +367,6 @@ export default defineComponent({
                         task: null,
                     },
                 })
-                console.log(route.params)
             } else {
                 activeTask.value = task
                 router.push({
@@ -375,6 +379,19 @@ export default defineComponent({
             }
         }
 
+        const openTasks: Ref<String[]> = ref([''])
+        contract.forEach((task: Task) => {
+            if('tasks' in task.data) {
+                openTasks.value.push(task.slug)
+            }
+        })
+
+        function toggleSubtasks(slug: String) {
+            const idx = openTasks.value.indexOf(slug)
+            if(idx >= 0) openTasks.value.splice(idx, 1)
+            else openTasks.value.push(slug)
+        }
+
         return {
             StatusType,
             positions,
@@ -382,6 +399,8 @@ export default defineComponent({
             contract,
             activeTask,
             updateActiveTask,
+            openTasks,
+            toggleSubtasks,
         }
     },
 })
@@ -398,14 +417,39 @@ export default defineComponent({
         font-weight: 600;
     }
 
+    & .contract-nav-spacer {
+        flex: 1
+    }
+
+    & .contract-nav-expand {
+        transition: all 0.3s;
+
+        &.expanded {
+            transform: rotateX(180deg);
+        }
+    }
+
+    & .contract-subtask-wrapper {
+        overflow: hidden;
+
+        & .contract-subtasks {
+            margin-bottom: -100%;
+            transition: all 0.4s;
+
+            &.expanded {
+                margin-bottom: 0;
+            }
+        }
+    }
+
     & .contract-nav-item {
         display: flex;
         align-items: center;
-        padding: 0.35rem 2rem;
+        padding: 0.3rem 1.75rem;
         transition: 0.3s;
 
         &.subtask{
-            padding-left: 4rem;
+            padding-left: 3rem;
         }
 
         &.active {
