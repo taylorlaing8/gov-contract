@@ -3,29 +3,29 @@
         <v-layout class="fill-height">
             <div class="contract-nav-wrapper">
                 <div class="contract-title">
-                    <v-btn size="x-small" variant="contained-text" @click="updateActiveTask(null)">Contract ID: #{{$route.params.contract_id}}</v-btn>
+                    <v-btn size="x-small" variant="contained-text" :to="$route.params.contract_id">Contract ID: #{{$route.params.contract_id}}</v-btn>
                 </div>
                 <template v-for="task in contract" :key="task.id">
                     <div
                         class="contract-nav-item"
-                        :class="$route.params.task === `${task.id}-${task.slug}` ? 'active' : ''"
-                        @click="updateActiveTask(task)"
+                        :class="$route.params.task === formatTaskParam(task) ? 'active' : ''"
+                        @click="updateActiveTask(task.slug)"
                     >
                         <StatusIcon size="x-small" :status="task.status"></StatusIcon>
                         <h5 class="contract-nav-title">{{task.title}}</h5>
                         <span class="contract-nav-spacer"></span>
-                        <v-icon class="contract-nav-expand" :class="openTasks.indexOf(task.slug) >= 0 ? 'expanded' : ''" v-if="task.data.tasks" size="x-small" @click="toggleSubtasks(task.slug)">
+                        <v-icon class="contract-nav-expand" :class="openTasks.indexOf(task.id) >= 0 ? 'expanded' : ''" v-if="task.data.tasks" size="x-small" @click="toggleSubtasks(task.id)">
                             mdi-chevron-down
                         </v-icon>
                     </div>
                     <div class="contract-subtask-wrapper">
-                        <div class="contract-subtasks" :class="openTasks.indexOf(task.slug) >= 0 ? 'expanded' : ''">
+                        <div class="contract-subtasks" :class="openTasks.indexOf(task.id) >= 0 ? 'expanded' : ''">
                             <div
                                 v-for="subtask in task.data.tasks"
                                 :key="subtask.id"
                                 class="contract-nav-item subtask"
-                                :class="$route.params.task === `${subtask.id}-${subtask.slug}` ? 'active' : ''"
-                                @click="updateActiveTask(subtask)"
+                                :class="$route.params.task === formatTaskParam(subtask) ? 'active' : ''"
+                                @click="updateActiveTask(subtask.slug)"
                             >
                                 <StatusIcon size="x-small" :status="subtask.status"></StatusIcon>
                                 <span class="contract-nav-title">{{subtask.title}}</span>
@@ -34,92 +34,20 @@
                     </div>
                 </template>
             </div>
-            <!-- <v-navigation-drawer theme="light" permanent width="400">
-                <v-list nav>
-                    <v-list-item
-                        :title="`Contract ID: #${$route.params.contract_id}`"
-                        class="pl-4"
-                        @click="updateActiveTask(null)"
-                    ></v-list-item>
-
-                    <template v-for="task in contract" :key="task.id">
-                        <v-list-group
-                            v-if="task.data.tasks && task.data.tasks.length > 0"
-                            :value="true"
-                        >
-                            <template v-slot:activator="{ props }">
-                                <v-list-item
-                                    v-bind="props"
-                                    :title="task.title"
-                                    :value="task.slug"
-                                    active-color="primary"
-                                    :variant="
-                                        task.status === StatusType.INCOMPLETE
-                                            ? 'plain'
-                                            : 'text'
-                                    "
-                                    :active="task.slug === $route.params.task"
-                                    @click="updateActiveTask(task)"
-                                >
-                                    <template v-slot:prepend>
-                                        <StatusIcon
-                                            :status="task.status"
-                                        ></StatusIcon>
-                                    </template>
-                                </v-list-item>
-                            </template>
-
-                            <v-list-item
-                                v-for="subtask in task.data.tasks"
-                                :key="subtask.id"
-                                :value="subtask.slug"
-                                :title="subtask.title"
-                                active-color="primary"
-                                :variant="
-                                    subtask.status === StatusType.INCOMPLETE
-                                        ? 'plain'
-                                        : 'text'
-                                "
-                                :active="subtask.slug === $route.params.task"
-                                @click="updateActiveTask(subtask)"
-                            >
-                                <template v-slot:prepend>
-                                    <StatusIcon
-                                        :status="subtask.status"
-                                    ></StatusIcon>
-                                </template>
-                            </v-list-item>
-                        </v-list-group>
-
-                        <v-list-item
-                            v-else
-                            :title="task.title"
-                            :value="task.slug"
-                            active-color="primary"
-                            :variant="
-                                task.status === StatusType.INCOMPLETE
-                                    ? 'plain'
-                                    : 'text'
-                            "
-                            :active="task.slug === $route.params.task"
-                            @click="updateActiveTask(task)"
-                        >
-                            <template v-slot:prepend>
-                                <StatusIcon :status="task.status"></StatusIcon>
-                            </template>
-                        </v-list-item>
-                    </template>
-                </v-list>
-            </v-navigation-drawer> -->
             <template v-if="activeTask">
                 <ContractContent :task="activeTask"></ContractContent>
+            </template>
+            <template v-else>
+                <div>
+                    <h1>Contract Dashboard Overview</h1>
+                </div>
             </template>
         </v-layout>
     </v-card>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, Ref, toRaw } from 'vue'
+import { defineComponent, ref, Ref, watch } from 'vue'
 import router from '@/router'
 import { useRoute } from 'vue-router'
 import StatusIcon from '@/components/StatusIcon.vue'
@@ -349,16 +277,41 @@ export default defineComponent({
         // Calculate Palt Actual as you loop through tasks that have a start and end date
         const contract = contractObject
 
-        const navAvailable = contract.find((task) => {
-            if (route.params && route.params.task === task.slug) return task
+        const formatTaskParam = (task: Task) => `${task.id}-${task.slug}`
+        const unformatTaskParam = (slug: string) => slug.slice(slug.indexOf('-') + 1)
+        watch(() => route.params.task, (nTask) => {
+            if(nTask) {
+                const nTaskFormat = unformatTaskParam(nTask.toString())
+                if(activeTask.value !== null && activeTask.value.slug !== nTaskFormat) updateActiveTask(nTaskFormat)
+            }
         })
+        
+        function findTask(slug: string): Task | null {
+            let tsk: Task | null = null
+            contract.forEach(task => {
+                if (task.slug === slug) tsk = task
+                else {
+                    if('tasks' in task.data) {
+                        const subTask = task.data.tasks.find(subtask => {
+                            if (subtask.slug === slug) return task
+                        })
 
-        const activeTask: Ref<Task> | Ref<null> = toRaw(
-            ref(navAvailable ? navAvailable : contract[0]),
-        )
+                        if (subTask) tsk = subTask
+                    }
+                }
+            })
+            return tsk
+        }
 
-        function updateActiveTask(task: Task | null) {
-            if (task === null) {
+        const activeTask = ref({} as Task | null)
+
+        function updateActiveTask(slug?: string) {
+            let currTask: Task | null = null
+
+            if (slug) currTask = findTask(slug)
+            else currTask = findTask(unformatTaskParam(route.params.task.toString()))
+
+            if (currTask === null) {
                 activeTask.value = null
                 router.push({
                     name: 'contract',
@@ -368,28 +321,26 @@ export default defineComponent({
                     },
                 })
             } else {
-                activeTask.value = task
+                activeTask.value = currTask
                 router.push({
                     name: 'contract',
                     params: {
                         contract_id: route.params.contract_id,
-                        task: `${task.id}-${task.slug.toString()}`,
+                        task: `${currTask.id}-${currTask.slug.toString()}`,
                     },
                 })
             }
         }
 
-        const openTasks: Ref<String[]> = ref([''])
-        contract.forEach((task: Task) => {
-            if('tasks' in task.data) {
-                openTasks.value.push(task.slug)
-            }
-        })
+        updateActiveTask()
 
-        function toggleSubtasks(slug: String) {
-            const idx = openTasks.value.indexOf(slug)
+        const openTasks: Ref<Number[]> = ref([])
+        if (activeTask.value !== null && activeTask.value.task_id) openTasks.value.push(activeTask.value.task_id)
+
+        function toggleSubtasks(id: Number) {
+            const idx = openTasks.value.indexOf(id)
             if(idx >= 0) openTasks.value.splice(idx, 1)
-            else openTasks.value.push(slug)
+            else openTasks.value.push(id)
         }
 
         return {
@@ -397,6 +348,7 @@ export default defineComponent({
             positions,
             pointsOfContact,
             contract,
+            formatTaskParam,
             activeTask,
             updateActiveTask,
             openTasks,
