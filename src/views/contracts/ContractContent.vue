@@ -1,30 +1,287 @@
 <template>
-    <v-main>
-        <v-row no-gutters class="py-5 justify-center">
-            <v-col cols=11>
-                <v-row>
-                    <v-col cols="6">
-                        <h2>{{ task.title }}</h2>
-                        <span class="text-subtitle-1">{{ task.sub_title }}</span>
-                    </v-col>
-                    <v-col cols="6" class="text-right">
-                        <span class="text-caption">Task ID: #{{ task.id }}</span>
-                        <StatusIcon :status="task.status" :showTitle="true"></StatusIcon>
-                    </v-col>
-                </v-row>
-                <v-row>
-                    <v-col cols="4">
-                        Gate
-                    </v-col>
-                </v-row>
-            </v-col>
-        </v-row>
+    <v-main class="contract-content-wrapper">
+        <template v-if="!edit">
+            <v-row class="justify-center">
+                <v-col cols="11">
+                    <v-card theme="light" class="px-8 py-5 my-5" elevation="2">
+                        <v-row class="justify-space-between">
+                            <v-col cols="8">
+                                <h5 class="text-h5">{{ taskData.title }}</h5>
+                                <p class="text-subtitle-1">
+                                    {{
+                                        taskData.sub_title
+                                            ? taskData.sub_title
+                                            : '-'
+                                    }}
+                                </p>
+                            </v-col>
+                            <v-col cols="4" class="text-right">
+                                <span class="text-caption"
+                                    >Task ID: #{{ taskData.id }}</span
+                                >
+                                <StatusIcon
+                                    :status="taskData.status"
+                                    :showTitle="true"
+                                ></StatusIcon>
+                            </v-col>
+                        </v-row>
+                    </v-card>
+                    <v-card theme="light" class="pa-8 my-5" elevation="2">
+                        <v-row class="justify-start">
+                            <v-col cols="3">
+                                <span class="text-caption">
+                                    Gate:
+                                    <br />
+                                </span>
+                                <p class="text-box">
+                                    {{ taskData.data.gate || '-' }}
+                                </p>
+                            </v-col>
+                            <v-col cols="3">
+                                <span class="text-caption">
+                                    Sub-Gate:
+                                    <br />
+                                </span>
+                                <p class="text-box">
+                                    {{ taskData.data.subgate || '-' }}
+                                </p>
+                            </v-col>
+                        </v-row>
+                        <v-row class="justify-start">
+                            <v-col cols="3">
+                                <span class="text-caption">
+                                    Palt Planned:
+                                    <br />
+                                </span>
+                                <p class="text-box">
+                                    {{ taskData.data.palt_plan || '-' }}
+                                </p>
+                            </v-col>
+                            <v-col cols="3">
+                                <span class="text-caption">
+                                    Palt Actual:
+                                    <br />
+                                </span>
+                                <p class="text-box">
+                                    <!-- CALCULATE PALT ACTUAL -->
+                                    {{ '-' }}
+                                </p>
+                            </v-col>
+                            <v-col cols="3">
+                                <span class="text-caption">
+                                    Business Days:
+                                    <br />
+                                </span>
+                                <p class="text-box">
+                                    {{ taskData.data.bus_days || '-' }}
+                                </p>
+                            </v-col>
+                        </v-row>
+                        <v-row class="justify-start">
+                            <v-col cols="12">
+                                <span class="text-caption">
+                                    Comments:
+                                    <br />
+                                </span>
+                                <p class="text-box">
+                                    {{ taskData.data.comments }}
+                                </p>
+                            </v-col>
+                        </v-row>
+                    </v-card>
+                    <v-card theme="light" class="pa-8 my-5" elevation="2">
+                        <v-row class="justify-start align-center">
+                            <v-col cols="4">
+                                <span class="text-caption">
+                                    Point of Contact:
+                                    <br />
+                                </span>
+                                <p class="text-box">
+                                    {{ formatPOC(taskData.data.poc) }}
+                                </p>
+                            </v-col>
+                            <v-col cols="4">
+                                <span class="text-caption">
+                                    Title:
+                                    <br />
+                                </span>
+                                <p class="text-box">
+                                    {{ taskData.data.poc ? taskData.data.poc.title.title : '-' }}
+                                </p>
+                            </v-col>
+                            <v-col cols="4" class="text-right" v-if="taskData.data.poc && taskData.data.poc.email" >
+                                <a class="plain-link" :href="`mailto:${taskData.data.poc.email}`">
+                                    <v-btn icon size="small">
+                                        <v-icon size="small" >
+                                            mdi-email-edit
+                                        </v-icon>
+                                        <v-tooltip
+                                            activator="parent"
+                                            location="bottom"
+                                        >Open Email</v-tooltip>
+                                    </v-btn>
+                                </a>
+                                <v-btn icon size="small" class="ml-3" v-clipboard:copy="taskData.data.poc.email">
+                                    <v-icon size="small" >
+                                        mdi-content-copy
+                                    </v-icon>
+                                    <v-tooltip
+                                        activator="parent"
+                                        location="bottom"
+                                    >Copy Email</v-tooltip>
+                                </v-btn>
+                            </v-col>
+                        </v-row>
+                    </v-card>
+                </v-col>
+            </v-row>
+            <v-btn
+                color="primary"
+                icon="mdi-pencil"
+                size="large"
+                class="contract-fab"
+                @click.prevent="edit = true"
+            ></v-btn>
+        </template>
+        <template v-else>
+            <v-row class="justify-center">
+                <v-col cols="11">
+                    <v-card theme="light" class="px-8 py-5 my-5" elevation="2">
+                        <v-row class="justify-space-between">
+                            <v-col cols="8">
+                                <h5 class="text-h5">{{ taskData.title }}</h5>
+                                <p class="text-subtitle-1">
+                                    {{
+                                        taskData.sub_title
+                                            ? taskData.sub_title
+                                            : '-'
+                                    }}
+                                </p>
+                            </v-col>
+                            <v-col cols="4" class="text-right">
+                                <span class="text-caption"
+                                    >Task ID: #{{ taskData.id }}</span
+                                >
+                                <div class="d-flex align-center">
+                                    <StatusIcon
+                                        :status="taskData.status"
+                                    ></StatusIcon>
+                                    <v-select
+                                        :items="statusTypes"
+                                        color="primary"
+                                        label="Task Status"
+                                        v-model="taskData.status"
+                                        hide-details
+                                        class="pl-3"
+                                    ></v-select>
+                                </div>
+                            </v-col>
+                        </v-row>
+                    </v-card>
+                    <v-card theme="light" class="pa-8 my-5" elevation="2">
+                        <v-row class="justify-start">
+                            <v-col cols="3">
+                                <v-select
+                                    color="primary"
+                                    label="Gate"
+                                    v-model="taskData.data.gate"
+                                    :disabled="true"
+                                    hide-details
+                                ></v-select>
+                            </v-col>
+                            <v-col cols="3">
+                                <v-select
+                                    color="primary"
+                                    label="Sub Gate"
+                                    v-model="taskData.data.subgate"
+                                    :disabled="true"
+                                    hide-details
+                                ></v-select>
+                            </v-col>
+                        </v-row>
+                        <v-row class="justify-start">
+                            <v-col cols="3">
+                                <v-text-field
+                                    color="primary"
+                                    label="Palt Planned"
+                                    v-model="taskData.data.palt_plan"
+                                    :disabled="true"
+                                    hide-details
+                                ></v-text-field>
+                            </v-col>
+                            <v-col cols="3">
+                                <v-text-field
+                                    color="primary"
+                                    label="Palt Actual"
+                                    v-model="taskData.data.palt_actual"
+                                    :disabled="true"
+                                    hide-details
+                                ></v-text-field>
+                            </v-col>
+                            <v-col cols="3">
+                                <v-text-field
+                                    color="primary"
+                                    label="Business Days"
+                                    v-model="taskData.data.bus_days"
+                                ></v-text-field>
+                            </v-col>
+                        </v-row>
+                        <v-row class="justify-start">
+                            <v-col cols="12">
+                                <v-textarea
+                                    color="primary"
+                                    label="Comments"
+                                    auto-grow
+                                    outlined
+                                    rows="3"
+                                    row-height="25"
+                                    shaped
+                                    v-model="taskData.data.comments"
+                                    hide-details
+                                ></v-textarea>
+                            </v-col>
+                        </v-row>
+                    </v-card>
+                    <v-card theme="light" class="pa-8 my-5" elevation="2">
+                        <v-row class="justify-start">
+                            <v-col cols="12">
+                                <v-select
+                                    :items="fPocs"
+                                    item-value="id"
+                                    item-title="fpoc"
+                                    color="primary"
+                                    label="Point of Contact"
+                                    :return-object="true"
+                                    v-model="taskData.data.poc"
+                                    hide-details
+                                ></v-select>
+                            </v-col>
+                        </v-row>
+                    </v-card>
+                </v-col>
+            </v-row>
+            <v-btn
+                color="success"
+                icon="mdi-check"
+                size="large"
+                class="contract-fab"
+                @click.prevent="save()"
+            ></v-btn>
+            <v-btn
+                color="error"
+                icon="mdi-close"
+                size="small"
+                class="contract-fab-secondary"
+                @click.prevent="cancel()"
+            ></v-btn>
+        </template>
     </v-main>
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from 'vue'
-import type { Task } from '@/types/ContractData.type'
+import { defineComponent, PropType, ref, watch } from 'vue'
+import type { Task, Contract, PointOfContact } from '@/types/ContractData.type'
+
 import StatusIcon from '@/components/StatusIcon.vue'
 
 export default defineComponent({
@@ -37,14 +294,90 @@ export default defineComponent({
     props: {
         task: {
             type: Object as PropType<Task>,
-            required: true
-        }
+            required: true,
+        },
+        contract: {
+            type: Object as PropType<Contract>,
+            required: true,
+        },
     },
 
-    setup() {
-        return {}
+    setup(props) {
+        const edit = ref(false)
+
+        const taskData = ref({...props.task})
+
+        const statusTypes = ['IC', 'IP', 'CP']
+
+        watch(() => props.task, (nTask: Task) => {
+            if (edit.value) {
+                alert('Navigating away from this page will lose any unsaved changes.')
+                edit.value = false
+            }
+            taskData.value = nTask
+        })
+
+        function formatPOC(poc: PointOfContact | undefined) {
+            if (poc !== undefined) {
+                return `${poc.prefix}. ${poc.first_name} ${poc.last_name}`
+            }
+            else return '-'
+        }
+        const fPocs = props.contract.pocs.map((poc: PointOfContact) => {
+            return {
+                ...poc,
+                fpoc: formatPOC(poc),
+            }
+        })
+
+        function save() {
+            // SAVE LOGIC HERE
+            edit.value = false
+        }
+
+        function cancel() {
+            location.reload()
+        }
+
+        return {
+            edit,
+            taskData,
+            statusTypes,
+            formatPOC,
+            fPocs,
+            save,
+            cancel,
+        }
     },
 })
 </script>
 
-<style scoped></style>
+<style lang="scss" scoped>
+.contract-content-wrapper {
+    background-color: #75726b;
+    height: calc(100vh - 60px);
+    overflow-y: scroll;
+
+    & .text-caption {
+        font-weight: 500;
+        color: #1d9fca;
+    }
+
+    & .contract-fab {
+        position: fixed;
+        bottom: 2rem;
+        right: 2rem;
+    }
+
+    & .contract-fab-secondary {
+        position: fixed;
+        bottom: 2rem;
+        right: 6rem;
+    }
+
+    & a.plain-link {
+        text-decoration: none;
+        color: inherit;
+    }
+}
+</style>
