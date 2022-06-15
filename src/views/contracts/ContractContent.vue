@@ -34,7 +34,7 @@
                                     <br />
                                 </span>
                                 <p class="text-box">
-                                    {{ taskData.data.gate || '-' }}
+                                    {{ taskData.gate || '-' }}
                                 </p>
                             </v-col>
                             <v-col cols="3">
@@ -43,7 +43,7 @@
                                     <br />
                                 </span>
                                 <p class="text-box">
-                                    {{ taskData.data.subgate || '-' }}
+                                    {{ taskData.subgate || '-' }}
                                 </p>
                             </v-col>
                         </v-row>
@@ -54,7 +54,7 @@
                                     <br />
                                 </span>
                                 <p class="text-box">
-                                    {{ taskData.data.palt_plan || '-' }}
+                                    {{ taskData.palt_plan || '-' }}
                                 </p>
                             </v-col>
                             <v-col cols="3">
@@ -73,7 +73,7 @@
                                     <br />
                                 </span>
                                 <p class="text-box">
-                                    {{ taskData.data.bus_days || '-' }}
+                                    {{ taskData.bus_days || '-' }}
                                 </p>
                             </v-col>
                         </v-row>
@@ -84,7 +84,7 @@
                                     <br />
                                 </span>
                                 <p class="text-box">
-                                    {{ taskData.data.comments }}
+                                    {{ taskData.comments }}
                                 </p>
                             </v-col>
                         </v-row>
@@ -97,7 +97,7 @@
                                     <br />
                                 </span>
                                 <p class="text-box">
-                                    {{ formatPOC(taskData.data.poc) }}
+                                    {{ formatPOC(taskData.poc) }}
                                 </p>
                             </v-col>
                             <v-col cols="4">
@@ -106,11 +106,11 @@
                                     <br />
                                 </span>
                                 <p class="text-box">
-                                    {{ taskData.data.poc ? taskData.data.poc.title.title : '-' }}
+                                    {{ taskData.poc ? taskData.poc.title.title : '-' }}
                                 </p>
                             </v-col>
-                            <v-col cols="4" class="text-right" v-if="taskData.data.poc && taskData.data.poc.email" >
-                                <a class="plain-link" :href="`mailto:${taskData.data.poc.email}`">
+                            <v-col cols="4" class="text-right" v-if="taskData.poc && taskData.poc.email" >
+                                <a class="plain-link" :href="`mailto:${taskData.poc.email}`">
                                     <v-btn icon size="small">
                                         <v-icon size="small" >
                                             mdi-email-edit
@@ -121,7 +121,7 @@
                                         >Open Email</v-tooltip>
                                     </v-btn>
                                 </a>
-                                <v-btn icon size="small" class="ml-3" v-clipboard:copy="taskData.data.poc.email">
+                                <v-btn icon size="small" class="ml-3" v-clipboard:copy="taskData.poc.email">
                                     <v-icon size="small" >
                                         mdi-content-copy
                                     </v-icon>
@@ -184,7 +184,7 @@
                                 <v-select
                                     color="primary"
                                     label="Gate"
-                                    v-model="taskData.data.gate"
+                                    v-model="taskData.gate"
                                     :disabled="true"
                                     hide-details
                                 ></v-select>
@@ -193,7 +193,7 @@
                                 <v-select
                                     color="primary"
                                     label="Sub Gate"
-                                    v-model="taskData.data.subgate"
+                                    v-model="taskData.subgate"
                                     :disabled="true"
                                     hide-details
                                 ></v-select>
@@ -204,7 +204,7 @@
                                 <v-text-field
                                     color="primary"
                                     label="Palt Planned"
-                                    v-model="taskData.data.palt_plan"
+                                    v-model="taskData.palt_plan"
                                     :disabled="true"
                                     hide-details
                                 ></v-text-field>
@@ -213,7 +213,7 @@
                                 <v-text-field
                                     color="primary"
                                     label="Palt Actual"
-                                    v-model="taskData.data.palt_actual"
+                                    v-model="taskData.palt_actual"
                                     :disabled="true"
                                     hide-details
                                 ></v-text-field>
@@ -222,7 +222,7 @@
                                 <v-text-field
                                     color="primary"
                                     label="Business Days"
-                                    v-model="taskData.data.bus_days"
+                                    v-model="taskData.bus_days"
                                 ></v-text-field>
                             </v-col>
                         </v-row>
@@ -236,7 +236,7 @@
                                     rows="3"
                                     row-height="25"
                                     shaped
-                                    v-model="taskData.data.comments"
+                                    v-model="taskData.comments"
                                     hide-details
                                 ></v-textarea>
                             </v-col>
@@ -252,7 +252,7 @@
                                     color="primary"
                                     label="Point of Contact"
                                     :return-object="true"
-                                    v-model="taskData.data.poc"
+                                    v-model="taskData.poc"
                                     hide-details
                                 ></v-select>
                             </v-col>
@@ -305,6 +305,8 @@ export default defineComponent({
     setup(props) {
         const edit = ref(false)
 
+        console.log(props.task.start_date?.toJSON())
+
         const taskData = ref({...props.task})
 
         const statusTypes = ['IC', 'IP', 'CP']
@@ -317,8 +319,8 @@ export default defineComponent({
             taskData.value = nTask
         })
 
-        function formatPOC(poc: PointOfContact | undefined) {
-            if (poc !== undefined) {
+        function formatPOC(poc: PointOfContact | null) {
+            if (poc !== null) {
                 return `${poc.prefix}. ${poc.first_name} ${poc.last_name}`
             }
             else return '-'

@@ -25,37 +25,21 @@ export interface Task {
     id: Number
     title: String
     sub_title: String | null
-    slug: String                    // Auto generated from title if not given
+    slug: String
     status: Status
-    task_id: Number | null          // Null if it is the task, Number if it is a subtask
-    contract_id: Number             // Foreign key to connect object together
-    order_id: Number                // Order of object in list of objects (rows) that make up the contract
-    data: TaskTitleData | TaskData  // Data about the object itself. If task is the title task, it will have one of two data object types
-}
-
-export interface TaskTitleData {
-    id: Number
+    task_id: Number | null                  // Null if it is the task, Number if it is a subtask
     contract_id: Number
+    order_id: Number
     gate: Number
     subgate: Number | null
+    palt_plan: Number | null
+    bus_days: Number | null
+    start_date: Date | null
+    end_date: Date | null
     ssp_date: Date | null
+    poc: PointOfContact | Number | null
     comments: String | null
-    tasks: Task[]
-}
-
-export interface TaskData {
-    id: Number
-    contract_id: Number
-    task_id: Number
-    gate: Number
-    subgate: Number | null
-    palt_plan: Number
-    bus_days: Number
-    poc: PointOfContact | Number
-    start_date: Date
-    end_date: Date
-    ssp_date: Date
-    comments: String | null
+    tasks: Task[] | null                    // If subtasks exist, this lists them out, otherwise null
 }
 
 export interface Contract {

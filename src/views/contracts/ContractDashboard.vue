@@ -26,7 +26,7 @@
                         ></StatusIcon>
                         <h5 class="contract-nav-title">{{ task.title }}</h5>
                         <v-icon
-                            v-if="task.data.comments"
+                            v-if="task.comments"
                             size="x-small"
                             class="pl-3"
                         >
@@ -40,7 +40,7 @@
                                     ? 'expanded'
                                     : ''
                             "
-                            v-if="task.data.tasks"
+                            v-if="task.tasks"
                             size="x-small"
                             @click.stop="toggleSubtasks(task.id)"
                         >
@@ -57,7 +57,7 @@
                             "
                         >
                             <div
-                                v-for="subtask in task.data.tasks"
+                                v-for="subtask in task.tasks"
                                 :key="subtask.id"
                                 class="contract-nav-item subtask"
                                 :class="
@@ -76,7 +76,7 @@
                                     subtask.title
                                 }}</span>
                                 <v-icon
-                                    v-if="subtask.data.comments"
+                                    v-if="subtask.comments"
                                     size="x-small"
                                     class="pl-3"
                                 >
@@ -110,7 +110,7 @@ import ContractOverview from './ContractOverview.vue'
 import type { Task } from '@/types/ContractData.type'
 import { StatusType } from '@/types/ContractData.type'
 
-import basicContract from './templates/BaseContract'
+import basicContract from './cTemplates/BaseContract'
 
 export default defineComponent({
     name: 'ContractDashboard',
@@ -196,8 +196,8 @@ export default defineComponent({
             contract.forEach((task) => {
                 if (task.slug === slug) tsk = task
                 else {
-                    if ('tasks' in task.data) {
-                        const subTask = task.data.tasks.find((subtask) => {
+                    if (task.tasks) {
+                        const subTask = task.tasks.find((subtask) => {
                             if (subtask.slug === slug) return task
                         })
 
