@@ -21,24 +21,14 @@ const routes = [
         path: '/pocs/:nav_item?',
         name: 'pocs',
         component: POCDashboard,
+        beforeEnter: [verifyAuthorization],
     },
     {
         path: '/contracts/:contract_id/:task?',
         name: 'contract',
         component: ContractDashboard,
+        beforeEnter: [verifyAuthorization],
     },
-    // {
-    //     path: '/admin',
-    //     component: AdminNav,
-    //     name: 'admin-view',
-    //     redirect: '/admin/dashboard/home',
-    // },
-    // {
-    //     path: '/admin/:navItem/:navSubItem',
-    //     name: 'admin',
-    //     component: AdminNav,
-    //     beforeEnter: [verifyAuthorization],
-    // },
     {
         path: '/:pathMatch(.*)*',
         name: 'PageNotFound',

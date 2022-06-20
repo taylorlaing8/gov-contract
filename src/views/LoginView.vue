@@ -1,36 +1,41 @@
 <template>
-    <div>
-        <v-card class="elevation-12">
-            <v-toolbar dark color="primary">
-                <v-toolbar-title>Login</v-toolbar-title>
-            </v-toolbar>
-            <v-card-text>
-                <v-form>
-                    <v-text-field
-                        prepend-icon="person"
-                        name="login"
-                        label="Login"
-                        type="text"
-                        v-model="userData.username"
-                    ></v-text-field>
-                    <v-text-field
-                        id="password"
-                        prepend-icon="lock"
-                        name="password"
-                        label="Password"
-                        type="password"
-                        v-model="userData.password"
-                    ></v-text-field>
-                </v-form>
-            </v-card-text>
-            <v-card-actions>
-                <v-spacer></v-spacer>
-                <v-btn color="primary" :loading="true" @click.prevent="login()"
-                    >Login</v-btn
-                >
-            </v-card-actions>
-            <span v-if="error" style="color: red">ERROR LOGGING IN</span>
-        </v-card>
+    <div class="contract-content-wrapper">
+        <v-row :no-gutters="true" justify="center">
+            <v-col cols="6">
+                <v-card theme="light" class="pa-8 my-5" elevation="2" width="auto">
+                    <v-row class="justify-start">
+                        <v-col cols="12">
+                            <h5 class="text-h5">Login</h5>
+                        </v-col>
+                    </v-row>
+                    <v-row class="justify-start py-10">
+                        <v-col cols="12">
+                            <v-text-field
+                                prepend-icon="mdi-account"
+                                color="primary"
+                                label="Username"
+                                variant="outlined"
+                                v-model="userData.username"
+                            ></v-text-field>
+                            <v-text-field
+                                prepend-icon="mdi-lock"
+                                color="primary"
+                                label="Password"
+                                variant="outlined"
+                                type="password"
+                                v-model="userData.password"
+                            ></v-text-field>
+                        </v-col>
+                    </v-row>
+                     <v-row class="text-right">
+                        <v-col cols="12">
+                            <span v-if="error" style="color: red">ERROR LOGGING IN</span>
+                            <v-btn color="primary" :loading="true" @click.prevent="login()">Login</v-btn>
+                        </v-col>
+                     </v-row>
+                </v-card>
+            </v-col>
+        </v-row>
     </div>
 </template>
 
