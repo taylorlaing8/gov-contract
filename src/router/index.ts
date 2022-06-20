@@ -3,7 +3,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '@/views/HomeView.vue'
 import LoginView from '@/views/LoginView.vue'
 import ContractDashboard from '@/views/contracts/ContractDashboard.vue'
-// import AdminNav from '@/views/admin/navigation/AdminNav.vue'
+import POCDashboard from '@/views/pocs/POCDashboard.vue'
 import PageNotFound from '@/views/PageNotFound.vue'
 
 const routes = [
@@ -16,6 +16,11 @@ const routes = [
         path: '/login',
         name: 'login',
         component: LoginView,
+    },
+    {
+        path: '/pocs/:nav_item?',
+        name: 'pocs',
+        component: POCDashboard,
     },
     {
         path: '/contracts/:contract_id/:task?',

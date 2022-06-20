@@ -40,7 +40,7 @@ export default defineComponent({
             title: 'Laing Development',
             links: [
                 {
-                    title: 'Dashboard',
+                    title: 'Home',
                     url: '/',
                 },
                 {
@@ -48,7 +48,11 @@ export default defineComponent({
                     url: '/',
                 },
                 {
-                    title: 'Positions',
+                    title: 'POCs',
+                    url: '/pocs',
+                },
+                {
+                    title: 'Templates',
                     url: '/',
                 },
                 {

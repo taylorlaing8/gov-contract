@@ -25,7 +25,7 @@
             color="primary"
             icon="mdi-pencil"
             size="default"
-            class="contract-fab"
+            class="fab-primary"
         ></v-btn>
     </v-main>
 </template>
@@ -60,11 +60,5 @@ export default defineComponent({
     background-color: #75726b;
     height: calc(100vh - 60px);
     overflow-y: scroll;
-    
-    & .contract-fab {
-        position: fixed;
-        bottom: 2rem;
-        right: 2rem;
-    }
 }
 </style>

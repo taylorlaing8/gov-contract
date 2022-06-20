@@ -1,7 +1,7 @@
 <template>
     <v-main class="contract-content-wrapper">
         <template v-if="!edit">
-            <v-row class="justify-center">
+            <v-row class="justify-center" :no-gutters="true">
                 <v-col cols="11">
                     <v-card theme="light" class="px-8 py-5 my-5" elevation="2">
                         <v-row class="justify-space-between">
@@ -138,13 +138,13 @@
             <v-btn
                 color="primary"
                 icon="mdi-pencil"
-                size="large"
-                class="contract-fab"
+                size="default"
+                class="fab-primary"
                 @click.prevent="edit = true"
             ></v-btn>
         </template>
         <template v-else>
-            <v-row class="justify-center">
+            <v-row class="justify-center" :no-gutters="true">
                 <v-col cols="11">
                     <v-card theme="light" class="px-8 py-5 my-5" elevation="2">
                         <v-row class="justify-space-between">
@@ -263,15 +263,15 @@
             <v-btn
                 color="success"
                 icon="mdi-check"
-                size="large"
-                class="contract-fab"
+                size="default"
+                class="fab-primary"
                 @click.prevent="save()"
             ></v-btn>
             <v-btn
                 color="error"
                 icon="mdi-close"
                 size="small"
-                class="contract-fab-secondary"
+                class="fab-secondary"
                 @click.prevent="cancel()"
             ></v-btn>
         </template>
@@ -305,7 +305,7 @@ export default defineComponent({
     setup(props) {
         const edit = ref(false)
 
-        console.log(props.task.start_date?.toJSON())
+        console.log(props.task.start_date?.toJSON)
 
         const taskData = ref({...props.task})
 
@@ -355,31 +355,5 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-.contract-content-wrapper {
-    background-color: #75726b;
-    height: calc(100vh - 60px);
-    overflow-y: scroll;
-
-    & .text-caption {
-        font-weight: 500;
-        color: #1d9fca;
-    }
-
-    & .contract-fab {
-        position: fixed;
-        bottom: 2rem;
-        right: 2rem;
-    }
-
-    & .contract-fab-secondary {
-        position: fixed;
-        bottom: 2rem;
-        right: 6rem;
-    }
-
-    & a.plain-link {
-        text-decoration: none;
-        color: inherit;
-    }
-}
+//
 </style>

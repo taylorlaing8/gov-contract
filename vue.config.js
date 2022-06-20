@@ -18,4 +18,15 @@ module.exports = defineConfig({
             // https://github.com/vuetifyjs/vuetify-loader/tree/next/packages/vuetify-loader
         },
     },
+
+    css: {
+        loaderOptions: {
+            scss: {
+                // the change was made here (match the option name with file extension)
+                additionalData: `
+                  @import "@/assets/scss/main.scss";
+                `,
+            },
+        },
+    },
 })

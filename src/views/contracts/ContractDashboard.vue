@@ -129,6 +129,7 @@ export default defineComponent({
             id: 21,
             title: 'Overhead Production Services',
             sub_title: '',
+            slug: 'overhead-production-services',
             abv: 'ops',
             type: 'Source Selection',
             ucid: 'FA822422R0006', // Unique Contract ID

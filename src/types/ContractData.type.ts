@@ -10,6 +10,7 @@ export interface Position {
     id: Number,
     title: String
     department: String
+    created?: Date
 }
 
 export interface PointOfContact {
@@ -18,7 +19,9 @@ export interface PointOfContact {
     last_name: String
     email: String
     prefix: String
-    title: Position | Number
+    title?: Position | null
+    title_id?: Number
+    created?: Date
 }
 
 export interface Task {
@@ -46,6 +49,7 @@ export interface Contract {
     id: Number
     title: String
     sub_title: String
+    slug: String
     abv: String
     type: String
     ucid: String                    // Unique Contract ID
