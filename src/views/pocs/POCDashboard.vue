@@ -514,7 +514,6 @@ export default defineComponent({
             PositionService.create(pos)
                 .then((res) => {
                     positions.value.push(res.data)
-                    console.log('Created!', res.data)
                 })
                 .catch((err) => {
                     console.warn('Error Creating Position', err)
@@ -530,7 +529,6 @@ export default defineComponent({
                 .then((res) => {
                     positions.value[idx] = res.data
                     edit.value.positions.splice(editIndex, 1)
-                    console.log('Updated!', res.data)
                 })
                 .catch((err) => {
                     console.warn('Error Updating Position', err)
@@ -544,7 +542,6 @@ export default defineComponent({
                 .then((res) => {
                     positions.value.splice(idx, 1)
                     edit.value.positions.splice(editIndex, 1)
-                    console.log('Removed!', res.data)
                 })
                 .catch((err) => {
                     console.warn('Error Deleting Position', err)
@@ -572,7 +569,6 @@ export default defineComponent({
             PointOfContactService.create(poc)
                 .then((res) => {
                     pocs.value.push(res.data)
-                    console.log('Created!', res.data)
                 })
                 .catch((err) => {
                     console.warn('Error Creating Point of Contact', err)
@@ -597,7 +593,6 @@ export default defineComponent({
                 .then((res) => {
                     pocs.value[idx] = res.data
                     edit.value.pocs.splice(editIndex, 1)
-                    console.log('Updated!', res.data)
                 })
                 .catch((err) => {
                     console.warn('Error Updating Point of Contact', err)
@@ -610,7 +605,6 @@ export default defineComponent({
                 .then((res) => {
                     pocs.value.splice(idx, 1)
                     edit.value.pocs.splice(editIndex, 1)
-                    console.log('Removed!', res.data)
                 })
                 .catch((err) => {
                     console.warn('Error Deleting Point of Contact', err)
