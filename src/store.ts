@@ -9,8 +9,8 @@ interface tokenResponse {
 
 const store = createStore({
     state: {
-        jwt: localStorage.getItem('t'),
-        jwtr: localStorage.getItem('tr'),
+        jwt: localStorage.getItem('jt'),
+        jwtr: localStorage.getItem('jtr'),
         endpoints: {
             obtainJWT: '/api/auth/token/',
             refreshJWT: '/api/auth/token/refresh/',
@@ -21,14 +21,18 @@ const store = createStore({
             state: any,
             newTokens: { access: string; refresh: string },
         ) {
-            localStorage.setItem('t', newTokens.access)
-            localStorage.setItem('tr', newTokens.refresh)
-            state.jwt = newTokens.access
-            state.jwtr = newTokens.refresh
+            if(newTokens.access) {
+                localStorage.setItem('jt', newTokens.access)
+                state.jwt = newTokens.access
+            }
+            if(newTokens.refresh) {
+                localStorage.setItem('jtr', newTokens.refresh)
+                state.jwtr = newTokens.refresh
+            }
         },
         removeTokens(state: any) {
-            localStorage.removeItem('t')
-            localStorage.removeItem('tr')
+            localStorage.removeItem('jt')
+            localStorage.removeItem('jtr')
             state.jwt = null
             state.jwtr = null
         },
@@ -50,7 +54,7 @@ const store = createStore({
         },
         refreshToken() {
             const payload = {
-                token: store.state.jwtr,
+                refresh: store.state.jwtr,
             }
             return new Promise((res, rej) => {
                 axios
@@ -68,16 +72,17 @@ const store = createStore({
             if (token) {
                 const decoded: any = jwtDecode(token)
                 const exp = decoded.exp
-                const orig_iat = decoded.orig_iat
-                if (
-                    exp - Date.now() / 1000 < 1800 &&
-                    Date.now() / 1000 - orig_iat < 628200
-                ) {
-                    store.dispatch('refreshToken')
-                } else if (exp - Date.now() / 1000 < 1800) {
-                    // DO NOTHING, DO NOT REFRESH
+                const iat = decoded.iat
+                
+                if (exp - Date.now() / 1000 > 60 && Date.now() / 1000 - iat < 561600) {
+                    if (exp - Date.now() / 1000 < 1800) {
+                        store.dispatch('refreshToken')
+                    }
+                    else {
+                        // Do nothing, just continue
+                    }
                 } else {
-                    // PROMPT USER TO RE-LOGIN, THIS ELSE CLAUSE COVERS THE CONDITION WHERE A TOKEN IS EXPIRED AS WELL
+                    // Get user to log back in
                     store.commit('removeTokens')
                 }
             }

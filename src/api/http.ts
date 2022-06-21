@@ -3,14 +3,23 @@ import store from '@/store'
 
 export const http = axios.create({
     baseURL: '/api/v1',
-    headers: {}
+    headers: {},
 })
 
 export const govHttp = axios.create({
     baseURL: '/api/gov/contract',
     headers: {
-        'Accept': 'application/json',
+        Accept: 'application/json',
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${store.state.jwt}`
-    }
+    },
 })
+
+govHttp.interceptors.request.use(
+    (config) => {
+        if(config.headers) config.headers['Authorization'] = `Bearer ${localStorage.getItem('jt')}`
+        return config
+    },
+    (error) => {
+        return Promise.reject(error)
+    },
+)
