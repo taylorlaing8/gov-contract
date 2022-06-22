@@ -50,18 +50,28 @@ export interface Contract {
     title: String
     sub_title: String
     slug: String
-    abv: String
     type: String
     ucid: String                    // Unique Contract ID
     status: Status
+    value: Number
+    ss_leads: PointOfContact[]
+    need_date: Date
+    award_date: Date
+    cycle_code: String
     pop_date: Date                  // When current contract ends
-    gate_one_plan: Number
-    gate_two_plan: Number
-    gate_three_plan: Number
-    gate_four_one_plan: Number
-    gate_four_two_plan: Number
-    gate_four_three_plan: Number
-    gate_four_four_plan: Number
-    gate_four_five_plan: Number
+    g_o_p: Number
+    g_t_p: Number
+    g_tr_p: Number
+    g_fr_o_p: Number
+    g_fr_t_p: Number
+    g_fr_tr_p: Number
+    g_fr_fr_p: Number
+    g_fr_fv_p: Number
     pocs: PointOfContact[]
+    tasks: Task[]
+    created: Date
+    pco: PointOfContact
+    buyer: PointOfContact
+    admin_pco: PointOfContact
+    admin_buyer: PointOfContact
 }

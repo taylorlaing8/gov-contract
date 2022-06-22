@@ -305,8 +305,6 @@ export default defineComponent({
     setup(props) {
         const edit = ref(false)
 
-        console.log(props.task.start_date?.toJSON)
-
         const taskData = ref({...props.task})
 
         const statusTypes = ['IC', 'IP', 'CP']

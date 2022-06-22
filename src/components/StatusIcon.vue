@@ -1,5 +1,5 @@
 <template>
-    <div class="d-flex justify-end">
+    <div class="d-flex" :class="centered ? 'justify-center' : 'justify-end'">
         <h1>{{}}</h1>
         <v-icon :size="size ? size : 'default'" :color="icon.color">{{icon.mdi}}</v-icon>
         <h4 class="pl-2" v-if="showTitle">{{icon.title}}</h4>
@@ -25,6 +25,10 @@ export default defineComponent({
             required: true,
         },
         showTitle: {
+            type: Boolean,
+            required: false,
+        },
+        centered: {
             type: Boolean,
             required: false,
         },

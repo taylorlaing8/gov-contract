@@ -46,7 +46,12 @@
                                         v-for="(poc, idx) in pocs"
                                         :key="poc.id"
                                     >
-                                        <tr v-if="edit.pocs.includes(poc.id)">
+                                        <tr v-if="loading.pocs">
+                                            <td width="100%" class="text-center">
+                                                LOADING...
+                                            </td>
+                                        </tr>
+                                        <tr v-else-if="edit.pocs.includes(poc.id)">
                                             <td width="7%">
                                                 <v-text-field
                                                     color="primary"
@@ -167,7 +172,12 @@
                                         v-for="(position, idx) in positions"
                                         :key="position.id"
                                     >
-                                        <tr v-if="edit.positions.includes(position.id)" >
+                                        <tr v-if="loading.positions">
+                                            <td width="100%" class="text-center">
+                                                LOADING...
+                                            </td>
+                                        </tr>
+                                        <tr v-else-if="edit.positions.includes(position.id)" >
                                             <td>
                                                 <v-text-field
                                                     color="primary"
@@ -449,6 +459,26 @@ export default defineComponent({
         }
         updateActiveNav()
 
+        const edit = ref({
+            pocs: [],
+            positions: [],
+        })
+        function toggleEdit(type: string, value: number) {
+            switch (type) {
+                case 'poc':
+                    edit.value.pocs.splice(edit.value.pocs.findIndex((p) => { return p === value }))
+                    break
+                case 'position':
+                    edit.value.positions.splice(edit.value.positions.findIndex((p) => { return p === value }))
+                    break
+            }
+        }
+
+        const loading = ref({
+            pocs: true,
+            positions: true,
+        })
+
         function openModal(slug: string) {
             switch (slug) {
                 case 'pocs':
@@ -481,21 +511,6 @@ export default defineComponent({
             }
         }
 
-        const edit = ref({
-            pocs: [],
-            positions: [],
-        })
-        function toggleEdit(type: string, value: number) {
-            switch (type) {
-                case 'poc':
-                    edit.value.pocs.splice(edit.value.pocs.findIndex((p) => { return p === value }))
-                    break
-                case 'position':
-                    edit.value.positions.splice(edit.value.positions.findIndex((p) => { return p === value }))
-                    break
-            }
-        }
-
         const positions = ref([] as Position[])
         PositionService.list()
             .then((res) => {
@@ -504,6 +519,9 @@ export default defineComponent({
             .catch((err) => {
                 console.warn('Error Fetching Positions', err)
             })
+            .finally(() => {
+                loading.value.positions = false
+            })
 
         const showNewPosition = ref(false)
         const newPosition = ref({
@@ -511,6 +529,8 @@ export default defineComponent({
             department: '',
         })
         function createPosition(pos: Position) {
+            loading.value.positions = true
+
             PositionService.create(pos)
                 .then((res) => {
                     positions.value.push(res.data)
@@ -519,12 +539,15 @@ export default defineComponent({
                     console.warn('Error Creating Position', err)
                 })
                 .finally(() => {
+                    loading.value.positions = false
                     showNewPosition.value = false
                 })
         }
 
         function savePosition(idx: number, pos: Position) {
+            loading.value.positions = true
             const editIndex = edit.value.pocs.findIndex((p) => p === pos.id)
+
             PositionService.update(pos.id, pos)
                 .then((res) => {
                     positions.value[idx] = res.data
@@ -533,9 +556,13 @@ export default defineComponent({
                 .catch((err) => {
                     console.warn('Error Updating Position', err)
                 })
+                .finally(() => {
+                    loading.value.positions = false
+                })
         }
 
         function deletePosition(idx: number, pos: Position) {
+            loading.value.positions = true
             const editIndex = edit.value.positions.findIndex((p) => p === pos.id)
 
             PositionService.delete(pos.id)
@@ -545,6 +572,9 @@ export default defineComponent({
                 })
                 .catch((err) => {
                     console.warn('Error Deleting Position', err)
+                })
+                .finally(() => {
+                    loading.value.positions = false
                 })
         }
 
@@ -556,6 +586,9 @@ export default defineComponent({
             .catch((err) => {
                 console.warn('Error Fetching Team Members', err)
             })
+            .finally(() => {
+                loading.value.pocs = false
+            })
 
         const showNewPoc = ref(false)
         const newPoc = ref({
@@ -566,6 +599,8 @@ export default defineComponent({
             title_id: null,
         })
         function createPoc(poc: PointOfContact) {
+            loading.value.pocs = false
+
             PointOfContactService.create(poc)
                 .then((res) => {
                     pocs.value.push(res.data)
@@ -574,11 +609,13 @@ export default defineComponent({
                     console.warn('Error Creating Point of Contact', err)
                 })
                 .finally(() => {
+                    loading.value.pocs = true
                     showNewPoc.value = false
                 })
         }
 
         function savePoc(idx: number, poc: PointOfContact) {
+            loading.value.pocs = true
             const formatPoc = {
                 id: poc.id,
                 first_name: poc.first_name,
@@ -597,8 +634,12 @@ export default defineComponent({
                 .catch((err) => {
                     console.warn('Error Updating Point of Contact', err)
                 })
+                .finally(() => {
+                    loading.value.pocs = false
+                })
         }
         function deletePoc(idx: number, poc: PointOfContact) {
+            loading.value.pocs = true
             const editIndex = edit.value.pocs.findIndex((p) => p === poc.id)
 
             PointOfContactService.delete(poc.id)
@@ -609,11 +650,14 @@ export default defineComponent({
                 .catch((err) => {
                     console.warn('Error Deleting Point of Contact', err)
                 })
+                .finally(() => {
+                    loading.value.pocs = false
+                })
         }
 
         return {
             nav, activeNav, updateActiveNav,
-            openModal, closeModal, edit, toggleEdit,
+            loading, edit, toggleEdit, openModal, closeModal,
             positions, showNewPosition, newPosition, createPosition, savePosition, deletePosition,
             pocs, showNewPoc, newPoc, createPoc, savePoc, deletePoc,
         }

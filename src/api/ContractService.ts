@@ -36,3 +36,21 @@ export class PointOfContactService {
         return govHttp.delete(`/pocs/${id}/delete/`)
     }
 }
+
+export class ContractService {
+    static get(id: Number|String) {
+        return govHttp.get(`/contracts/${id}/`)
+    }
+    static list() {
+        return govHttp.get('/contracts/')
+    }
+    static create(data: PointOfContact) {
+        return govHttp.post('/contracts/create/', data)
+    }
+    static update(id: Number, data: PointOfContact) {
+        return govHttp.put(`/contracts/${id}/update/`, data)
+    }
+    static delete(id: Number) {
+        return govHttp.delete(`/contracts/${id}/delete/`)
+    }
+}

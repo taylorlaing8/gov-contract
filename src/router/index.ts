@@ -2,7 +2,9 @@ import store from '@/store'
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '@/views/HomeView.vue'
 import LoginView from '@/views/LoginView.vue'
-import ContractDashboard from '@/views/contracts/ContractDashboard.vue'
+import ContractWrapper from '@/views/contracts/ContractWrapper.vue'
+import ContractList from '@/views/contracts/ContractList.vue'
+import ContractNavigation from '@/views/contracts/ContractNavigation.vue'
 import POCDashboard from '@/views/pocs/POCDashboard.vue'
 import PageNotFound from '@/views/PageNotFound.vue'
 import ErrorView from '@/views/ErrorView.vue'
@@ -25,9 +27,26 @@ const routes = [
         beforeEnter: [verifyAuthorization],
     },
     {
-        path: '/contracts/:contract_id/:task?',
-        name: 'contract',
-        component: ContractDashboard,
+        path: '/contracts',
+        name: 'contracts',
+        component: ContractWrapper,
+        children: [
+            {
+                path: '',
+                component: ContractList,
+                name: 'contract-list'
+            },
+            {
+              path: ':contract_id/:task?',
+              component: ContractNavigation,
+              name: 'contract-view',
+              props(route) {
+                return {
+                    contract_id: parseInt(route.params.contract_id)
+                }
+              }
+            },
+        ],
         beforeEnter: [verifyAuthorization],
     },
     {

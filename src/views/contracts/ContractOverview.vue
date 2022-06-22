@@ -5,7 +5,7 @@
                 <v-card theme="light" class="px-8 py-5 my-5" elevation="2">
                     <v-row class="justify-space-between">
                         <v-col cols="8">
-                            <h5 class="text-h5">{{ `${contract.title} (${contract.abv.toUpperCase()})` }}</h5>
+                            <h5 class="text-h5">{{contract.title}}</h5>
                             <p class="text-subtitle-1">{{ contract.type }}</p>
                         </v-col>
                         <v-col cols="4" class="text-right">
@@ -34,6 +34,7 @@
 import { defineComponent, PropType } from 'vue'
 // import type { Contract } from '@/types/ContractData.type'
 import StatusIcon from '@/components/StatusIcon.vue'
+import type { Contract } from '@/types/ContractData.type'
 
 export default defineComponent({
     name: 'ContractContent',
@@ -44,12 +45,12 @@ export default defineComponent({
 
     props: {
         contract: {
-            type: Object as PropType<Object>,
+            type: Object as PropType<Contract>,
             required: true,
         },
     },
 
-    setup() {
+    setup(props) {
         return {}
     },
 })

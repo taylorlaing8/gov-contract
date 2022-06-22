@@ -44,8 +44,8 @@ export default defineComponent({
                     url: '/',
                 },
                 {
-                    title: 'Contacts',
-                    url: '/',
+                    title: 'Contracts',
+                    url: '/contracts',
                 },
                 {
                     title: 'POCs',
