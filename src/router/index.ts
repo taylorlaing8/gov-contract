@@ -37,14 +37,14 @@ const routes = [
                 name: 'contract-list'
             },
             {
-              path: ':contract_id/:task?',
+              path: ':contract_id/:task?', // FIX THIS!!!! FOR SOME REASON REFRESHING ON A SUBTASK PAGE ROUTES YOU TO THE contract_id PAGE ONLY
               component: ContractNavigation,
               name: 'contract-view',
               props(route) {
                 return {
                     contract_id: parseInt(route.params.contract_id)
                 }
-              }
+              },
             },
         ],
         beforeEnter: [verifyAuthorization],

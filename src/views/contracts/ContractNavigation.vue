@@ -17,7 +17,7 @@
                                     ? 'active'
                                     : ''
                             "
-                            @click="updateActiveTask(task.slug)"
+                            @click="updateActiveTask(task.id)"
                         >
                             <StatusIcon
                                 size="x-small"
@@ -65,7 +65,7 @@
                                             ? 'active'
                                             : ''
                                     "
-                                    @click="updateActiveTask(subtask.slug)"
+                                    @click="updateActiveTask(subtask.id)"
                                 >
                                     <StatusIcon
                                         size="x-small"
@@ -198,7 +198,9 @@ export default defineComponent({
             })
 
         const formatTaskParam = (task: Task) => `${task.id}-${task.slug}`
-        const unformatTaskParam = (slug: string) => slug.slice(slug.indexOf('-') + 1)
+        function unformatTaskParam(routeSlug: string): number {
+            return parseInt(routeSlug.slice(0, routeSlug.indexOf('-')))
+        }
         watch(
             () => route.params.task,
             (nTask) => {
@@ -206,21 +208,21 @@ export default defineComponent({
                     const nTaskFormat = unformatTaskParam(nTask.toString())
                     if (
                         activeTask.value !== null &&
-                        activeTask.value.slug !== nTaskFormat
+                        activeTask.value.id !== nTaskFormat
                     )
                         updateActiveTask(nTaskFormat)
                 }
             },
         )
 
-        function findTask(slug: string): Task | null {
+        function findTask(taskId?: number): Task | null {
             let tsk: Task | null = null
             contract.value.tasks?.forEach((task) => {
-                if (task.slug === slug) tsk = task
+                if (task.id === taskId) tsk = task
                 else {
                     if (task.tasks) {
                         const subTask = task.tasks.find((subtask) => {
-                            if (subtask.slug === slug) return task
+                            if (subtask.id === taskId) return task
                         })
 
                         if (subTask) tsk = subTask
@@ -232,10 +234,10 @@ export default defineComponent({
 
         const activeTask = ref({} as Task | null)
 
-        function updateActiveTask(slug?: string) {
+        function updateActiveTask(taskId?: number) {
             let currTask: Task | null = null
 
-            if (slug) currTask = findTask(slug)
+            if (taskId) currTask = findTask(taskId)
             else
                 currTask = findTask(
                     unformatTaskParam(route.params.task.toString()),
