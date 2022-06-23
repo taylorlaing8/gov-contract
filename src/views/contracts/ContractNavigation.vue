@@ -5,7 +5,7 @@
             <div class="contract-nav-wrapper">
                 <div class="contract-title">
                     <router-link :to="`${$route.params.contract_id}`">
-                        <h4>Contract ID: #{{ $route.params.contract_id }}</h4>
+                        <h4>Contract ID: {{ contract.ucid }}</h4>
                     </router-link>
                 </div>
                 <template v-if="contract.tasks.length > 0">
