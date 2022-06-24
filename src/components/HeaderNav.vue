@@ -1,10 +1,10 @@
 <template>
-    <v-app-bar app height="60" theme="dark" elevation="3">
+    <v-app-bar app height="70" color="primary" elevation="3">
         <v-row align="center" class="px-5">
             <router-link to="/">
                 <img
-                    :src="require('../../public/logo_light.png')"
-                    height="30"
+                    :src="require('../../public/logo_dark.png')"
+                    height="40"
                 />
             </router-link>
 
@@ -15,6 +15,7 @@
                     v-for="link in headerNav.links"
                     :key="link.title"
                     :to="link.url"
+                    color="grey-text"
                     variant="text"
                     size="small"
                     rounded
@@ -54,10 +55,6 @@ export default defineComponent({
                 {
                     title: 'Templates',
                     url: '/',
-                },
-                {
-                    title: 'TEMP CONTRACT',
-                    url: '/contracts/21',
                 },
             ],
         })

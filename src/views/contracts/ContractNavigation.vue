@@ -302,7 +302,7 @@ export default defineComponent({
         padding: 1rem 0.75rem;
         margin-bottom: 0.75rem;
         // background: linear-gradient(35deg, #1d9fca 30%, #ffffff 100%);
-        background-color: #1d9fca;
+        background-color: rgb(var(--v-theme-grey));
         box-shadow: 0px 3px 1px -2px rgb(0 0 0 / 20%),
             0px 2px 2px 0px rgb(0 0 0 / 14%), 0px 1px 5px 0px rgb(0 0 0 / 12%);
         color: white;
@@ -344,11 +344,24 @@ export default defineComponent({
 
         &.subtask {
             padding-left: 2rem;
+
+            & .contract-nav-title {
+                padding-left: 8px;
+                font-size: 10pt;
+                font-weight: 400;
+            }
+
+            &.active {
+                background-color: rgb(var(--v-theme-light-grey));
+                font-weight: 500;
+                color: rgb(var(--v-theme-secondary))
+            }
         }
 
         &.active {
-            background-color: #1d9fca15;
-            color: #1d9fca;
+            background-color: rgb(var(--v-theme-light-grey));
+            font-weight: 500;
+            color: rgb(var(--v-theme-secondary))
         }
 
         & .contract-nav-title {
@@ -359,7 +372,7 @@ export default defineComponent({
 
         &:hover {
             cursor: pointer;
-            background-color: #efefef;
+            background-color: rgb(var(--v-theme-grey), 0.5);
         }
     }
 }
