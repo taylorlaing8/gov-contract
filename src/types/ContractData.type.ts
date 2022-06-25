@@ -6,14 +6,14 @@ export enum StatusType {
     COMPLETE = 'CP',
 }
 
-export type Position = {
+export interface Position {
     id: Number,
     title: String
     department: String
     created?: Date
 }
 
-export type PointOfContact = {
+export interface PointOfContact {
     id: Number,
     first_name: String
     last_name: String
@@ -24,7 +24,7 @@ export type PointOfContact = {
     created?: Date
 }
 
-export type Task = {
+export interface Task {
     id: Number
     title: String
     sub_title: String | null
@@ -40,12 +40,12 @@ export type Task = {
     start_date: Date | null
     end_date: Date | null
     ssp_date: Date | null
-    poc: PointOfContact | Number | null
+    poc: PointOfContact | null
     comments: String | null
     tasks: Task[] | null                    // If subtasks exist, this lists them out, otherwise null
 }
 
-export type Contract = {
+export interface Contract {
     id: Number
     title: String
     sub_title: String

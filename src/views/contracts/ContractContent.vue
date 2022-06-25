@@ -281,6 +281,7 @@
 <script lang="ts">
 import { defineComponent, PropType, ref, watch } from 'vue'
 import type { Task, Contract, PointOfContact } from '@/types/ContractData.type'
+import { TaskService } from '@/api/ContractService'
 
 import StatusIcon from '@/components/StatusIcon.vue'
 
@@ -302,10 +303,12 @@ export default defineComponent({
         },
     },
 
+    // emits: ['update-active-task'],
+
     setup(props) {
         const edit = ref(false)
 
-        const taskData = ref({...props.task})
+        const taskData = ref({...props.task} as Task)
 
         const statusTypes = ['IC', 'IP', 'CP']
 
@@ -331,12 +334,31 @@ export default defineComponent({
         })
 
         function save() {
-            // SAVE LOGIC HERE
-            edit.value = false
+            const data = {
+                ...taskData.value,
+                comments: taskData.value.comments && taskData.value.comments === "" ? taskData.value.comments : null,
+                poc: taskData.value.poc ? taskData.value.poc.id : null
+            }
+            TaskService.update(data.id, data)
+                .then((res) => {
+                    edit.value = false
+                    taskData.value = res.data
+                    // emit('update-active-task', taskData.value)
+                })
+                .catch((err) => {
+                    console.warn('Error Updating Task', err)
+                })
         }
 
         function cancel() {
-            location.reload()
+            TaskService.get(taskData.value.id)
+                .then((res) => {
+                    edit.value = false
+                    taskData.value = res.data
+                })
+                .catch((err) => {
+                    console.warn('Error Fetching Task', err)
+                })
         }
 
         return {

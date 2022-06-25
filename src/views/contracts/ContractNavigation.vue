@@ -18,7 +18,7 @@
                                     ? 'active'
                                     : ''
                             "
-                            @click="updateActiveTask(task.id)"
+                            @click="setActiveTask(task.id)"
                         >
                             <StatusIcon
                                 size="x-small"
@@ -66,7 +66,7 @@
                                             ? 'active'
                                             : ''
                                     "
-                                    @click="updateActiveTask(subtask.id)"
+                                    @click="setActiveTask(subtask.id)"
                                 >
                                     <StatusIcon
                                         size="x-small"
@@ -150,7 +150,7 @@ export default defineComponent({
                         activeTask.value !== null &&
                         activeTask.value.id !== nTaskFormat
                     )
-                        updateActiveTask(nTaskFormat)
+                        setActiveTask(nTaskFormat)
                 }
             },
         )
@@ -174,7 +174,7 @@ export default defineComponent({
 
         const activeTask = ref({} as Task | null)
 
-        function updateActiveTask(taskId?: number) {
+        function setActiveTask(taskId?: number) {
             let currTask: Task | null = null
 
             if (taskId) currTask = findTask(taskId)
@@ -212,7 +212,7 @@ export default defineComponent({
             })
             .finally(() => {
                 loading.value = false
-                updateActiveTask()
+                setActiveTask()
                 if (activeTask.value !== null && activeTask.value.task_id !== null) {
                     openTasks.value.push(activeTask.value.task_id)
                 }
@@ -231,7 +231,7 @@ export default defineComponent({
             contract,
             formatTaskParam,
             activeTask,
-            updateActiveTask,
+            setActiveTask,
             openTasks,
             toggleSubtasks,
         }

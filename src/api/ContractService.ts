@@ -1,5 +1,5 @@
 import { govHttp } from './http'
-import type { PointOfContact, Position } from '@/types/ContractData.type'
+import type { PointOfContact, Position, Task, Contract } from '@/types/ContractData.type'
 
 export class PositionService {
     static get(id: Number) {
@@ -37,6 +37,28 @@ export class PointOfContactService {
     }
 }
 
+interface UpdateTask extends Omit<Task, 'poc'> {
+    poc: Number | null
+}
+
+export class TaskService {
+    static get(id: Number) {
+        return govHttp.get(`/tasks/${id}/`)
+    }
+    // static list() {
+    //     return govHttp.get('/tasks/')
+    // }
+    // static create(data: PointOfContact) {
+    //     return govHttp.post('/tasks/create/', data)
+    // }
+    static update(id: Number, data: UpdateTask) {
+        return govHttp.put(`/tasks/${id}/update/`, data)
+    }
+    // static delete(id: Number) {
+    //     return govHttp.delete(`/tasks/${id}/delete/`)
+    // }
+}
+
 export class ContractService {
     static get(id: Number|String) {
         return govHttp.get(`/contracts/${id}/`)
@@ -44,10 +66,10 @@ export class ContractService {
     static list() {
         return govHttp.get('/contracts/')
     }
-    static create(data: PointOfContact) {
+    static create(data: Contract) {
         return govHttp.post('/contracts/create/', data)
     }
-    static update(id: Number, data: PointOfContact) {
+    static update(id: Number, data: Contract) {
         return govHttp.put(`/contracts/${id}/update/`, data)
     }
     static delete(id: Number) {
