@@ -2,7 +2,7 @@
     <div class="contract-content-wrapper">
         <v-row :no-gutters="true" justify="center">
             <v-col cols="6">
-                <v-card theme="light" class="pa-8 my-5" elevation="2" width="auto">
+                <v-card class="pa-8 my-5" elevation="2" width="auto">
                     <v-row class="justify-start">
                         <v-col cols="12">
                             <h5 class="text-h5">Login</h5>

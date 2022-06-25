@@ -1,6 +1,7 @@
 <template>
     <v-card class="fill-height">
         <div v-if="loading">LOADING...</div>
+        <div v-else-if="error">{{error}}</div>
         <v-layout class="fill-height" v-else>
             <div class="contract-nav-wrapper">
                 <div class="contract-title">
@@ -132,70 +133,9 @@ export default defineComponent({
     setup(props) {
         const route = useRoute()
         const loading = ref(true)
-
-        // Call API to load contract meta data
-        // const contractMeta: Object = {
-        //     id: 21,
-        //     title: 'Overhead Production Services',
-        //     sub_title: '',
-        //     slug: 'overhead-production-services',
-        //     abv: 'ops',
-        //     type: 'Source Selection',
-        //     ucid: 'FA822422R0006', // Unique Contract ID
-        //     status: 'IP',
-        //     pop_date: '', // When current contract ends
-        //     // CALCULATED FIELD
-        //     // arrears: '',                         // How many deliquent days behind the contract is
-        //     gate_one_plan: '',
-        //     gate_two_plan: '',
-        //     gate_three_plan: '',
-        //     gate_four_one_plan: '',
-        //     gate_four_two_plan: '',
-        //     gate_four_three_plan: '',
-        //     gate_four_four_plan: '',
-        //     gate_four_five_plan: '',
-        //     pocs: [
-        //         {
-        //             id: 12,
-        //             first_name: 'Kailey',
-        //             last_name: 'Norman',
-        //             email: 'kailey.norman@hillbilly.gov',
-        //             prefix: 'Ms',
-        //             title: {
-        //                 id: 123,
-        //                 title: 'SSEB Chairperson / PM',
-        //                 department: 'Department of Somthing Here',
-        //             },
-        //         },
-        //         {
-        //             id: 13,
-        //             first_name: 'Joseph',
-        //             last_name: 'Laing',
-        //             email: 'joseph.laing@hillbilly.gov',
-        //             prefix: 'Mr',
-        //             title: {
-        //                 id: 124,
-        //                 title: 'Contract Specialist',
-        //                 department: 'Department of Somthing Else',
-        //             },
-        //         },
-        //     ],
-        // }
-
-        // Calculate Palt Actual as you loop through tasks that have a start and end date
-        // const contract = basicContract
-
         const contract = ref({} as Contract)
-        ContractService.get(props.contract_id)
-            .then((res) => {
-                contract.value = res.data
-            })
-            .catch((err) => {
-                console.warn('Error Fetching Contract', err)
-            })
-            .finally(() => {
-                loading.value = false
-            })
+        const openTasks: Ref<Number[]> = ref([])
+        const error = ref('')
 
         const formatTaskParam = (task: Task) => `${task.id}-${task.slug}`
         function unformatTaskParam(routeSlug: string): number {
@@ -215,9 +155,9 @@ export default defineComponent({
             },
         )
 
-        function findTask(taskId?: number): Task | null {
+        function findTask(taskId: number): Task | null {
             let tsk: Task | null = null
-            contract.value.tasks?.forEach((task) => {
+            contract.value.tasks.forEach((task) => {
                 if (task.id === taskId) tsk = task
                 else {
                     if (task.tasks) {
@@ -239,9 +179,7 @@ export default defineComponent({
 
             if (taskId) currTask = findTask(taskId)
             else
-                currTask = findTask(
-                    unformatTaskParam(route.params.task.toString()),
-                )
+                currTask = route.params.task ? findTask(unformatTaskParam(route.params.task.toString())) : null
 
             if (currTask === null) {
                 activeTask.value = null
@@ -264,11 +202,21 @@ export default defineComponent({
             }
         }
 
-        updateActiveTask()
-
-        const openTasks: Ref<Number[]> = ref([])
-        if (activeTask.value !== null && activeTask.value.task_id)
-            openTasks.value.push(activeTask.value.task_id)
+        ContractService.get(props.contract_id)
+            .then((res) => {
+                contract.value = res.data
+            })
+            .catch((err) => {
+                console.warn('Error Fetching Contract', err)
+                error.value = 'Contract Not Found'
+            })
+            .finally(() => {
+                loading.value = false
+                updateActiveTask()
+                if (activeTask.value !== null && activeTask.value.task_id !== null) {
+                    openTasks.value.push(activeTask.value.task_id)
+                }
+            })
 
         function toggleSubtasks(id: Number) {
             const idx = openTasks.value.indexOf(id)
@@ -279,6 +227,7 @@ export default defineComponent({
         return {
             StatusType,
             loading,
+            error,
             contract,
             formatTaskParam,
             activeTask,

@@ -1,5 +1,5 @@
 <template>
-    <v-navigation-drawer v-if="!subNav" theme="dark" width="100%" permanent>
+    <v-navigation-drawer v-if="!subNav" width="100%" permanent>
         <!-- <template v-if="">
             <v-list-item :prepend-avatar="''"></v-list-item>
             <v-divider></v-divider>

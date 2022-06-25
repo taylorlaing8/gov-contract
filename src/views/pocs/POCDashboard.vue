@@ -15,7 +15,7 @@
     <div class="contract-content-wrapper">
         <v-row class="justify-center" :no-gutters="true">
             <v-col cols="11">
-                <v-card theme="light" class="px-8 py-5 my-5" elevation="2">
+                <v-card class="px-8 py-5 my-5" elevation="2">
                     <v-row class="justify-space-between">
                         <v-col cols="12">
                             <h5 class="text-h5">{{ activeNav.title }}</h5>
@@ -24,7 +24,6 @@
                 </v-card>
                 <v-card
                     v-if="activeNav.slug === 'pocs'"
-                    theme="light"
                     class="px-8 py-5 my-5"
                     elevation="2"
                 >
@@ -153,7 +152,6 @@
                 </v-card>
                 <v-card
                     v-if="activeNav.slug === 'positions'"
-                    theme="light"
                     class="px-8 py-5 my-5"
                     elevation="2"
                 >
@@ -258,7 +256,7 @@
         scrollable
         width="auto"
     >
-        <v-card theme="light" class="pa-8 my-5" elevation="2" width="800px">
+        <v-card class="pa-8 my-5" elevation="2" width="800px">
             <v-row class="justify-start">
                  <v-col cols="12">
                     <h5 class="text-h5">Create New Point of Contact</h5>
@@ -349,7 +347,7 @@
         scrollable
         width="auto"
     >
-        <v-card theme="light" class="pa-8 my-5" elevation="2" width="800px">
+        <v-card class="pa-8 my-5" elevation="2" width="800px">
             <v-row class="justify-start">
                  <v-col cols="12">
                     <h5 class="text-h5">Create New Position</h5>

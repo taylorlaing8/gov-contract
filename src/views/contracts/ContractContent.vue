@@ -3,7 +3,7 @@
         <template v-if="!edit">
             <v-row class="justify-center" :no-gutters="true">
                 <v-col cols="11">
-                    <v-card theme="light" class="px-8 py-5 my-5" elevation="2">
+                    <v-card class="px-8 py-5 my-5" elevation="2">
                         <v-row class="justify-space-between">
                             <v-col cols="8">
                                 <h5 class="text-h5">{{ taskData.title }}</h5>
@@ -26,7 +26,7 @@
                             </v-col>
                         </v-row>
                     </v-card>
-                    <v-card theme="light" class="pa-8 my-5" elevation="2">
+                    <v-card class="pa-8 my-5" elevation="2">
                         <v-row class="justify-start">
                             <v-col cols="3">
                                 <span class="text-caption">
@@ -89,7 +89,7 @@
                             </v-col>
                         </v-row>
                     </v-card>
-                    <v-card theme="light" class="pa-8 my-5" elevation="2">
+                    <v-card class="pa-8 my-5" elevation="2">
                         <v-row class="justify-start align-center">
                             <v-col cols="4">
                                 <span class="text-caption">
@@ -146,7 +146,7 @@
         <template v-else>
             <v-row class="justify-center" :no-gutters="true">
                 <v-col cols="11">
-                    <v-card theme="light" class="px-8 py-5 my-5" elevation="2">
+                    <v-card class="px-8 py-5 my-5" elevation="2">
                         <v-row class="justify-space-between">
                             <v-col cols="8">
                                 <h5 class="text-h5">{{ taskData.title }}</h5>
@@ -178,7 +178,7 @@
                             </v-col>
                         </v-row>
                     </v-card>
-                    <v-card theme="light" class="pa-8 my-5" elevation="2">
+                    <v-card class="pa-8 my-5" elevation="2">
                         <v-row class="justify-start">
                             <v-col cols="3">
                                 <v-select
@@ -242,7 +242,7 @@
                             </v-col>
                         </v-row>
                     </v-card>
-                    <v-card theme="light" class="pa-8 my-5" elevation="2">
+                    <v-card class="pa-8 my-5" elevation="2">
                         <v-row class="justify-start">
                             <v-col cols="12">
                                 <v-select

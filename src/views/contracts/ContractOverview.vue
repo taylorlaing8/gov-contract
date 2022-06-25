@@ -2,7 +2,7 @@
     <v-main class="contract-content-wrapper">
         <v-row no-gutters class="justify-center">
             <v-col cols="11">
-                <v-card theme="light" class="px-8 py-5 my-5" elevation="2">
+                <v-card class="px-8 py-5 my-5" elevation="2">
                     <v-row class="justify-space-between">
                         <v-col cols="8">
                             <h5 class="text-h5">{{contract.title}}</h5>
