@@ -241,7 +241,7 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 .contract-nav-wrapper {
-    width: 400px;
+    width: 350px;
     height: calc(100vh - 60px);
     overflow-x: hidden;
     overflow-y: scroll;

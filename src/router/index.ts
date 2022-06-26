@@ -5,9 +5,14 @@ import LoginView from '@/views/LoginView.vue'
 import ContractWrapper from '@/views/contracts/ContractWrapper.vue'
 import ContractList from '@/views/contracts/ContractList.vue'
 import ContractNavigation from '@/views/contracts/ContractNavigation.vue'
-import POCDashboard from '@/views/pocs/POCDashboard.vue'
 import PageNotFound from '@/views/PageNotFound.vue'
 import ErrorView from '@/views/ErrorView.vue'
+
+import AdminNav from '@/views/admin/AdminNav.vue'
+import PocList from '@/views/admin/PocList.vue'
+import PositionsList from '@/views/admin/PositionsList.vue'
+import TemplateList from '@/views/admin/TemplateList.vue'
+import HolidayList from '@/views/admin/HolidayList.vue'
 
 const routes = [
     {
@@ -19,12 +24,6 @@ const routes = [
         path: '/login',
         name: 'login',
         component: LoginView,
-    },
-    {
-        path: '/pocs/:nav_item?',
-        name: 'pocs',
-        component: POCDashboard,
-        beforeEnter: [verifyAuthorization],
     },
     {
         path: '/contracts',
@@ -46,6 +45,45 @@ const routes = [
                 }
               },
             },
+        ],
+        beforeEnter: [verifyAuthorization],
+    },
+    // {
+    //     path: '/admin/:nav_item?',
+    //     name: 'admin',
+    //     component: AdminDashboard,
+    //     beforeEnter: [verifyAuthorization],
+    // },
+    {
+        path: '/admin',
+        name: 'admin',
+        component: AdminNav,
+        children: [
+            // {
+            //     path: '',
+            //     component: AdminDashboard,
+            //     name: 'admin-dashboard'
+            // },
+            {
+                path: 'pocs',
+                component: PocList,
+                name: 'admin-pocs',
+            },
+            {
+                path: 'positions',
+                component: PositionsList,
+                name: 'admin-positions',
+            },
+            {
+                path: 'templates',
+                component: TemplateList,
+                name: 'admin-templates',
+            },
+            {
+                path: 'holidays',
+                component: HolidayList,
+                name: 'admin-holidays'
+            }
         ],
         beforeEnter: [verifyAuthorization],
     },

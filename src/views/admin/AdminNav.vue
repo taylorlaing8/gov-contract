@@ -417,7 +417,7 @@ interface navLink {
 }
 
 export default defineComponent({
-    name: 'POCDashboard',
+    name: 'AdminNav',
 
     setup() {
         const route = useRoute()
@@ -431,15 +431,25 @@ export default defineComponent({
             {
                 title: 'Positions',
                 slug: 'positions',
-                icon: 'mdi-badge-account',
+                icon: 'mdi-badge-account-horizontal',
             },
+            {
+                title: 'Templates',
+                slug: 'templates',
+                icon: 'mdi-file-document-multiple'
+            },
+            {
+                title: 'Holidays',
+                slug: 'holidays',
+                icon: 'mdi-calendar-star'
+            }
         ] as navLink[])
 
         const activeNav = ref({} as navLink)
         watch(
             () => route.params,
             (params) => {
-                if (route.name === 'pocs' && !params.nav_item) updateActiveNav()
+                if (route.name === 'admin' && !params.nav_item) updateActiveNav()
             },
         )
         function updateActiveNav(nSlug?: string) {
@@ -449,7 +459,7 @@ export default defineComponent({
 
             activeNav.value = navItem ? navItem : nav.value[0]
             router.push({
-                name: 'pocs',
+                name: 'admin',
                 params: {
                     nav_item: activeNav.value.slug,
                 },

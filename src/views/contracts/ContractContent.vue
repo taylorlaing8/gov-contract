@@ -15,10 +15,7 @@
                                     }}
                                 </p>
                             </v-col>
-                            <v-col cols="4" class="text-right">
-                                <span class="text-caption"
-                                    >Task ID: #{{ taskData.id }}</span
-                                >
+                            <v-col cols="4" class="d-flex justify-end align-center">
                                 <StatusIcon
                                     :status="taskData.status"
                                     :showTitle="true"
@@ -64,7 +61,7 @@
                                 </span>
                                 <p class="text-box">
                                     <!-- CALCULATE PALT ACTUAL -->
-                                    {{ '-' }}
+                                    {{ calculatePaltActual(taskData.start_date, taskData.end_date) || '-' }}
                                 </p>
                             </v-col>
                             <v-col cols="3">
@@ -80,12 +77,13 @@
                         <v-row class="justify-start">
                             <v-col cols="12">
                                 <span class="text-caption">
-                                    Comments:
+                                    Start Date - End Date
                                     <br />
+                                    <DateRange
+                                        :startDate="formatDate(taskData.start_date)"
+                                        :endDate="formatDate(taskData.end_date)"
+                                    ></DateRange>
                                 </span>
-                                <p class="text-box">
-                                    {{ taskData.comments }}
-                                </p>
                             </v-col>
                         </v-row>
                     </v-card>
@@ -133,6 +131,19 @@
                             </v-col>
                         </v-row>
                     </v-card>
+                    <v-card class="pa-8 my-5" elevation="2">
+                        <v-row class="justify-start">
+                            <v-col cols="12">
+                                <span class="text-caption">
+                                    Comments:
+                                    <br />
+                                </span>
+                                <p class="text-box">
+                                    {{ taskData.comments || '-' }}
+                                </p>
+                            </v-col>
+                        </v-row>
+                    </v-card>
                 </v-col>
             </v-row>
             <v-btn
@@ -158,23 +169,18 @@
                                     }}
                                 </p>
                             </v-col>
-                            <v-col cols="4" class="text-right">
-                                <span class="text-caption"
-                                    >Task ID: #{{ taskData.id }}</span
-                                >
-                                <div class="d-flex align-center">
-                                    <StatusIcon
-                                        :status="taskData.status"
-                                    ></StatusIcon>
-                                    <v-select
-                                        :items="statusTypes"
-                                        color="primary"
-                                        label="Task Status"
-                                        v-model="taskData.status"
-                                        hide-details
-                                        class="pl-3"
-                                    ></v-select>
-                                </div>
+                            <v-col cols="4" class="d-flex justify-end align-center">
+                                <StatusIcon
+                                    :status="taskData.status"
+                                ></StatusIcon>
+                                <v-select
+                                    :items="statusTypes"
+                                    color="primary"
+                                    label="Task Status"
+                                    v-model="taskData.status"
+                                    hide-details
+                                    class="pl-3"
+                                ></v-select>
                             </v-col>
                         </v-row>
                     </v-card>
@@ -226,21 +232,6 @@
                                 ></v-text-field>
                             </v-col>
                         </v-row>
-                        <v-row class="justify-start">
-                            <v-col cols="12">
-                                <v-textarea
-                                    color="primary"
-                                    label="Comments"
-                                    auto-grow
-                                    outlined
-                                    rows="3"
-                                    row-height="25"
-                                    shaped
-                                    v-model="taskData.comments"
-                                    hide-details
-                                ></v-textarea>
-                            </v-col>
-                        </v-row>
                     </v-card>
                     <v-card class="pa-8 my-5" elevation="2">
                         <v-row class="justify-start">
@@ -255,6 +246,23 @@
                                     v-model="taskData.poc"
                                     hide-details
                                 ></v-select>
+                            </v-col>
+                        </v-row>
+                    </v-card>
+                    <v-card class="pa-8 my-5" elevation="2">
+                        <v-row class="justify-start">
+                            <v-col cols="12">
+                                <v-textarea
+                                    color="primary"
+                                    label="Comments"
+                                    auto-grow
+                                    outlined
+                                    rows="3"
+                                    row-height="25"
+                                    shaped
+                                    v-model="taskData.comments"
+                                    hide-details
+                                ></v-textarea>
                             </v-col>
                         </v-row>
                     </v-card>
@@ -282,6 +290,8 @@
 import { defineComponent, PropType, ref, watch } from 'vue'
 import type { Task, Contract, PointOfContact } from '@/types/ContractData.type'
 import { TaskService } from '@/api/ContractService'
+import DateRange from '@/components/DateRange.vue'
+import { formatDate, formatPOC, formatUpdateTask, calculatePaltActual } from '@/views/contracts/ContractCalcs.composable'
 
 import StatusIcon from '@/components/StatusIcon.vue'
 
@@ -290,6 +300,7 @@ export default defineComponent({
 
     components: {
         StatusIcon,
+        DateRange,
     },
 
     props: {
@@ -307,9 +318,7 @@ export default defineComponent({
 
     setup(props) {
         const edit = ref(false)
-
         const taskData = ref({...props.task} as Task)
-
         const statusTypes = ['IC', 'IP', 'CP']
 
         watch(() => props.task, (nTask: Task) => {
@@ -320,25 +329,10 @@ export default defineComponent({
             taskData.value = nTask
         })
 
-        function formatPOC(poc: PointOfContact | null) {
-            if (poc !== null) {
-                return `${poc.prefix}. ${poc.first_name} ${poc.last_name}`
-            }
-            else return '-'
-        }
-        const fPocs = props.contract.pocs.map((poc: PointOfContact) => {
-            return {
-                ...poc,
-                fpoc: formatPOC(poc),
-            }
-        })
+        const fPocs = props.contract.pocs.map((poc: PointOfContact) => ({ ...poc, fpoc: formatPOC(poc), }))
 
         function save() {
-            const data = {
-                ...taskData.value,
-                comments: taskData.value.comments && taskData.value.comments === "" ? taskData.value.comments : null,
-                poc: taskData.value.poc ? taskData.value.poc.id : null
-            }
+            const { data }  = formatUpdateTask(taskData.value)
             TaskService.update(data.id, data)
                 .then((res) => {
                     edit.value = false
@@ -362,13 +356,10 @@ export default defineComponent({
         }
 
         return {
-            edit,
-            taskData,
-            statusTypes,
-            formatPOC,
-            fPocs,
-            save,
-            cancel,
+            edit, taskData, statusTypes,
+            formatPOC, fPocs,
+            formatDate, calculatePaltActual,
+            save, cancel,
         }
     },
 })

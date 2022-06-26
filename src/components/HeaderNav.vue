@@ -49,12 +49,8 @@ export default defineComponent({
                     url: '/contracts',
                 },
                 {
-                    title: 'POCs',
-                    url: '/pocs',
-                },
-                {
-                    title: 'Templates',
-                    url: '/',
+                    title: 'Admin',
+                    url: '/admin',
                 },
             ],
         })
