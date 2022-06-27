@@ -1,4 +1,4 @@
-import type { PointOfContact, Task } from '@/types/ContractData.type'
+import type { Holiday, PointOfContact, Task } from '@/types/ContractData.type'
 
 export function formatDate (date: string) {
     return new Date(date)
@@ -11,7 +11,7 @@ export function formatPOC(poc: PointOfContact | null) {
     else return '-'
 }
 
-export function formatUpdateTask (task: Task) {
+export function formatUpdateTask(task: Task) {
     const data = {
         ...task,
         comments: task.comments && task.comments !== "" ? task.comments : null,

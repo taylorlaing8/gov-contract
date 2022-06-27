@@ -291,7 +291,7 @@ import { defineComponent, PropType, ref, watch } from 'vue'
 import type { Task, Contract, PointOfContact } from '@/types/ContractData.type'
 import { TaskService } from '@/api/ContractService'
 import DateRange from '@/components/DateRange.vue'
-import { formatDate, formatPOC, formatUpdateTask, calculatePaltActual } from '@/views/contracts/ContractCalcs.composable'
+import { formatDate, formatPOC, formatUpdateTask, calculatePaltActual } from '@/composables/ContractCalcs.composable'
 
 import StatusIcon from '@/components/StatusIcon.vue'
 

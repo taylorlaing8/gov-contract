@@ -9,7 +9,6 @@
 
 <script lang="ts">
 import { defineComponent, watch, ref, nextTick } from 'vue'
-import 'v-calendar/dist/style.css'
 import { Calendar } from 'v-calendar'
 
 export default defineComponent({

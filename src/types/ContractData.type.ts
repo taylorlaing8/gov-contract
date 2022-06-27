@@ -6,6 +6,14 @@ export enum StatusType {
     COMPLETE = 'CP',
 }
 
+export interface Holiday {
+    id: Number,
+    title: String
+    details: String|null
+    date: Date
+    observed: Date
+}
+
 export interface Position {
     id: Number,
     title: String

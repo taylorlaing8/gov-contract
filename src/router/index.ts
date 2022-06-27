@@ -68,21 +68,25 @@ const routes = [
                 path: 'pocs',
                 component: PocList,
                 name: 'admin-pocs',
+                props: true,
             },
             {
                 path: 'positions',
                 component: PositionsList,
                 name: 'admin-positions',
+                props: true,
             },
             {
                 path: 'templates',
                 component: TemplateList,
                 name: 'admin-templates',
+                props: true,
             },
             {
                 path: 'holidays',
                 component: HolidayList,
-                name: 'admin-holidays'
+                name: 'admin-holidays',
+                props: true,
             }
         ],
         beforeEnter: [verifyAuthorization],
