@@ -1,8 +1,10 @@
 <template>
     <template v-if="render">
         <Calendar
-            :columns="displayColumns()"
+            :columns="displayColumns() / displayRows()"
+            :rows="displayRows()"
             :attributes="calendarAttrs"
+            :from-page="fromDate"
         ></Calendar>
     </template>
 </template>
@@ -32,13 +34,9 @@ export default defineComponent({
     setup(props) {
         const render = ref(true)
         const displayColumns = () => (props.endDate.getMonth() - props.startDate.getMonth() + 1)
+        const displayRows = () => displayColumns() > 1 ?  Math.floor(displayColumns() / 2) : 1
 
         const calendarAttrs = ref([
-            {
-                key: 'today',
-                highlight: { fillMode: 'outline' },
-                dates: new Date(),
-            },
             {
                 highlight: {
                     start: { fillMode: 'solid' },
@@ -48,17 +46,19 @@ export default defineComponent({
                 dates: { start: props.startDate, end: props.endDate },
             },
         ])
+        const fromDate = ref({ month: props.startDate.getMonth() + 1, year: props.startDate.getFullYear() })
 
         watch(() => props.startDate, () => {
             render.value = false
-            calendarAttrs.value[1] = {
+            calendarAttrs.value = [{
                 highlight: {
                     start: { fillMode: 'solid' },
                     base: { fillMode: 'light' },
                     end: { fillMode: 'solid' },
                 },
                 dates: { start: props.startDate, end: props.endDate },
-            }
+            }]
+            fromDate.value = { month: props.startDate.getMonth() + 1, year: props.startDate.getFullYear() }
             nextTick(() => {
                 render.value = true
             })
@@ -67,7 +67,9 @@ export default defineComponent({
         return {
             render,
             displayColumns,
+            displayRows,
             calendarAttrs,
+            fromDate,
         }
     }
 })

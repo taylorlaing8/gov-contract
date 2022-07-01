@@ -70,7 +70,7 @@ export class TaskService {
     //     return govHttp.post('/tasks/create/', data)
     // }
     static update(id: Number, data: UpdateTask) {
-        return govHttp.put(`/tasks/${id}/update/`, data)
+        return govHttp.put(`/tasks/${id}/`, data)
     }
     // static delete(id: Number) {
     //     return govHttp.delete(`/tasks/${id}/delete/`)

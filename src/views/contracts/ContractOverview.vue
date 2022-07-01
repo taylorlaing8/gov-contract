@@ -37,7 +37,7 @@ import StatusIcon from '@/components/StatusIcon.vue'
 import type { Contract } from '@/types/ContractData.type'
 
 export default defineComponent({
-    name: 'ContractContent',
+    name: 'ContractOverview',
 
     components: {
         StatusIcon,
@@ -58,8 +58,9 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 .contract-content-wrapper {
-    background-color: #75726b;
+    background-color: rgb(var(--v-theme-primary-lighten-1));
     height: calc(100vh - 60px);
     overflow-y: scroll;
+    overflow-x: hidden;
 }
 </style>

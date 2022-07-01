@@ -6,7 +6,7 @@
                 :key="navItem.id"
                 :title="navItem.title"
                 :prepend-icon="navItem.icon"
-                :active="$route.params.nav_item === navItem.slug"
+                :active="$route.name === navItem.slug"
                 active-color="primary"
                 @click="updateActiveNav(navItem.slug)"
             ></v-list-item>

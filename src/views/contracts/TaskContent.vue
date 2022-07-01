@@ -61,7 +61,7 @@
                                 </span>
                                 <p class="text-box">
                                     <!-- CALCULATE PALT ACTUAL -->
-                                    {{ calculatePaltActual(taskData.start_date, taskData.end_date) || '-' }}
+                                    {{ taskData.palt_actual || '-' }}
                                 </p>
                             </v-col>
                             <v-col cols="3">
@@ -147,6 +147,7 @@
                 </v-col>
             </v-row>
             <v-btn
+                v-if="taskData.tasks.length === 0"
                 color="primary"
                 icon="mdi-pencil"
                 size="default"
@@ -229,6 +230,7 @@
                                     color="primary"
                                     label="Business Days"
                                     v-model="taskData.bus_days"
+                                    type="number"
                                 ></v-text-field>
                             </v-col>
                         </v-row>
@@ -291,12 +293,12 @@ import { defineComponent, PropType, ref, watch } from 'vue'
 import type { Task, Contract, PointOfContact } from '@/types/ContractData.type'
 import { TaskService } from '@/api/ContractService'
 import DateRange from '@/components/DateRange.vue'
-import { formatDate, formatPOC, formatUpdateTask, calculatePaltActual } from '@/composables/ContractCalcs.composable'
+import { formatDate, formatPOC, formatUpdateTask } from '@/composables/ContractCalcs.composable'
 
 import StatusIcon from '@/components/StatusIcon.vue'
 
 export default defineComponent({
-    name: 'ContractContent',
+    name: 'TaskContent',
 
     components: {
         StatusIcon,
@@ -319,6 +321,7 @@ export default defineComponent({
     setup(props) {
         const edit = ref(false)
         const taskData = ref({...props.task} as Task)
+
         const statusTypes = ['IC', 'IP', 'CP']
 
         watch(() => props.task, (nTask: Task) => {
@@ -358,7 +361,7 @@ export default defineComponent({
         return {
             edit, taskData, statusTypes,
             formatPOC, fPocs,
-            formatDate, calculatePaltActual,
+            formatDate,
             save, cancel,
         }
     },

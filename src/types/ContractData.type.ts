@@ -38,19 +38,21 @@ export interface Task {
     sub_title: String | null
     slug: String
     status: Status
-    task_id: Number | null                  // Null if it is the task, Number if it is a subtask
+    task_id: Number | null
     contract_id: Number
     order_id: Number
     gate: Number
     subgate: Number | null
     palt_plan: Number | null
+    palt_actual: Number | null
     bus_days: Number | null
     start_date: Date | null
     end_date: Date | null
     ssp_date: Date | null
     poc: PointOfContact | null
     comments: String | null
-    tasks: Task[] | null                    // If subtasks exist, this lists them out, otherwise null
+    tasks: Task[] | null
+    status_updated: Date | null
 }
 
 export interface Contract {

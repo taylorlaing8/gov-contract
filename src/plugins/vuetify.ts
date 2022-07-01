@@ -9,6 +9,7 @@ const darkTheme = {
     background: '#FFFFFF',
     surface: '#FFFFFF',
     primary: '#1c2347',
+    'primary-lighten-1': '#e0e1e6',
     'primary-darken-1': '#3700B3',
     secondary: '#ec7211',
     'secondary-darken-1': '#018786',
@@ -17,6 +18,7 @@ const darkTheme = {
     success: '#4CAF50',
     warning: '#FB8C00',
     grey: '#c4c4c4',
+    'dark-grey': '#747474',
     'light-grey': '#efefef',
     'grey-text': '#c9c9c9',
   }

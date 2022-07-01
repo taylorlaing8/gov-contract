@@ -89,10 +89,10 @@
                 </template>
             </div>
             <template v-if="activeTask">
-                <ContractContent
+                <TaskContent
                     :task="activeTask"
                     :contract="contract"
-                ></ContractContent>
+                ></TaskContent>
             </template>
             <template v-else>
                 <ContractOverview :contract="contract"></ContractOverview>
@@ -106,7 +106,7 @@ import { defineComponent, ref, Ref, watch } from 'vue'
 import router from '@/router'
 import { useRoute } from 'vue-router'
 import StatusIcon from '@/components/StatusIcon.vue'
-import ContractContent from './ContractContent.vue'
+import TaskContent from './TaskContent.vue'
 import ContractOverview from './ContractOverview.vue'
 import type { Task, Contract } from '@/types/ContractData.type'
 import { StatusType } from '@/types/ContractData.type'
@@ -119,7 +119,7 @@ export default defineComponent({
 
     components: {
         StatusIcon,
-        ContractContent,
+        TaskContent,
         ContractOverview,
     },
 
@@ -241,21 +241,20 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 .contract-nav-wrapper {
+    min-width: 350px;
     width: 350px;
     height: calc(100vh - 60px);
     overflow-x: hidden;
     overflow-y: scroll;
-    padding: 0.5rem 0.7rem;
 
     & .contract-title {
         padding: 1rem 0.75rem;
         margin-bottom: 0.75rem;
         // background: linear-gradient(35deg, #1d9fca 30%, #ffffff 100%);
-        background-color: rgb(var(--v-theme-grey));
-        box-shadow: 0px 3px 1px -2px rgb(0 0 0 / 20%),
+        background-color: rgb(var(--v-theme-dark-grey));
+        box-shadow: 0px 0px 1px -2px rgb(0 0 0 / 20%),
             0px 2px 2px 0px rgb(0 0 0 / 14%), 0px 1px 5px 0px rgb(0 0 0 / 12%);
         color: white;
-        border-radius: 3px;
 
         & a {
             text-decoration: none;
@@ -289,7 +288,6 @@ export default defineComponent({
         align-items: center;
         padding: 0.3rem 0.75rem;
         transition: 0.3s;
-        border-radius: 3px;
 
         &.subtask {
             padding-left: 2rem;

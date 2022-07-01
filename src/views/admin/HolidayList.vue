@@ -9,6 +9,12 @@
                         </v-col>
                     </v-row>
                 </v-card>
+                <Calendar
+                    :columns="4"
+                    :rows="1"
+                    :is-expanded="true"
+                    :attributes="calHolidays"
+                ></Calendar>
                 <v-card
                     class="px-8 py-5 my-5"
                     elevation="2"
@@ -107,8 +113,8 @@
                                         <tr v-else>
                                             <td>{{ holiday.title }}</td>
                                             <td>{{ holiday.details }}</td>
-                                            <td>{{ formatDate(holiday.date) }}</td>
-                                            <td>{{ formatDate(holiday.observed) }}</td>
+                                            <td>{{ dateToString(holiday.date) }}</td>
+                                            <td>{{ dateToString(holiday.observed) }}</td>
                                             <td class="text-right">
                                                 <v-btn
                                                     color="grey"
@@ -242,7 +248,9 @@
 import { HolidayService } from '@/api/ContractService'
 import type { Holiday } from '@/types/ContractData.type'
 import { defineComponent, ref } from 'vue'
+import { Calendar } from 'v-calendar'
 import { DatePicker } from 'v-calendar'
+import { formatDate } from '@/composables/ContractCalcs.composable'
 
 export default defineComponent({
     props: {
@@ -254,6 +262,7 @@ export default defineComponent({
 
     components: {
         DatePicker,
+        Calendar,
     },
 
     setup() {
@@ -284,9 +293,18 @@ export default defineComponent({
             }
         }
 
-        function formatDate (date: string) {
+        function dateToString(date: string) {
             return new Date(date).toLocaleDateString('en-us', { weekday:"long", year:"numeric", month:"short", day:"numeric"})
         }
+
+        const calHolidays = ref([
+            {
+                key: 'today',
+                highlight: { fillMode: 'solid' },
+                dates: new Date(),
+                popover: { label: 'Today' },
+            },
+        ] as any[])
 
         const holidays = ref([] as Holiday[])
         HolidayService.list()
@@ -295,6 +313,19 @@ export default defineComponent({
             })
             .catch((err) => {
                 console.warn('Error Fetching Holidays', err)
+            })
+            .finally(() => {
+                holidays.value.forEach(hol => {
+                    calHolidays.value.push({
+                        highlight: {
+                            start: { color: 'red', fillMode: 'solid' },
+                            base: { color: 'red', fillMode: 'light' },
+                            end: { color: 'red', fillMode: 'solid' },
+                        },
+                        dates: { start: formatDate(hol.date.toString()), end: formatDate(hol.observed.toString()) },
+                        popover: { label: hol.title },
+                    })
+                })
             })
 
         function createHoliday(holiday: Holiday) {
@@ -360,7 +391,7 @@ export default defineComponent({
         
         return {
             edit, toggleEdit, loading, newHoliday, holidays,
-            formatDate,
+            calHolidays, dateToString,
             createHoliday, saveHoliday, deleteHoliday,
             showModal, openModal, closeModal,
         }
@@ -369,6 +400,12 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
+.vc-container {
+    padding: 10px 0px !important;
+    border: 0px !important;
+    box-shadow: 0px 3px 1px -2px rgb(0 0 0 / 20%), 0px 2px 2px 0px rgb(0 0 0 / 14%), 0px 1px 5px 0px rgb(0 0 0 / 12%) !important;
+}
+
 .create-modal {
     & .v-row {
         flex: 0 1 auto !important;
