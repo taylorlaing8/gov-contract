@@ -1,16 +1,16 @@
 <template>
-    <v-card class="fill-height">
+    <v-card class="contract-wrapper fill-height">
         <div v-if="loading">LOADING...</div>
         <div v-else-if="error">{{error}}</div>
         <v-layout class="fill-height" v-else>
             <div class="contract-nav-wrapper">
                 <div class="contract-title">
                     <router-link :to="`${$route.params.contract_id}`">
-                        <h4>Contract ID: {{ contract.ucid }}</h4>
+                        <h4>Contract ID: {{ simpleContract.ucid }}</h4>
                     </router-link>
                 </div>
-                <template v-if="contract.tasks.length > 0">
-                    <template v-for="task in contract.tasks" :key="task.id">
+                <div class="contract-nav-item-wrapper" v-if="simpleContract.tasks.length > 0">
+                    <template v-for="task in simpleContract.tasks" :key="task.id">
                         <div
                             class="contract-nav-item"
                             :class="
@@ -86,16 +86,17 @@
                             </div>
                         </div>
                     </template>
-                </template>
+                </div>
             </div>
             <template v-if="activeTask">
                 <TaskContent
-                    :task="activeTask"
-                    :contract="contract"
+                    :simpleTask="activeTask"
+                    :contract="simpleContract"
+                    @check_status="taskStatusUpdate"
                 ></TaskContent>
             </template>
             <template v-else>
-                <ContractOverview :contract="contract"></ContractOverview>
+                <ContractOverview :contract="simpleContract"></ContractOverview>
             </template>
         </v-layout>
     </v-card>
@@ -108,7 +109,7 @@ import { useRoute } from 'vue-router'
 import StatusIcon from '@/components/StatusIcon.vue'
 import TaskContent from './TaskContent.vue'
 import ContractOverview from './ContractOverview.vue'
-import type { Task, Contract } from '@/types/ContractData.type'
+import type { SimpleContract, SimpleTask } from '@/types/ContractData.type'
 import { StatusType } from '@/types/ContractData.type'
 import { ContractService } from '@/api/ContractService'
 
@@ -133,11 +134,11 @@ export default defineComponent({
     setup(props) {
         const route = useRoute()
         const loading = ref(true)
-        const contract = ref({} as Contract)
+        const simpleContract = ref({} as SimpleContract)
         const openTasks: Ref<Number[]> = ref([])
         const error = ref('')
 
-        const formatTaskParam = (task: Task) => `${task.id}-${task.slug}`
+        const formatTaskParam = (task: SimpleTask) => `${task.id}-${task.slug}`
         function unformatTaskParam(routeSlug: string): number {
             return parseInt(routeSlug.slice(0, routeSlug.indexOf('-')))
         }
@@ -155,9 +156,9 @@ export default defineComponent({
             },
         )
 
-        function findTask(taskId: number): Task | null {
-            let tsk: Task | null = null
-            contract.value.tasks.forEach((task) => {
+        function findTask(taskId: number): SimpleTask | null {
+            let tsk: SimpleTask | null = null
+            simpleContract.value.tasks.forEach((task) => {
                 if (task.id === taskId) tsk = task
                 else {
                     if (task.tasks) {
@@ -172,10 +173,10 @@ export default defineComponent({
             return tsk
         }
 
-        const activeTask = ref({} as Task | null)
+        const activeTask = ref({} as SimpleTask | null)
 
         function setActiveTask(taskId?: number) {
-            let currTask: Task | null = null
+            let currTask: SimpleTask | null = null
 
             if (taskId) currTask = findTask(taskId)
             else
@@ -202,9 +203,31 @@ export default defineComponent({
             }
         }
 
-        ContractService.get(props.contract_id)
+        function taskStatusUpdate(task: SimpleTask) {
+            if (task.task_id) {
+                const idx = simpleContract.value.tasks.map(tsk => tsk.id).indexOf(task.task_id)
+                const status = ref(task.status as StatusType)
+
+                simpleContract.value.tasks[idx].tasks?.forEach(tsk => {
+                    if(tsk.id === task.id && tsk.status !== task.status) tsk.status = task.status
+
+                    if(status.value != tsk.status && status.value != StatusType.INPROGRESS) {
+                        status.value = tsk.status as StatusType
+                    }
+                })
+
+                simpleContract.value.tasks[idx].status = status.value
+            }
+            else {
+                const idx = simpleContract.value.tasks.map(tsk => tsk.id).indexOf(task.id)
+                if(simpleContract.value.tasks[idx].status !== task.status) simpleContract.value.tasks[idx].status = task.status
+            }
+            // simpleContract.value.tasks.
+        }
+
+        ContractService.getTasks(props.contract_id)
             .then((res) => {
-                contract.value = res.data
+                simpleContract.value = res.data
             })
             .catch((err) => {
                 console.warn('Error Fetching Contract', err)
@@ -228,7 +251,8 @@ export default defineComponent({
             StatusType,
             loading,
             error,
-            contract,
+            simpleContract,
+            taskStatusUpdate,
             formatTaskParam,
             activeTask,
             setActiveTask,
@@ -249,7 +273,6 @@ export default defineComponent({
 
     & .contract-title {
         padding: 1rem 0.75rem;
-        margin-bottom: 0.75rem;
         // background: linear-gradient(35deg, #1d9fca 30%, #ffffff 100%);
         background-color: rgb(var(--v-theme-dark-grey));
         box-shadow: 0px 0px 1px -2px rgb(0 0 0 / 20%),
@@ -262,40 +285,50 @@ export default defineComponent({
         }
     }
 
-    & .contract-nav-expand {
-        transition: all 0.3s;
+    & .contract-nav-item-wrapper {
+        padding: 0.75rem 0rem;
 
-        &.expanded {
-            transform: rotateX(180deg);
-        }
-    }
-
-    & .contract-subtask-wrapper {
-        overflow: hidden;
-
-        & .contract-subtasks {
-            margin-bottom: -100%;
-            transition: all 0.4s;
+        & .contract-nav-expand {
+            transition: all 0.3s;
 
             &.expanded {
-                margin-bottom: 0;
+                transform: rotateX(180deg);
             }
         }
-    }
 
-    & .contract-nav-item {
-        display: flex;
-        align-items: center;
-        padding: 0.3rem 0.75rem;
-        transition: 0.3s;
+        & .contract-subtask-wrapper {
+            overflow: hidden;
 
-        &.subtask {
-            padding-left: 2rem;
+            & .contract-subtasks {
+                margin-bottom: -200%;
+                transition: all 0.4s;
 
-            & .contract-nav-title {
-                padding-left: 8px;
-                font-size: 10pt;
-                font-weight: 400;
+                &.expanded {
+                    margin-bottom: 0;
+                }
+            }
+        }
+
+        & .contract-nav-item {
+            display: flex;
+            align-items: center;
+            padding: 0.3rem 0.75rem;
+            transition: 0.3s;
+
+            &.subtask {
+                padding-left: 2rem;
+
+                & .contract-nav-title {
+                    padding-left: 8px;
+                    font-size: 10pt;
+                    font-weight: 400;
+                }
+
+                &.active {
+                    background-color: rgb(var(--v-theme-light-grey));
+                    font-weight: 500;
+                    color: rgb(var(--v-theme-secondary))
+                }
             }
 
             &.active {
@@ -303,23 +336,17 @@ export default defineComponent({
                 font-weight: 500;
                 color: rgb(var(--v-theme-secondary))
             }
-        }
 
-        &.active {
-            background-color: rgb(var(--v-theme-light-grey));
-            font-weight: 500;
-            color: rgb(var(--v-theme-secondary))
-        }
+            & .contract-nav-title {
+                padding-left: 8px;
+                font-size: 10pt;
+                font-weight: 500;
+            }
 
-        & .contract-nav-title {
-            padding-left: 8px;
-            font-size: 10pt;
-            font-weight: 500;
-        }
-
-        &:hover {
-            cursor: pointer;
-            background-color: rgb(var(--v-theme-grey), 0.5);
+            &:hover {
+                cursor: pointer;
+                background-color: rgb(var(--v-theme-grey), 0.5);
+            }
         }
     }
 }

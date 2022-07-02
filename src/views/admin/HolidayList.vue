@@ -113,8 +113,8 @@
                                         <tr v-else>
                                             <td>{{ holiday.title }}</td>
                                             <td>{{ holiday.details }}</td>
-                                            <td>{{ dateToString(holiday.date) }}</td>
-                                            <td>{{ dateToString(holiday.observed) }}</td>
+                                            <td>{{ dateString(holiday.date) }}</td>
+                                            <td>{{ dateString(holiday.observed) }}</td>
                                             <td class="text-right">
                                                 <v-btn
                                                     color="grey"
@@ -250,7 +250,7 @@ import type { Holiday } from '@/types/ContractData.type'
 import { defineComponent, ref } from 'vue'
 import { Calendar } from 'v-calendar'
 import { DatePicker } from 'v-calendar'
-import { formatDate } from '@/composables/ContractCalcs.composable'
+import { formatDate, dateString } from '@/composables/ContractCalcs.composable'
 
 export default defineComponent({
     props: {
@@ -291,10 +291,6 @@ export default defineComponent({
                 date: null,
                 observed: null,
             }
-        }
-
-        function dateToString(date: string) {
-            return new Date(date).toLocaleDateString('en-us', { weekday:"long", year:"numeric", month:"short", day:"numeric"})
         }
 
         const calHolidays = ref([
@@ -391,7 +387,7 @@ export default defineComponent({
         
         return {
             edit, toggleEdit, loading, newHoliday, holidays,
-            calHolidays, dateToString,
+            calHolidays, dateString,
             createHoliday, saveHoliday, deleteHoliday,
             showModal, openModal, closeModal,
         }

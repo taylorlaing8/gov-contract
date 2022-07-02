@@ -1,6 +1,9 @@
 <template>
     <v-main class="contract-content-wrapper">
-        <template v-if="!edit">
+        <template v-if="loading">
+            <h1>LOADING</h1>
+        </template>
+        <template v-else-if="!edit">
             <v-row class="justify-center" :no-gutters="true">
                 <v-col cols="11">
                     <v-card class="px-8 py-5 my-5" elevation="2">
@@ -79,11 +82,14 @@
                                 <span class="text-caption">
                                     Start Date - End Date
                                     <br />
-                                    <DateRange
-                                        :startDate="formatDate(taskData.start_date)"
-                                        :endDate="formatDate(taskData.end_date)"
-                                    ></DateRange>
                                 </span>
+                                <p class="text-box mb-4">
+                                    {{ `${dateString(taskData.start_date)} - ${dateString(taskData.end_date)}` }}
+                                </p>
+                                <DateRange
+                                    :startDate="formatDate(taskData.start_date)"
+                                    :endDate="formatDate(taskData.end_date)"
+                                ></DateRange>
                             </v-col>
                         </v-row>
                     </v-card>
@@ -231,6 +237,7 @@
                                     label="Business Days"
                                     v-model="taskData.bus_days"
                                     type="number"
+                                    @change="formatData('bus_days')"
                                 ></v-text-field>
                             </v-col>
                         </v-row>
@@ -290,10 +297,10 @@
 
 <script lang="ts">
 import { defineComponent, PropType, ref, watch } from 'vue'
-import type { Task, Contract, PointOfContact } from '@/types/ContractData.type'
+import type { Task, Contract, PointOfContact, SimpleTask, StatusType } from '@/types/ContractData.type'
 import { TaskService } from '@/api/ContractService'
 import DateRange from '@/components/DateRange.vue'
-import { formatDate, formatPOC, formatUpdateTask } from '@/composables/ContractCalcs.composable'
+import { formatDate, dateString, formatPOC, formatUpdateTask } from '@/composables/ContractCalcs.composable'
 
 import StatusIcon from '@/components/StatusIcon.vue'
 
@@ -306,8 +313,8 @@ export default defineComponent({
     },
 
     props: {
-        task: {
-            type: Object as PropType<Task>,
+        simpleTask: {
+            type: Object as PropType<SimpleTask>,
             required: true,
         },
         contract: {
@@ -316,34 +323,83 @@ export default defineComponent({
         },
     },
 
-    // emits: ['update-active-task'],
+    emits: ['check_status'],
 
-    setup(props) {
+    setup(props, { emit }) {
+        const loading = ref(true)
         const edit = ref(false)
-        const taskData = ref({...props.task} as Task)
+        const taskData = ref({} as Task)
 
-        const statusTypes = ['IC', 'IP', 'CP']
+        const statusTypes = [
+            {
+                title: 'Incomplete',
+                value: 'IC',
+            },
+            {
+                title: 'In Progress',
+                value: 'IP',
+            },
+            {
+                title: 'Complete',
+                value: 'CP',
+            },
+        ] as { title: string, value: StatusType }[]
 
-        watch(() => props.task, (nTask: Task) => {
-            if (edit.value) {
-                alert('Navigating away from this page will lose any unsaved changes.')
-                edit.value = false
+        function formatData(dType: string) {
+            switch(dType) {
+                case 'bus_days':
+                    taskData.value.bus_days = Math.round(taskData.value.bus_days.valueOf()*2)/2
+                    break
             }
-            taskData.value = nTask
+        }
+
+        function fetchTask(id: Number) {
+            loading.value = true
+            TaskService.get(id)
+                .then((res) => {
+                    taskData.value = res.data
+                })
+                .catch((err) => {
+                    console.warn('Error Fetching Task', err)
+                })
+                .finally(() => {
+                    loading.value = false
+                })
+        }
+
+        fetchTask(props.simpleTask.id)
+
+        watch(() => props.simpleTask, (nTask: SimpleTask) => {
+            let cnfm = true
+            if (edit.value) {
+                cnfm = false
+                if(!confirm('Navigating away from this page will lose any unsaved changes. Do you wish to continue?')){
+                    cnfm = false
+                }
+                else {
+                    cnfm = true
+                    edit.value = false
+                }
+            }
+            if(cnfm) fetchTask(nTask.id)
         })
 
         const fPocs = props.contract.pocs.map((poc: PointOfContact) => ({ ...poc, fpoc: formatPOC(poc), }))
 
         function save() {
+            loading.value = true
             const { data }  = formatUpdateTask(taskData.value)
             TaskService.update(data.id, data)
                 .then((res) => {
                     edit.value = false
+                    emit('check_status', res.data)
                     taskData.value = res.data
-                    // emit('update-active-task', taskData.value)
                 })
                 .catch((err) => {
                     console.warn('Error Updating Task', err)
+                })
+                .finally(() => {
+                    loading.value = false
                 })
         }
 
@@ -359,9 +415,9 @@ export default defineComponent({
         }
 
         return {
-            edit, taskData, statusTypes,
+            loading, edit, taskData, formatData, statusTypes,
             formatPOC, fPocs,
-            formatDate,
+            formatDate, dateString,
             save, cancel,
         }
     },

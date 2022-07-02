@@ -1,8 +1,8 @@
 <template>
     <template v-if="render">
         <Calendar
-            :columns="displayColumns() / displayRows()"
-            :rows="displayRows()"
+            :columns="displayCols"
+            :rows="displayRows"
             :attributes="calendarAttrs"
             :from-page="fromDate"
         ></Calendar>
@@ -33,8 +33,35 @@ export default defineComponent({
 
     setup(props) {
         const render = ref(true)
-        const displayColumns = () => (props.endDate.getMonth() - props.startDate.getMonth() + 1)
-        const displayRows = () => displayColumns() > 1 ?  Math.floor(displayColumns() / 2) : 1
+        const displayRows = ref(0)
+        const displayCols = ref(0)
+        // ACCURATE WAY TO GET COLUMNS AND ROWS
+        // function getColRow() {
+        //     let months = 0
+            
+        //     months = (props.endDate.getFullYear() - props.startDate.getFullYear()) * 12
+        //     months -= props.startDate.getMonth()
+        //     months += props.endDate.getMonth()
+        //     months = (months <= 0 ? 0 : months) + 1
+
+        //     displayRows.value = (months / 3) > 1 ? Math.ceil(months / 3) : 1
+        //     displayCols.value = Math.ceil(months / displayRows.value)
+        // }
+
+        // SINGLE ROW, CAPPED AT 3 COLUMNS
+
+        function getColRow() {
+            let months = 0
+            
+            months = (props.endDate.getFullYear() - props.startDate.getFullYear()) * 12
+            months -= props.startDate.getMonth()
+            months += props.endDate.getMonth()
+            months = (months <= 0 ? 0 : months) + 1
+
+            displayRows.value = 1
+            displayCols.value = (months > 3) ? 3 : months
+        }
+        getColRow()
 
         const calendarAttrs = ref([
             {
@@ -59,6 +86,7 @@ export default defineComponent({
                 dates: { start: props.startDate, end: props.endDate },
             }]
             fromDate.value = { month: props.startDate.getMonth() + 1, year: props.startDate.getFullYear() }
+            getColRow()
             nextTick(() => {
                 render.value = true
             })
@@ -66,7 +94,7 @@ export default defineComponent({
 
         return {
             render,
-            displayColumns,
+            displayCols,
             displayRows,
             calendarAttrs,
             fromDate,

@@ -3,7 +3,7 @@
         <header-nav />
         <!-- <side-nav /> -->
         <v-main>
-            <v-container fluid fill-height class="pa-0 fill-height ld-main">
+            <v-container fluid fill-height class="pa-0 fill-height">
                 <router-view />
             </v-container>
         </v-main>
@@ -29,7 +29,7 @@ export default defineComponent({
 })
 </script>
 <style lang="scss" scoped>
-.ld-main {
-    min-height: calc(100vh - 186px);
+.v-main {
+    height: calc(100vh - 70px);
 }
 </style>

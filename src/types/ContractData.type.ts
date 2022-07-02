@@ -26,10 +26,23 @@ export interface PointOfContact {
     first_name: String
     last_name: String
     email: String
-    prefix: String
+    prefix: String | null
     title?: Position | null
     title_id?: Number
     created?: Date
+}
+
+export interface SimpleTask {
+    id: Number
+    title: String
+    sub_title: String | null
+    slug: String
+    status: Status
+    task_id: Number | null
+    contract_id: Number
+    order_id: Number
+    comments: String | null
+    tasks: Task[] | null
 }
 
 export interface Task {
@@ -43,16 +56,26 @@ export interface Task {
     order_id: Number
     gate: Number
     subgate: Number | null
-    palt_plan: Number | null
-    palt_actual: Number | null
-    bus_days: Number | null
-    start_date: Date | null
-    end_date: Date | null
+    palt_plan: Number
+    palt_actual: Number
+    bus_days: Number
+    start_date: Date
+    end_date: Date
     ssp_date: Date | null
     poc: PointOfContact | null
     comments: String | null
     tasks: Task[] | null
     status_updated: Date | null
+}
+
+export interface SimpleContract {
+    id: Number
+    title: String
+    sub_title: String
+    slug: String
+    ucid: String
+    status: Status
+    tasks: SimpleTask[]
 }
 
 export interface Contract {
@@ -67,6 +90,7 @@ export interface Contract {
     ss_leads: PointOfContact[]
     need_date: Date
     award_date: Date
+    start_date: Date
     cycle_code: String
     pop_date: Date                  // When current contract ends
     g_o_p: Number
