@@ -36,7 +36,6 @@
                                                     variant="outlined"
                                                     density="compact"
                                                     :hide-details="true"
-                                                    :disabled="loading"
                                                     v-model="position.title"
                                                 ></v-text-field>
                                             </td>
@@ -47,7 +46,6 @@
                                                     variant="outlined"
                                                     density="compact"
                                                     :hide-details="true"
-                                                    :disabled="loading"
                                                     v-model="position.department"
                                                 ></v-text-field>
                                             </td>
@@ -57,7 +55,6 @@
                                                     icon="mdi-close"
                                                     size="x-small"
                                                     variant="plain"
-                                                    :disabled="loading"
                                                     @click.prevent="toggleEdit()"
                                                 ></v-btn>
                                                 <v-btn
@@ -65,7 +62,6 @@
                                                     icon="mdi-check"
                                                     size="x-small"
                                                     variant="plain"
-                                                    :disabled="loading"
                                                     @click.prevent="savePosition(idx, position)"
                                                 ></v-btn>
                                             </td>
@@ -182,9 +178,10 @@ export default defineComponent({
         }
     },
 
-    setup() {
+    emits: ['loading-change'],
+
+    setup(props, { emit }) {
         const edit = ref([])
-        const loading = ref(false)
         const showModal = ref(false)
         const newPosition = ref({
             title: '',
@@ -206,6 +203,7 @@ export default defineComponent({
             }
         }
 
+        emit('loading-change', true)
         const positions = ref([] as Position[])
         PositionService.list()
             .then((res) => {
@@ -214,9 +212,12 @@ export default defineComponent({
             .catch((err) => {
                 console.warn('Error Fetching Positions', err)
             })
+            .finally(() => {
+                emit('loading-change', false)
+            })
 
         function createPosition(pos: Position) {
-            loading.value = true
+            emit('loading-change', true)
 
             PositionService.create(pos)
                 .then((res) => {
@@ -226,13 +227,13 @@ export default defineComponent({
                     console.warn('Error Creating Position', err)
                 })
                 .finally(() => {
-                    loading.value = false
+                    emit('loading-change', false)
                     closeModal()
                 })
         }
 
         function savePosition(idx: number, pos: Position) {
-            loading.value = true
+            emit('loading-change', true)
             const editIndex = edit.value.findIndex((p) => p === pos.id)
 
             PositionService.update(pos.id, pos)
@@ -244,12 +245,12 @@ export default defineComponent({
                     console.warn('Error Updating Position', err)
                 })
                 .finally(() => {
-                    loading.value = false
+                    emit('loading-change', false)
                 })
         }
 
         function deletePosition(idx: number, pos: Position) {
-            loading.value = true
+            emit('loading-change', true)
             const editIndex = edit.value.findIndex((p) => p === pos.id)
 
             PositionService.delete(pos.id)
@@ -261,13 +262,13 @@ export default defineComponent({
                     console.warn('Error Deleting Position', err)
                 })
                 .finally(() => {
-                    loading.value = false
+                    emit('loading-change', false)
                 })
         }
 
         
         return {
-            edit, toggleEdit, loading, newPosition, positions,
+            edit, toggleEdit, newPosition, positions,
             createPosition, savePosition, deletePosition,
             showModal, openModal, closeModal,
         }

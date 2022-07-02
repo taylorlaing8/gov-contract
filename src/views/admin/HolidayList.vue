@@ -44,7 +44,6 @@
                                                     variant="outlined"
                                                     density="compact"
                                                     :hide-details="true"
-                                                    :disabled="loading"
                                                     v-model="holiday.title"
                                                 ></v-text-field>
                                             </td>
@@ -55,7 +54,6 @@
                                                     variant="outlined"
                                                     density="compact"
                                                     :hide-details="true"
-                                                    :disabled="loading"
                                                     v-model="holiday.details"
                                                 ></v-text-field>
                                             </td>
@@ -97,7 +95,6 @@
                                                     icon="mdi-close"
                                                     size="x-small"
                                                     variant="plain"
-                                                    :disabled="loading"
                                                     @click.prevent="toggleEdit()"
                                                 ></v-btn>
                                                 <v-btn
@@ -105,7 +102,6 @@
                                                     icon="mdi-check"
                                                     size="x-small"
                                                     variant="plain"
-                                                    :disabled="loading"
                                                     @click.prevent="saveHoliday(idx, holiday)"
                                                 ></v-btn>
                                             </td>
@@ -265,9 +261,10 @@ export default defineComponent({
         Calendar,
     },
 
-    setup() {
+    emits: ['loading-change'],
+
+    setup(props,{ emit }) {
         const edit = ref([])
-        const loading = ref(false)
         const showModal = ref(false)
         const newHoliday = ref({
             title: '',
@@ -302,6 +299,7 @@ export default defineComponent({
             },
         ] as any[])
 
+        emit('loading-change', true)
         const holidays = ref([] as Holiday[])
         HolidayService.list()
             .then((res) => {
@@ -322,10 +320,11 @@ export default defineComponent({
                         popover: { label: hol.title },
                     })
                 })
+                emit('loading-change', false)
             })
 
         function createHoliday(holiday: Holiday) {
-            loading.value = true
+            emit('loading-change', true)
 
             const data: Holiday = {
                 ...holiday,
@@ -340,13 +339,13 @@ export default defineComponent({
                     console.warn('Error Creating Holiday', err)
                 })
                 .finally(() => {
-                    loading.value = false
+                    emit('loading-change', false)
                     closeModal()
                 })
         }
 
         function saveHoliday(idx: number, holiday: Holiday) {
-            loading.value = true
+            emit('loading-change', true)
             const editIndex = edit.value.findIndex((h) => h === holiday.id)
 
             const data: Holiday = {
@@ -363,12 +362,12 @@ export default defineComponent({
                     console.warn('Error Updating Holiday', err)
                 })
                 .finally(() => {
-                    loading.value = false
+                    emit('loading-change', false)
                 })
         }
 
         function deleteHoliday(idx: number, holiday: Holiday) {
-            loading.value = true
+            emit('loading-change', true)
             const editIndex = edit.value.findIndex((h) => h === holiday.id)
 
             HolidayService.delete(holiday.id)
@@ -380,13 +379,13 @@ export default defineComponent({
                     console.warn('Error Deleting Holiday', err)
                 })
                 .finally(() => {
-                    loading.value = false
+                    emit('loading-change', false)
                 })
         }
 
         
         return {
-            edit, toggleEdit, loading, newHoliday, holidays,
+            edit, toggleEdit, newHoliday, holidays,
             calHolidays, dateString,
             createHoliday, saveHoliday, deleteHoliday,
             showModal, openModal, closeModal,

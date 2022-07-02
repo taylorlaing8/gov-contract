@@ -1,8 +1,6 @@
 <template>
     <v-main class="contract-content-wrapper">
-        <template v-if="loading">
-            <h1>LOADING</h1>
-        </template>
+        <LoadingScreen v-if="loading"></LoadingScreen>
         <template v-else-if="!edit">
             <v-row class="justify-center" :no-gutters="true">
                 <v-col cols="11">
@@ -303,6 +301,7 @@ import DateRange from '@/components/DateRange.vue'
 import { formatDate, dateString, formatPOC, formatUpdateTask } from '@/composables/ContractCalcs.composable'
 
 import StatusIcon from '@/components/StatusIcon.vue'
+import LoadingScreen from '@/components/LoadingScreen.vue'
 
 export default defineComponent({
     name: 'TaskContent',
@@ -310,6 +309,7 @@ export default defineComponent({
     components: {
         StatusIcon,
         DateRange,
+        LoadingScreen,
     },
 
     props: {

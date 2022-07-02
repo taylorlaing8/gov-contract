@@ -39,7 +39,6 @@
                                                     variant="outlined"
                                                     density="compact"
                                                     :hide-details="true"
-                                                    :disabled="loading"
                                                     v-model="poc.prefix"
                                                 ></v-text-field>
                                             </td>
@@ -50,7 +49,6 @@
                                                     variant="outlined"
                                                     density="compact"
                                                     :hide-details="true"
-                                                    :disabled="loading"
                                                     v-model="poc.first_name"
                                                 ></v-text-field>
                                             </td>
@@ -61,7 +59,6 @@
                                                     variant="outlined"
                                                     density="compact"
                                                     :hide-details="true"
-                                                    :disabled="loading"
                                                     v-model="poc.last_name"
                                                 ></v-text-field>
                                             </td>
@@ -72,7 +69,6 @@
                                                     variant="outlined"
                                                     density="compact"
                                                     :hide-details="true"
-                                                    :disabled="loading"
                                                     v-model="poc.email"
                                                 ></v-text-field>
                                             </td>
@@ -86,7 +82,6 @@
                                                     v-model="poc.title.id"
                                                     variant="outlined"
                                                     density="compact"
-                                                    :disabled="loading"
                                                     :hide-details="true"
                                                 ></v-select>
                                             </td>
@@ -96,7 +91,6 @@
                                                     icon="mdi-close"
                                                     size="x-small"
                                                     variant="plain"
-                                                    :disabled="loading"
                                                     @click.prevent="toggleEdit()"
                                                 ></v-btn>
                                                 <v-btn
@@ -104,7 +98,6 @@
                                                     icon="mdi-check"
                                                     size="x-small"
                                                     variant="plain"
-                                                    :disabled="loading"
                                                     @click.prevent="savePoc(idx, poc)"
                                                 ></v-btn>
                                             </td>
@@ -257,9 +250,10 @@ export default defineComponent({
         }
     },
 
-    setup() {
+    emits: ['loading-change'],
+
+    setup(props, { emit }) {
         const edit = ref([])
-        const loading = ref(false)
         const showModal = ref(false)
         const newPoc = ref({
             first_name: '',
@@ -288,29 +282,33 @@ export default defineComponent({
         }
 
         const positions = ref([] as Position[])
-        PositionService.list()
-            .then((res) => {
-                positions.value = res.data
-            })
-            .catch((err) => {
-                console.warn('Error Fetching Positions', err)
-            })
-
         const pocs = ref([] as PointOfContact[])
-        PointOfContactService.list()
-            .then((res) => {
-                pocs.value = res.data
-            })
-            .catch((err) => {
-                console.warn('Error Fetching Team Members', err)
-            })
-            .finally(() => {
-                loading.value = false
-            })
+        
+        async function initData() {
+            emit('loading-change', true)
+            
+            await PositionService.list()
+                .then((res) => {
+                    positions.value = res.data
+                })
+                .catch((err) => {
+                    console.warn('Error Fetching Positions', err)
+                })
 
+            await PointOfContactService.list()
+                .then((res) => {
+                    pocs.value = res.data
+                })
+                .catch((err) => {
+                    console.warn('Error Fetching Team Members', err)
+                })
+
+            emit('loading-change', false)
+        }
+        initData()
         
         function createPoc(poc: PointOfContact) {
-            loading.value = false
+            emit('loading-change', true)
 
             PointOfContactService.create(poc)
                 .then((res) => {
@@ -320,13 +318,13 @@ export default defineComponent({
                     console.warn('Error Creating Point of Contact', err)
                 })
                 .finally(() => {
-                    loading.value = true
+                    emit('loading-change', false)
                     closeModal()
                 })
         }
 
         function savePoc(idx: number, poc: PointOfContact) {
-            loading.value = true
+            emit('loading-change', true)
             const formatPoc = {
                 id: poc.id,
                 first_name: poc.first_name,
@@ -346,12 +344,12 @@ export default defineComponent({
                     console.warn('Error Updating Point of Contact', err)
                 })
                 .finally(() => {
-                    loading.value = false
+                    emit('loading-change', false)
                 })
         }
         
         function deletePoc(idx: number, poc: PointOfContact) {
-            loading.value = true
+            emit('loading-change', true)
             const editIndex = edit.value.findIndex((p) => p === poc.id)
 
             PointOfContactService.delete(poc.id)
@@ -363,12 +361,12 @@ export default defineComponent({
                     console.warn('Error Deleting Point of Contact', err)
                 })
                 .finally(() => {
-                    loading.value = false
+                    emit('loading-change', false)
                 })
         }
 
         return {
-            edit, toggleEdit, loading, newPoc, pocs, positions,
+            edit, toggleEdit, newPoc, pocs, positions,
             createPoc, savePoc, deletePoc,
             showModal, openModal, closeModal,
         }

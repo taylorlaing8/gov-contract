@@ -12,13 +12,16 @@
             ></v-list-item>
         </v-list>
     </v-navigation-drawer>
-    <router-view :nav="activeNav"></router-view>
+    <LoadingScreen v-if="loading"></LoadingScreen>
+    <router-view :nav="activeNav" @loading-change="updateLoading"></router-view>
 </template>
 
 <script lang="ts">
 import { defineComponent, ref, watch } from 'vue'
 import router from '@/router'
 import { useRoute } from 'vue-router'
+
+import LoadingScreen from '@/components/LoadingScreen.vue'
 
 interface navLink {
     title: string
@@ -29,8 +32,17 @@ interface navLink {
 export default defineComponent({
     name: 'AdminNav',
 
+    components: {
+        LoadingScreen,
+    },
+
     setup() {
         const route = useRoute()
+        const loading = ref(false)
+
+        function updateLoading(status: boolean) {
+            loading.value = status
+        }
 
         const nav = ref([
             {
@@ -75,6 +87,7 @@ export default defineComponent({
         updateActiveNav()
 
         return {
+            loading, updateLoading,
             nav, activeNav, updateActiveNav,
         }
     },

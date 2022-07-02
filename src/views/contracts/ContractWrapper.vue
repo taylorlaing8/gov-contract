@@ -1,15 +1,29 @@
 <template>
-    <router-view></router-view>
+    <LoadingScreen v-if="loading"></LoadingScreen>
+    <router-view @loading-change="updateLoading"></router-view>
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, ref } from 'vue'
+import LoadingScreen from '@/components/LoadingScreen.vue'
 
 export default defineComponent({
     name: 'ContractWrapper',
+
+    components: {
+        LoadingScreen,
+    },
     
     setup() {
-        return {}
+        const loading = ref(false)
+
+        function updateLoading(status: boolean) {
+            loading.value = status
+        }
+
+        return {
+            loading, updateLoading,
+        }
     }
 })
 

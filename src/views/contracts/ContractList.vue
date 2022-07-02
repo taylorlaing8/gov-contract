@@ -120,9 +120,12 @@ export default defineComponent({
         StatusIcon,
     },
 
-    setup() {
+    emits: ['loading-change'],
+
+    setup(props, { emit }) {
         const showNewContract = ref(false)
 
+        emit('loading-change', true)
         const contracts = ref([] as Contract[])
         ContractService.list()
             .then((res) => {
@@ -130,6 +133,9 @@ export default defineComponent({
             })
             .catch((err) => {
                 console.warn('Error Fetching Contracts', err)
+            })
+            .finally(() => {
+                emit('loading-change', false)
             })
 
         function openContract(id: number) {

@@ -1,8 +1,7 @@
 <template>
     <v-card class="contract-wrapper fill-height">
-        <div v-if="loading">LOADING...</div>
-        <div v-else-if="error">{{error}}</div>
-        <v-layout class="fill-height" v-else>
+        <div v-if="error">{{error}}</div>
+        <v-layout class="fill-height" v-else-if="!loading">
             <div class="contract-nav-wrapper">
                 <div class="contract-title">
                     <router-link :to="`${$route.params.contract_id}`">
@@ -131,7 +130,9 @@ export default defineComponent({
         }
     },
 
-    setup(props) {
+    emits: ['loading-change'],
+
+    setup(props, { emit }) {
         const route = useRoute()
         const loading = ref(true)
         const simpleContract = ref({} as SimpleContract)
@@ -225,6 +226,7 @@ export default defineComponent({
             // simpleContract.value.tasks.
         }
 
+        emit('loading-change', true)
         ContractService.getTasks(props.contract_id)
             .then((res) => {
                 simpleContract.value = res.data
@@ -234,6 +236,7 @@ export default defineComponent({
                 error.value = 'Contract Not Found'
             })
             .finally(() => {
+                emit('loading-change', false)
                 loading.value = false
                 setActiveTask()
                 if (activeTask.value !== null && activeTask.value.task_id !== null) {
@@ -249,8 +252,8 @@ export default defineComponent({
 
         return {
             StatusType,
-            loading,
             error,
+            loading,
             simpleContract,
             taskStatusUpdate,
             formatTaskParam,
