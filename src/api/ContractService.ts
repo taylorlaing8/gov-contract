@@ -19,6 +19,24 @@ export class HolidayService {
     }
 }
 
+export class TemplateService {
+    static get(id: Number) {
+        return govHttp.get(`/templates/${id}/`)
+    }
+    static list() {
+        return govHttp.get('/templates/')
+    }
+    static create(data: Holiday) {
+        return govHttp.post('/templates/create/', data)
+    }
+    static update(id: Number, data: Holiday) {
+        return govHttp.put(`/templates/${id}/update/`, data)
+    }
+    static delete(id: Number) {
+        return govHttp.delete(`/templates/${id}/delete/`)
+    }
+}
+
 export class PositionService {
     static get(id: Number) {
         return govHttp.get(`/positions/${id}/`)
@@ -63,18 +81,9 @@ export class TaskService {
     static get(id: Number) {
         return govHttp.get(`/tasks/${id}/`)
     }
-    // static list() {
-    //     return govHttp.get('/tasks/')
-    // }
-    // static create(data: PointOfContact) {
-    //     return govHttp.post('/tasks/create/', data)
-    // }
     static update(id: Number, data: UpdateTask) {
         return govHttp.put(`/tasks/${id}/`, data)
     }
-    // static delete(id: Number) {
-    //     return govHttp.delete(`/tasks/${id}/delete/`)
-    // }
 }
 
 export class ContractService {

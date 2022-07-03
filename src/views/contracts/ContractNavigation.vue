@@ -112,8 +112,6 @@ import type { SimpleContract, SimpleTask } from '@/types/ContractData.type'
 import { StatusType } from '@/types/ContractData.type'
 import { ContractService } from '@/api/ContractService'
 
-import basicContract from './cTemplates/BaseContract'
-
 export default defineComponent({
     name: 'ContractNavigation',
 
@@ -308,6 +306,8 @@ export default defineComponent({
 
                 &.expanded {
                     margin-bottom: 0;
+                    border-right: 2px solid rgba(var(--v-theme-primary), 0.75);
+                    background-color: rgb(var(--v-theme-light-grey));
                 }
             }
         }

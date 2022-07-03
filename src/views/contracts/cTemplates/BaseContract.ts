@@ -1,4 +1,36 @@
-const baseContract = {
+import type { PointOfContact, StatusType, TaskBuild } from '@/types/ContractData.type'
+
+export const contractBase = {
+    title: "",
+    sub_title: "",
+    slug: "",
+    type: "",
+    ucid: "",
+    cycle_code: null,
+    value: 0,
+    status: "IC" as StatusType,
+    need_date: new Date(),
+    award_date: new Date(),
+    start_date: new Date(),
+    pop_date: new Date(),
+    g_o_p: 0,
+    g_t_p: 0,
+    g_tr_p: 0,
+    g_fr_o_p: 0,
+    g_fr_t_p: 0,
+    g_fr_tr_p: 0,
+    g_fr_fr_p: 0,
+    g_fr_fv_p: 0,
+    pocs: [] as PointOfContact[],
+    ss_leads: [] as PointOfContact[],
+    pco: {} as PointOfContact,
+    buyer: {} as PointOfContact,
+    admin_pco: {} as PointOfContact,
+    admin_buyer: {} as PointOfContact,
+    tasks: [] as TaskBuild[],
+}
+
+export const baseContract = {
     title: null,
     sub_title: null,
     slug: null,
@@ -2592,5 +2624,3 @@ const baseContract = {
         },
     ],
 }
-
-export default baseContract

@@ -9,84 +9,42 @@
                         </v-col>
                     </v-row>
                 </v-card>
-                <!-- <v-card
+                <v-card
                     class="px-8 py-5 my-5"
                     elevation="2"
                 >
                     <v-row class="justify-space-between">
                         <v-col cols="12">
-                            <table>
+                            <table class="templates-table">
                                 <thead>
                                     <tr>
                                         <th class="text-left">Title</th>
-                                        <th class="text-left">Department</th>
+                                        <th class="text-left">Subtitle</th>
                                         <th class="text-left"></th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <template
-                                        v-for="(position, idx) in positions"
-                                        :key="position.id"
+                                        v-for="(template, idx) in templates"
+                                        :key="template.id"
                                     >
-                                        <tr v-if="edit.includes(position.id)" >
-                                            <td>
-                                                <v-text-field
-                                                    color="primary"
-                                                    label="Title"
-                                                    variant="outlined"
-                                                    density="compact"
-                                                    :hide-details="true"
-                                                    :disabled="loading"
-                                                    v-model="position.title"
-                                                ></v-text-field>
-                                            </td>
-                                            <td>
-                                                <v-text-field
-                                                    color="primary"
-                                                    label="Department"
-                                                    variant="outlined"
-                                                    density="compact"
-                                                    :hide-details="true"
-                                                    :disabled="loading"
-                                                    v-model="position.department"
-                                                ></v-text-field>
-                                            </td>
-                                            <td class="text-right">
-                                                <v-btn
-                                                    color="grey"
-                                                    icon="mdi-close"
-                                                    size="x-small"
-                                                    variant="plain"
-                                                    :disabled="loading"
-                                                    @click.prevent="toggleEdit()"
-                                                ></v-btn>
-                                                <v-btn
-                                                    color="success"
-                                                    icon="mdi-check"
-                                                    size="x-small"
-                                                    variant="plain"
-                                                    :disabled="loading"
-                                                    @click.prevent="savePosition(idx, position)"
-                                                ></v-btn>
-                                            </td>
-                                        </tr>
-                                        <tr v-else>
-                                            <td>{{ position.title }}</td>
-                                            <td>{{ position.department }}</td>
+                                        <tr>
+                                            <td>{{ template.title }}</td>
+                                            <td>{{ template.subtitle }}</td>
                                             <td class="text-right">
                                                 <v-btn
                                                     color="grey"
                                                     icon="mdi-pencil"
                                                     size="x-small"
                                                     variant="plain"
-                                                    @click.prevent="edit.push(position.id)"
+                                                    @click.prevent="editTemplate(template.id)"
                                                 ></v-btn>
                                                 <v-btn
                                                     color="error"
                                                     icon="mdi-delete"
                                                     size="x-small"
                                                     variant="plain"
-                                                    @click.prevent="deletePosition(idx, position)"
+                                                    @click.prevent="deleteTemplate(idx, template)"
                                                 ></v-btn>
                                             </td>
                                         </tr>
@@ -95,24 +53,25 @@
                             </table>
                         </v-col>
                     </v-row>
-                </v-card> -->
+                </v-card>
             </v-col>
         </v-row>
 
-        <!-- <v-btn
+        <v-btn
             color="primary"
             icon="mdi-plus"
             size="default"
             elevation="10"
             class="fab-primary"
-            @click.prevent="openModal()"
-        ></v-btn> -->
+            @click.prevent="createTemplate()"
+        ></v-btn>
     </div>
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue'
-
+import { TemplateService } from '@/api/ContractService'
+import type { Template } from '@/types/ContractData.type'
+import { defineComponent, ref } from 'vue'
 
 export default defineComponent({
     props: {
@@ -121,16 +80,41 @@ export default defineComponent({
             required: true,
         }
     },
-    
-    setup() {
-        
-        return {
 
+    emits: ['loading-change'],
+    
+    setup(props , { emit }) {
+        
+        emit('loading-change', true)
+        const templates = ref([] as Template[])
+        TemplateService.list()
+            .then((res) => {
+                templates.value = res.data
+            })
+            .catch((err) => {
+                console.warn('Error Fetching Templates', err)
+            })
+            .finally(() => {
+                emit('loading-change', false)
+            })
+
+        return {
+            templates
         }
     }
 })
 </script>
 
-<style land="scss" scoped>
-
+<style lang="scss" scoped>
+.templates-table {
+    & tbody {
+        & tr {
+            &:hover {
+                cursor: pointer;
+                background-color: #1d9fca25;
+                border-radius: 3px;
+            }
+        }
+    }
+}
 </style>

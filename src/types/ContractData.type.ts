@@ -7,22 +7,29 @@ export enum StatusType {
 }
 
 export interface Holiday {
-    id: Number,
+    id: Number
     title: String
-    details: String|null
+    details: String | null
     date: Date
     observed: Date
 }
 
+export interface Template {
+    id: Number
+    title: String
+    subtitle: String | null
+    data: Date
+}
+
 export interface Position {
-    id: Number,
+    id: Number
     title: String
     department: String
     created?: Date
 }
 
 export interface PointOfContact {
-    id: Number,
+    id: Number
     first_name: String
     last_name: String
     email: String
@@ -30,6 +37,21 @@ export interface PointOfContact {
     title?: Position | null
     title_id?: Number
     created?: Date
+}
+
+export interface TaskBuild {
+    title: String
+    sub_title: String | null
+    slug: String
+    status: Status
+    gate: Number
+    sub_gate: Number
+    palt_plan: Number
+    bus_days: Number
+    ssp_date: Date | null
+    comments: String | null
+    poc: Number | null
+    tasks: TaskBuild[] | null
 }
 
 export interface SimpleTask {
@@ -84,7 +106,7 @@ export interface Contract {
     sub_title: String
     slug: String
     type: String
-    ucid: String                    // Unique Contract ID
+    ucid: String // Unique Contract ID
     status: Status
     value: Number
     ss_leads: PointOfContact[]
@@ -92,7 +114,7 @@ export interface Contract {
     award_date: Date
     start_date: Date
     cycle_code: String
-    pop_date: Date                  // When current contract ends
+    pop_date: Date // When current contract ends
     g_o_p: Number
     g_t_p: Number
     g_tr_p: Number

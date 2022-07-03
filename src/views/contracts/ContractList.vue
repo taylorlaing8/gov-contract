@@ -53,57 +53,16 @@
             </v-col>
         </v-row>
 
-        <v-btn
-            color="primary"
-            icon="mdi-plus"
-            size="default"
-            elevation="10"
-            class="fab-primary"
-            @click.prevent="showNewContract = true"
-        ></v-btn>
+        <router-link to="/contracts/create">
+            <v-btn
+                color="primary"
+                icon="mdi-plus"
+                size="default"
+                elevation="10"
+                class="fab-primary"
+            ></v-btn>
+        </router-link>
     </div>
-    <v-dialog v-model="showNewContract" scrollable width="auto">
-        <v-card class="pa-8 my-5" elevation="2" width="800px">
-            <v-row class="justify-start">
-                <v-col cols="12">
-                    <h5 class="text-h5">Create New Position</h5>
-                </v-col>
-            </v-row>
-            <v-row class="justify-start py-10">
-                <v-col cols="6">
-                    <v-text-field
-                        color="primary"
-                        label="Title"
-                        variant="outlined"
-                        density="compact"
-                        :hide-details="true"
-                    ></v-text-field>
-                </v-col>
-                <v-col cols="6">
-                    <v-text-field
-                        color="primary"
-                        label="Department"
-                        variant="outlined"
-                        density="compact"
-                        :hide-details="true"
-                    ></v-text-field>
-                </v-col>
-            </v-row>
-            <v-row class="text-right">
-                <v-col cols="12">
-                    <v-btn
-                        prepend-icon="mdi-close"
-                        label="Save"
-                        size="default"
-                        variant="flat"
-                        @click.prevent="showNewContract = false"
-                    >
-                        Close
-                    </v-btn>
-                </v-col>
-            </v-row>
-        </v-card>
-    </v-dialog>
 </template>
 
 <script lang="ts">

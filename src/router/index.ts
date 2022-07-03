@@ -4,6 +4,7 @@ import HomeView from '@/views/HomeView.vue'
 import LoginView from '@/views/LoginView.vue'
 import ContractWrapper from '@/views/contracts/ContractWrapper.vue'
 import ContractList from '@/views/contracts/ContractList.vue'
+import ContractCreate from '@/views/contracts/ContractCreate.vue'
 import ContractNavigation from '@/views/contracts/ContractNavigation.vue'
 import PageNotFound from '@/views/PageNotFound.vue'
 import ErrorView from '@/views/ErrorView.vue'
@@ -34,6 +35,11 @@ const routes = [
                 path: '',
                 component: ContractList,
                 name: 'contract-list'
+            },
+            {
+                path: 'create',
+                component: ContractCreate,
+                name: 'contract-create'
             },
             {
               path: ':contract_id/:task?', // FIX THIS!!!! FOR SOME REASON REFRESHING ON A SUBTASK PAGE ROUTES YOU TO THE contract_id PAGE ONLY
