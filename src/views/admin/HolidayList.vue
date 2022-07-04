@@ -5,7 +5,7 @@
                 <v-card class="px-8 py-5 my-5" elevation="2">
                     <v-row class="justify-space-between">
                         <v-col cols="12">
-                            <h5 class="text-h5">{{ nav.title }}</h5>
+                            <h5 class="text-h5">Holidays</h5>
                         </v-col>
                     </v-row>
                 </v-card>
@@ -249,12 +249,7 @@ import { DatePicker } from 'v-calendar'
 import { formatDate, dateString } from '@/composables/ContractCalcs.composable'
 
 export default defineComponent({
-    props: {
-        nav: {
-            type: Object,
-            required: true,
-        }
-    },
+    name: 'HolidayList',
 
     components: {
         DatePicker,

@@ -4,7 +4,7 @@ import HomeView from '@/views/HomeView.vue'
 import LoginView from '@/views/LoginView.vue'
 import ContractWrapper from '@/views/contracts/ContractWrapper.vue'
 import ContractList from '@/views/contracts/ContractList.vue'
-import ContractCreate from '@/views/contracts/ContractCreate.vue'
+import ContractBuilder from '@/views/contracts/ContractBuilder.vue'
 import ContractNavigation from '@/views/contracts/ContractNavigation.vue'
 import PageNotFound from '@/views/PageNotFound.vue'
 import ErrorView from '@/views/ErrorView.vue'
@@ -14,6 +14,10 @@ import PocList from '@/views/admin/PocList.vue'
 import PositionsList from '@/views/admin/PositionsList.vue'
 import TemplateList from '@/views/admin/TemplateList.vue'
 import HolidayList from '@/views/admin/HolidayList.vue'
+
+import TemplateWrapper from '@/views/admin/contract-templates/TemplateWrapper.vue'
+import TemplateBuilder from '@/views/admin/contract-templates/TemplateBuilder.vue'
+import TemplateContent from '@/views/admin/contract-templates/TemplateContent.vue'
 
 const routes = [
     {
@@ -38,11 +42,11 @@ const routes = [
             },
             {
                 path: 'create',
-                component: ContractCreate,
+                component: ContractBuilder,
                 name: 'contract-create'
             },
             {
-              path: ':contract_id/:task?', // FIX THIS!!!! FOR SOME REASON REFRESHING ON A SUBTASK PAGE ROUTES YOU TO THE contract_id PAGE ONLY
+              path: ':contract_id/:task?',
               component: ContractNavigation,
               name: 'contract-view',
               props(route) {
@@ -54,12 +58,6 @@ const routes = [
         ],
         beforeEnter: [verifyAuthorization],
     },
-    // {
-    //     path: '/admin/:nav_item?',
-    //     name: 'admin',
-    //     component: AdminDashboard,
-    //     beforeEnter: [verifyAuthorization],
-    // },
     {
         path: '/admin',
         name: 'admin',
@@ -95,6 +93,36 @@ const routes = [
                 props: true,
             }
         ],
+        beforeEnter: [verifyAuthorization],
+    },
+    {
+        path: '/template',
+        name: 'template',
+        component: TemplateWrapper,
+        children: [
+            {
+                path: 'create',
+                component: TemplateBuilder,
+                name: 'template-create'
+            },
+            {
+              path: ':template_id',
+              component: TemplateContent,
+              name: 'template-content',
+              props(route) {
+                return {
+                    template_id: parseInt(route.params.template_id)
+                }
+              },
+            },
+        ],
+        beforeEnter: [verifyAuthorization],
+    },
+    {
+        path: '/template/build',
+        component: TemplateBuilder,
+        name: 'template-builder',
+        props: true,
         beforeEnter: [verifyAuthorization],
     },
     {

@@ -14,11 +14,15 @@ export interface Holiday {
     observed: Date
 }
 
+interface TemplateData {
+    tasks: TaskBuild[]
+}
+
 export interface Template {
     id: Number
     title: String
     subtitle: String | null
-    data: Date
+    data: TemplateData
 }
 
 export interface Position {

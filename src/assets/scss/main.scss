@@ -5,8 +5,8 @@
     overflow-y: scroll;
 
     & .text-caption {
-        font-weight: 500;
-        color: #1d9fca;
+        // font-weight: 500;
+        color: rgb(var(--v-theme-primary));
     }
 
     & a.plain-link {
@@ -45,6 +45,12 @@ table {
     
     & .v-field {
         background-color: white;
+    }
+
+    & .v-btn {
+        width: auto !important;
+        height: auto !important;
+        margin-left: 6px;
     }
 }
 

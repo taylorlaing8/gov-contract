@@ -5,7 +5,7 @@
                 <v-card class="px-8 py-5 my-5" elevation="2">
                     <v-row class="justify-space-between">
                         <v-col cols="12">
-                            <h5 class="text-h5">Create New Contract</h5>
+                            <h5 class="text-h5">Contract Builder</h5>
                         </v-col>
                     </v-row>
                 </v-card>
@@ -18,6 +18,8 @@
 import { defineComponent } from 'vue'
 
 export default defineComponent({
+    name: 'ContractBuilder',
+    
     setup() {
         return {
             "title": "Overhead Production Services",

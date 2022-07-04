@@ -5,7 +5,7 @@
                 <v-card class="px-8 py-5 my-5" elevation="2">
                     <v-row class="justify-space-between">
                         <v-col cols="12">
-                            <h5 class="text-h5">{{ nav.title }}</h5>
+                            <h5 class="text-h5">Templates</h5>
                         </v-col>
                     </v-row>
                 </v-card>
@@ -28,7 +28,7 @@
                                         v-for="(template, idx) in templates"
                                         :key="template.id"
                                     >
-                                        <tr>
+                                        <tr @click="openTask(template.id)">
                                             <td>{{ template.title }}</td>
                                             <td>{{ template.subtitle }}</td>
                                             <td class="text-right">
@@ -57,29 +57,26 @@
             </v-col>
         </v-row>
 
-        <v-btn
-            color="primary"
-            icon="mdi-plus"
-            size="default"
-            elevation="10"
-            class="fab-primary"
-            @click.prevent="createTemplate()"
-        ></v-btn>
+        <router-link to="/template/create">
+            <v-btn
+                color="primary"
+                icon="mdi-plus"
+                size="default"
+                elevation="10"
+                class="fab-primary"
+            ></v-btn>
+        </router-link>
     </div>
 </template>
 
 <script lang="ts">
+import router from '@/router'
 import { TemplateService } from '@/api/ContractService'
 import type { Template } from '@/types/ContractData.type'
 import { defineComponent, ref } from 'vue'
 
 export default defineComponent({
-    props: {
-        nav: {
-            type: Object,
-            required: true,
-        }
-    },
+    name: 'TemplateList',
 
     emits: ['loading-change'],
     
@@ -98,8 +95,17 @@ export default defineComponent({
                 emit('loading-change', false)
             })
 
+        function openTask(id: number) {
+            router.push({
+                name: 'template-content',
+                params: {
+                    template_id: id.toString(),
+                },
+            })
+        }
+
         return {
-            templates
+            templates, openTask
         }
     }
 })

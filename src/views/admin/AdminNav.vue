@@ -13,7 +13,7 @@
         </v-list>
     </v-navigation-drawer>
     <LoadingScreen v-if="loading"></LoadingScreen>
-    <router-view :nav="activeNav" @loading-change="updateLoading"></router-view>
+    <router-view @loading-change="updateLoading"></router-view>
 </template>
 
 <script lang="ts">

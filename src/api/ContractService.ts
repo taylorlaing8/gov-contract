@@ -1,5 +1,5 @@
 import { govHttp } from './http'
-import type { Holiday, PointOfContact, Position, Task, Contract } from '@/types/ContractData.type'
+import type { Holiday, PointOfContact, Position, Task, Contract, Template } from '@/types/ContractData.type'
 
 export class HolidayService {
     static get(id: Number) {
@@ -26,10 +26,10 @@ export class TemplateService {
     static list() {
         return govHttp.get('/templates/')
     }
-    static create(data: Holiday) {
+    static create(data: Template) {
         return govHttp.post('/templates/create/', data)
     }
-    static update(id: Number, data: Holiday) {
+    static update(id: Number, data: Template) {
         return govHttp.put(`/templates/${id}/update/`, data)
     }
     static delete(id: Number) {
