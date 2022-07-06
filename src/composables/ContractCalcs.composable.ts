@@ -23,3 +23,9 @@ export function formatUpdateTask(task: Task) {
     }
     return { data }
 }
+
+export function generateSlug(text: string) {
+    let slug = text.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '').replace(/--/g, '-').replace(/---/g, '-')
+    if (slug.charAt(slug.length - 1) === '-') slug = slug.substring(0, slug.length - 1)
+    return slug
+}

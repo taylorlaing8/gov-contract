@@ -25,12 +25,12 @@
                                 </thead>
                                 <tbody>
                                     <template
-                                        v-for="(template, idx) in templates"
+                                        v-for="template in templates"
                                         :key="template.id"
                                     >
                                         <tr @click="openTask(template.id)">
                                             <td>{{ template.title }}</td>
-                                            <td>{{ template.subtitle }}</td>
+                                            <td>{{ template.sub_title }}</td>
                                             <td class="text-right">
                                                 <v-btn
                                                     color="grey"
@@ -39,13 +39,13 @@
                                                     variant="plain"
                                                     @click.prevent="editTemplate(template.id)"
                                                 ></v-btn>
-                                                <v-btn
+                                                <!-- <v-btn
                                                     color="error"
                                                     icon="mdi-delete"
                                                     size="x-small"
                                                     variant="plain"
                                                     @click.prevent="deleteTemplate(idx, template)"
-                                                ></v-btn>
+                                                ></v-btn> -->
                                             </td>
                                         </tr>
                                     </template>

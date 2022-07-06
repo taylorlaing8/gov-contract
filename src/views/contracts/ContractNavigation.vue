@@ -91,7 +91,7 @@
                 <TaskContent
                     :simpleTask="activeTask"
                     :contract="simpleContract"
-                    @check_status="taskStatusUpdate"
+                    @refresh_data="refreshTaskData"
                 ></TaskContent>
             </template>
             <template v-else>
@@ -202,15 +202,18 @@ export default defineComponent({
             }
         }
 
-        function taskStatusUpdate(task: SimpleTask) {
+        function refreshTaskData(task: SimpleTask) {
             if (task.task_id) {
                 const idx = simpleContract.value.tasks.map(tsk => tsk.id).indexOf(task.task_id)
                 const status = ref(task.status as StatusType)
 
                 simpleContract.value.tasks[idx].tasks?.forEach(tsk => {
-                    if(tsk.id === task.id && tsk.status !== task.status) tsk.status = task.status
+                    if (tsk.id === task.id) {
+                        if (tsk.status !== task.status) tsk.status = task.status
+                        tsk.comments = task.comments
+                    }
 
-                    if(status.value != tsk.status && status.value != StatusType.INPROGRESS) {
+                    if (status.value != tsk.status && status.value != StatusType.INPROGRESS) {
                         status.value = tsk.status as StatusType
                     }
                 })
@@ -220,8 +223,8 @@ export default defineComponent({
             else {
                 const idx = simpleContract.value.tasks.map(tsk => tsk.id).indexOf(task.id)
                 if(simpleContract.value.tasks[idx].status !== task.status) simpleContract.value.tasks[idx].status = task.status
+                simpleContract.value.tasks[idx].comments = task.comments
             }
-            // simpleContract.value.tasks.
         }
 
         emit('loading-change', true)
@@ -253,7 +256,7 @@ export default defineComponent({
             error,
             loading,
             simpleContract,
-            taskStatusUpdate,
+            refreshTaskData,
             formatTaskParam,
             activeTask,
             setActiveTask,

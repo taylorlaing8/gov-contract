@@ -323,7 +323,7 @@ export default defineComponent({
         },
     },
 
-    emits: ['check_status'],
+    emits: ['refresh_data'],
 
     setup(props, { emit }) {
         const loading = ref(true)
@@ -392,7 +392,7 @@ export default defineComponent({
             TaskService.update(data.id, data)
                 .then((res) => {
                     edit.value = false
-                    emit('check_status', res.data)
+                    emit('refresh_data', res.data)
                     taskData.value = res.data
                 })
                 .catch((err) => {

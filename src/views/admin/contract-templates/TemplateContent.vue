@@ -5,11 +5,7 @@
                 <v-card class="px-8 py-5 my-5" elevation="2">
                     <v-row class="justify-space-between">
                         <v-col cols="12">
-                            <template v-if="!edit">
-                                <h5 class="text-h5">{{ template.title }}</h5>
-                                <span class="text-caption">{{ template.subtitle || '-' }}</span>
-                            </template>
-                            <template v-else>
+                            <template v-if="edit">
                                 <v-text-field
                                     color="primary"
                                     label="Title"
@@ -27,8 +23,12 @@
                                     density="compact"
                                     bg-color="white"
                                     :hide-details="true"
-                                    v-model="template.subtitle"
+                                    v-model="template.sub_title"
                                 ></v-text-field>
+                            </template>
+                            <template v-else>
+                                <h5 class="text-h5">{{ template.title }}</h5>
+                                <span class="text-caption">{{ template.sub_title || '-' }}</span>
                             </template>
                         </v-col>
                     </v-row>
@@ -48,7 +48,6 @@
                                         <th class="text-center" width="7%">Sub Gate</th>
                                         <th class="text-center" width="7%">Palt Planned</th>
                                         <th class="text-center" width="7%">Business Days</th>
-                                        <!-- <th class="text-center" width="9%"></th> -->
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -81,22 +80,6 @@
                                                     ></v-text-field>
                                                 </td>
                                                 <td colspan="4"></td>
-                                                <!-- <td class="text-right">
-                                                    <v-btn
-                                                        color="grey"
-                                                        icon="mdi-close"
-                                                        size="x-small"
-                                                        variant="plain"
-                                                        @click.prevent="toggleEdit(idx)"
-                                                    ></v-btn>
-                                                    <v-btn
-                                                        color="success"
-                                                        icon="mdi-check"
-                                                        size="x-small"
-                                                        variant="plain"
-                                                        @click.prevent="savePoc(idx, task)"
-                                                    ></v-btn>
-                                                </td> -->
                                             </template>
                                             <template v-else>
                                                 <td class="text-left" colspan="2">
@@ -105,7 +88,6 @@
                                                     <span class="text-caption">{{ task.sub_title }}</span>
                                                 </td>
                                                 <td colspan="4"></td>
-                                                <!-- <td></td> -->
                                             </template>
                                         </tr>
                                         <tr v-else>
@@ -176,22 +158,6 @@
                                                         v-model="task.bus_days"
                                                     ></v-text-field>
                                                 </td>
-                                               <!-- <td class="text-right">
-                                                    <v-btn
-                                                        color="grey"
-                                                        icon="mdi-close"
-                                                        size="x-small"
-                                                        variant="plain"
-                                                        @click.prevent="toggleEdit(idx)"
-                                                    ></v-btn>
-                                                    <v-btn
-                                                        color="success"
-                                                        icon="mdi-check"
-                                                        size="x-small"
-                                                        variant="plain"
-                                                        @click.prevent="saveTask(idx, task)"
-                                                    ></v-btn>
-                                                </td> -->
                                             </template>
                                             <template v-else>
                                                 <td class="text-left" colspan="2">
@@ -203,7 +169,6 @@
                                                 <td class="text-center">{{ task.sub_gate }}</td>
                                                 <td class="text-center">{{ task.palt_plan}}</td>
                                                 <td class="text-center">{{ task.bus_days }}</td>
-                                                <!-- <td></td> -->
                                             </template>
                                         </tr>
                                         <template v-if="task.tasks">
@@ -275,22 +240,6 @@
                                                             v-model="subtask.bus_days"
                                                         ></v-text-field>
                                                     </td>
-                                                <!-- <td class="text-right">
-                                                        <v-btn
-                                                            color="grey"
-                                                            icon="mdi-close"
-                                                            size="x-small"
-                                                            variant="plain"
-                                                            @click.prevent="toggleEdit(`${idx}-${sIdx}`)"
-                                                        ></v-btn>
-                                                        <v-btn
-                                                            color="success"
-                                                            icon="mdi-check"
-                                                            size="x-small"
-                                                            variant="plain"
-                                                            @click.prevent="saveTask(sIdx, subtask)"
-                                                        ></v-btn>
-                                                    </td> -->
                                                 </template>
                                                 <template v-else>
                                                     <td class="text-left" id="subtask-title" colspan="2">
@@ -302,7 +251,6 @@
                                                     <td class="text-center">{{ subtask.sub_gate }}</td>
                                                     <td class="text-center">{{ subtask.palt_plan}}</td>
                                                     <td class="text-center">{{ subtask.bus_days }}</td>
-                                                    <!-- <td></td> -->
                                                 </template>
                                             </tr>
                                         </template>
@@ -346,6 +294,7 @@
 import { TemplateService } from '@/api/ContractService'
 import type { TaskBuild, Template } from '@/types/ContractData.type'
 import { defineComponent, ref } from 'vue'
+import { generateSlug } from '@/composables/ContractCalcs.composable'
 
 export default defineComponent({
     name: 'TemplateContent',
@@ -382,6 +331,16 @@ export default defineComponent({
         fetchTemplate()
 
         function save() {
+            // Generate slug before saving
+            template.value.data.tasks.forEach((task: TaskBuild) => {
+                task.slug = generateSlug(task.title.toString())
+                
+                if (task.tasks && task.tasks.length > 0) {
+                    task.tasks.forEach(subtask => {
+                        subtask.slug = generateSlug(subtask.title.toString())
+                    })
+                }
+            })
             loading.value = true
             emit('loading-change', true)
             TemplateService.update(props.template_id, template.value)
