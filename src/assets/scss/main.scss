@@ -1,58 +1,100 @@
-// CONTENT
-.contract-content-wrapper {
-    background-color: #f2f3f3;
-    height: calc(100vh - 60px);
-    overflow-y: scroll;
+@import './variables.scss';
 
-    & .text-caption {
-        // font-weight: 500;
-        color: rgb(var(--v-theme-primary));
+body {
+    margin: 0px !important;
+    font-family: Roboto,sans-serif!important;
+
+    & h1, h2, h3, h4, h5 {
+        color: #1d1d1d;
+        margin: 0.25rem 0rem;
     }
 
-    & a.plain-link {
-        text-decoration: none;
-        color: inherit;
-    }
-}
+    & .p-button {
+        &.p-button-nav {
+            background: transparent;
+            border: none;
+            box-shadow: none;
 
+            &:hover, &:focus {
+                background: #ffffff35;
+            }
+            &:active {
+                background: #ffffff55;
+            }
+        }
+        &.p-button-secondary {
+            background: $secondary-color;
+            border: 1px solid $secondary-color;
 
-// TABLES
-table {
-    width: 100%;
-    border-spacing: 0px;
-    border-collapse:collapse;
-
-    & thead > tr {
-        border-bottom: 1px solid #eee;
-        font-size: 0.75rem;
-        font-weight: 500;
-    }
-
-    & tbody > tr {
-        border-bottom: 1px solid #eee;
-        font-size: 0.875rem;
-        font-weight: 400;
-
-        &:last-child {
-            border-bottom: 0px;
+            &:hover, &:focus {
+                background: $secondary-lighten-1;
+            }
+            &:active {
+                background: $secondary-darken-1;
+            }
         }
     }
-    
-    & td, th {
-        padding: 8px 4px !important;
-        // border-bottom: 1px solid #eee;
-    }
-    
-    & .v-field {
-        background-color: white;
+}
+
+.grid {
+    margin: 0rem;
+}
+
+.p-menu {
+    height: fit-content;
+}
+
+a {
+    text-decoration: none;
+}
+
+// TABLES
+.p-datatable {
+    &.p-datatable-hoverable-rows .p-datatable-tbody > tr:hover {
+        cursor: pointer;
     }
 
-    & .v-btn {
-        width: auto !important;
-        height: auto !important;
-        margin-left: 6px;
+    & .p-paginator-bottom {
+        border: none;
     }
 }
+
+// table {
+//     width: 100%;
+//     border-spacing: 0px;
+//     border-collapse:collapse;
+
+//     & thead > tr {
+//         border-bottom: 1px solid #eee;
+//         font-size: 0.75rem;
+//         font-weight: 500;
+//     }
+
+//     & tbody > tr {
+//         border-bottom: 1px solid #eee;
+//         font-size: 0.875rem;
+//         font-weight: 400;
+
+//         &:last-child {
+//             border-bottom: 0px;
+//         }
+//     }
+    
+//     & td, th {
+//         padding: 8px 4px !important;
+//         // border-bottom: 1px solid #eee;
+//     }
+    
+//     & .v-field {
+//         background-color: white;
+//     }
+
+//     & .v-btn {
+//         width: auto !important;
+//         height: auto !important;
+//         margin-left: 6px;
+//     }
+// }
 
 
 // BUTTON COMPONENTS

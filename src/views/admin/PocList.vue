@@ -1,239 +1,162 @@
 <template>
-    <div class="contract-content-wrapper">
-        <v-row class="justify-center" :no-gutters="true">
-            <v-col cols="11">
-                <v-card class="px-8 py-5 my-5" elevation="2">
-                    <v-row class="justify-space-between">
-                        <v-col cols="12">
-                            <h5 class="text-h5">Team Members</h5>
-                        </v-col>
-                    </v-row>
-                </v-card>
-                <v-card
-                    class="px-8 py-5 my-5"
-                    elevation="2"
-                >
-                    <v-row class="justify-space-between">
-                        <v-col cols="12">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th class="text-left">Prefix</th>
-                                        <th class="text-left">First Name</th>
-                                        <th class="text-left">Last Name</th>
-                                        <th class="text-left">Email</th>
-                                        <th class="text-left">Position</th>
-                                        <th></th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <template
-                                        v-for="(poc, idx) in pocs"
-                                        :key="poc.id"
-                                    >
-                                        <tr v-if="edit.includes(poc.id)">
-                                            <td width="7%">
-                                                <v-text-field
-                                                    color="primary"
-                                                    label="Prefix"
-                                                    variant="outlined"
-                                                    density="compact"
-                                                    :hide-details="true"
-                                                    v-model="poc.prefix"
-                                                ></v-text-field>
-                                            </td>
-                                            <td width="12%">
-                                                <v-text-field
-                                                    color="primary"
-                                                    label="First Name"
-                                                    variant="outlined"
-                                                    density="compact"
-                                                    :hide-details="true"
-                                                    v-model="poc.first_name"
-                                                ></v-text-field>
-                                            </td>
-                                            <td width="12%">
-                                                <v-text-field
-                                                    color="primary"
-                                                    label="Last Name"
-                                                    variant="outlined"
-                                                    density="compact"
-                                                    :hide-details="true"
-                                                    v-model="poc.last_name"
-                                                ></v-text-field>
-                                            </td>
-                                            <td width="30%">
-                                                <v-text-field
-                                                    color="primary"
-                                                    label="Email"
-                                                    variant="outlined"
-                                                    density="compact"
-                                                    :hide-details="true"
-                                                    v-model="poc.email"
-                                                ></v-text-field>
-                                            </td>
-                                            <td width="30%">
-                                                <v-select
-                                                    :items="positions"
-                                                    item-value="id"
-                                                    item-title="title"
-                                                    color="primary"
-                                                    label="Position"
-                                                    v-model="poc.title.id"
-                                                    variant="outlined"
-                                                    density="compact"
-                                                    :hide-details="true"
-                                                ></v-select>
-                                            </td>
-                                            <td width="9%" class="text-right">
-                                                <v-btn
-                                                    color="grey"
-                                                    icon="mdi-close"
-                                                    size="x-small"
-                                                    variant="plain"
-                                                    @click.prevent="toggleEdit()"
-                                                ></v-btn>
-                                                <v-btn
-                                                    color="success"
-                                                    icon="mdi-check"
-                                                    size="x-small"
-                                                    variant="plain"
-                                                    @click.prevent="savePoc(idx, poc)"
-                                                ></v-btn>
-                                            </td>
-                                        </tr>
-                                        <tr v-else>
-                                            <td width="7%">{{ poc.prefix }}</td>
-                                            <td width="12%">{{ poc.first_name }}</td>
-                                            <td width="12%">{{ poc.last_name }}</td>
-                                            <td width="30%">{{ poc.email }}</td>
-                                            <td width="30%">{{ poc.title?.title }}</td>
-                                            <td width="9%" class="text-right">
-                                                <v-btn
-                                                    color="grey"
-                                                    icon="mdi-pencil"
-                                                    size="x-small"
-                                                    variant="plain"
-                                                    @click.prevent="edit.push(poc.id)"
-                                                ></v-btn>
-                                                <v-btn
-                                                    color="error"
-                                                    icon="mdi-delete"
-                                                    size="x-small"
-                                                    variant="plain"
-                                                    @click.prevent="deletePoc(idx, poc)"
-                                                ></v-btn>
-                                            </td>
-                                        </tr>
-                                    </template>
-                                </tbody>
-                            </table>
-                        </v-col>
-                    </v-row>
-                </v-card>
-            </v-col>
-        </v-row>
-
-        <v-btn
-            color="primary"
-            icon="mdi-plus"
-            size="default"
-            elevation="10"
-            class="fab-primary"
-            @click.prevent="openModal()"
-        ></v-btn>
-    </div>
-    <v-dialog
-        v-model="showModal"
-        scrollable
-        width="auto"
-    >
-        <v-card class="pa-8 my-5" elevation="2" width="800px">
-            <v-row class="justify-start">
-                 <v-col cols="12">
-                    <h5 class="text-h5">Create New Point of Contact</h5>
-                </v-col>
-            </v-row>
-            <v-row class="justify-start py-10">
-                <v-col cols="2">
-                    <v-text-field
-                        color="primary"
-                        label="Prefix"
-                        variant="outlined"
-                        density="compact"
-                        :hide-details="true"
-                        v-model="newPoc.prefix"
-                    ></v-text-field>
-                </v-col>
-                <v-col cols="5">
-                    <v-text-field
-                        color="primary"
-                        label="First Name"
-                        variant="outlined"
-                        density="compact"
-                        :hide-details="true"
-                        v-model="newPoc.first_name"
-                    ></v-text-field>
-                </v-col>
-                <v-col cols="5">
-                    <v-text-field
-                        color="primary"
-                        label="Last Name"
-                        variant="outlined"
-                        density="compact"
-                        :hide-details="true"
-                        v-model="newPoc.last_name"
-                    ></v-text-field>
-                </v-col>
-                <v-col cols="6">
-                    <v-text-field
-                        color="primary"
-                        label="Email"
-                        variant="outlined"
-                        density="compact"
-                        :hide-details="true"
-                        v-model="newPoc.email"
-                    ></v-text-field>
-                </v-col>
-                <v-col cols="6">
-                    <v-select
-                        :items="positions"
-                        item-value="id"
-                        item-title="title"
-                        color="primary"
-                        label="Position"
+    <div class="grid align-items-center">
+        <div class="col-8">
+            <h1>Team Members</h1>
+        </div>
+        <div class="col-4 text-right">
+            <template v-if="selectedRow.id">
+                <Button
+                    label="Cancel"
+                    icon="pi pi-times"
+                    class="p-button-plain header-button ml-2"
+                    @click="selectedRow = {}"
+                />
+                <Button
+                    label="Delete"
+                    icon="pi pi-trash"
+                    class="p-button-danger header-button ml-2"
+                    @click="deletePoc"
+                />
+            </template>
+            <template v-else>
+                <Button
+                    label="Team Member"
+                    icon="pi pi-plus"
+                    class="p-button-secondary header-button"
+                    @click="openModal"
+                />
+            </template>
+        </div>
+        <div class="col-12 mt-4">
+            <DataTable
+                :value="pocs"
+                removableSort
+                :paginator="true"
+                :rows="10"
+                :loading="loading"
+                stripedRows
+                class="p-datatable-sm"
+                paginatorTemplate="CurrentPageReport FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
+                :rowsPerPageOptions="[10, 20, 50]"
+                currentPageReportTemplate="Showing {first} to {last} of {totalRecords}"
+                editMode="row"
+                dataKey="id"
+                v-model:editingRows="editingRows"
+                v-model:selection="selectedRow"
+                selectionMode="single"
+                @row-edit-save="savePoc($event.index, $event.newData)"
+            >
+                <Column field="prefix" header="Prefix" :sortable="true">
+                    <template #editor="{ data, field }">
+                        <InputText v-model="data[field]" autofocus />
+                    </template>
+                </Column>
+                <Column field="first_name" header="First Name" :sortable="true">
+                    <template #editor="{ data, field }">
+                        <InputText v-model="data[field]" autofocus />
+                    </template>
+                </Column>
+                <Column field="last_name" header="Last Name" :sortable="true">
+                    <template #editor="{ data, field }">
+                        <InputText v-model="data[field]" autofocus />
+                    </template>
+                </Column>
+                <Column field="email" header="Email" :sortable="true">
+                    <template #editor="{ data, field }">
+                        <InputText v-model="data[field]" autofocus />
+                    </template>
+                </Column>
+                <Column field="title.title" header="Position" :sortable="true">
+                    <template #editor="{ data }">
+                        <Dropdown
+                            v-model="data['title'].id"
+                            :options="positions"
+                            optionLabel="title"
+                            optionValue="id"
+                            placeholder="Select Position"
+                        >
+                            <template #option="slotProps">
+                                <span>{{ slotProps.option.title }}</span>
+                            </template>
+                        </Dropdown>
+                    </template>
+                    <template #body="slotProps">
+                        {{ formatPosition(slotProps.data) }}
+                    </template>
+                </Column>
+                <Column
+                    :rowEditor="true"
+                    style="min-width: 8rem"
+                    bodyStyle="text-align:center"
+                ></Column>
+                <!-- <template #paginatorstart>
+                    <Button icon="pi pi-refresh" class="p-button-text" :loading="loading" @click="getContracts"/>
+                </template>
+                <template #paginatorend>
+                    <Button icon="pi pi-cloud" class="p-button-text" />
+                </template> -->
+            </DataTable>
+        </div>
+        <ConfirmDialog></ConfirmDialog>
+        <Dialog
+            v-model:visible="showModal"
+            :style="{ width: '700px' }"
+            header="Add Team Member"
+            :modal="true"
+            class="p-fluid"
+            :closeOnEscape="true"
+            :dismissableMask="true"
+            :draggable="false"
+        >
+            <div class="formgrid grid">
+                <div class="field col-2">
+                    <label for="prefix">Prefix</label>
+                    <InputText id="prefix" v-model="newPoc.prefix" />
+                </div>
+                <div class="field col-5">
+                    <label for="first-name">First Name</label>
+                    <InputText id="first-name" v-model="newPoc.first_name" />
+                </div>
+                <div class="field col-5">
+                    <label for="last-name">Last Name</label>
+                    <InputText id="last-name" v-model="newPoc.last_name" />
+                </div>
+                <div class="field col-6">
+                    <label for="email">Email</label>
+                    <InputText id="email" v-model="newPoc.email" />
+                </div>
+                <div class="field col-6">
+                    <label for="title">Title</label>
+                    <Dropdown
                         v-model="newPoc.title_id"
-                        variant="outlined"
-                        density="compact"
-                        :hide-details="true"
-                    ></v-select>
-                </v-col>
-            </v-row>
-             <v-row class="text-right">
-                <v-col cols="12">
-                    <v-btn
-                        prepend-icon="mdi-close"
-                        label="Save"
-                        size="default"
-                        variant="flat"
-                        @click.prevent="closeModal()"
+                        id="title"
+                        :options="positions"
+                        optionLabel="title"
+                        optionValue="id"
+                        placeholder="Select Position"
                     >
-                        Cancel
-                    </v-btn>
-                    <v-btn
-                        color="success"
-                        prepend-icon="mdi-check"
-                        label="Save"
-                        size="default"
-                        variant="flat"
-                        @click.prevent="createPoc(newPoc)"
-                    >
-                        Create
-                    </v-btn>
-                </v-col>
-             </v-row>
-        </v-card>
-    </v-dialog>
+                        <template #option="slotProps">
+                            <span>{{ slotProps.option.title }}</span>
+                        </template>
+                    </Dropdown>
+                </div>
+            </div>
+            <template #footer>
+                <Button
+                    label="Cancel"
+                    icon="pi pi-times"
+                    class="p-button-text"
+                    @click="closeModal"
+                />
+                <Button
+                    label="Save"
+                    icon="pi pi-check"
+                    class="p-button-success"
+                    @click="createPoc"
+                />
+            </template>
+        </Dialog>
+    </div>
 </template>
 
 <script lang="ts">
@@ -241,14 +164,37 @@ import { PointOfContactService, PositionService } from '@/api/ContractService'
 import type { PointOfContact, Position } from '@/types/ContractData.type'
 import { defineComponent, ref } from 'vue'
 
+import Button from 'primevue/button'
+import Dialog from 'primevue/dialog'
+import DataTable from 'primevue/datatable'
+import Column from 'primevue/column'
+import Dropdown from 'primevue/dropdown'
+import InputText from 'primevue/inputtext'
+
+import { useToast } from 'primevue/usetoast'
+import ConfirmDialog from 'primevue/confirmdialog'
+import { useConfirm } from "primevue/useconfirm"
 
 export default defineComponent({
     name: 'PocList',
 
-    emits: ['loading-change'],
+    components: {
+        Button,
+        Dialog,
+        DataTable,
+        Column,
+        Dropdown,
+        InputText,
+        ConfirmDialog,
+    },
 
-    setup(props, { emit }) {
-        const edit = ref([])
+    setup(props) {
+        const editingRows = ref([])
+        const selectedRow = ref({} as PointOfContact)
+        const loading = ref(false)
+        const toast = useToast()
+        const confirm = useConfirm()
+
         const showModal = ref(false)
         const newPoc = ref({
             first_name: '',
@@ -257,10 +203,6 @@ export default defineComponent({
             prefix: '',
             title_id: null,
         })
-
-        function toggleEdit(type: string, value: number) {
-            edit.value.splice(edit.value.findIndex((p) => { return p === value }))
-        }
 
         function openModal() {
             showModal.value = true
@@ -278,10 +220,9 @@ export default defineComponent({
 
         const positions = ref([] as Position[])
         const pocs = ref([] as PointOfContact[])
-        
+
         async function initData() {
-            emit('loading-change', true)
-            
+            loading.value = true
             await PositionService.list()
                 .then((res) => {
                     positions.value = res.data
@@ -298,28 +239,41 @@ export default defineComponent({
                     console.warn('Error Fetching Team Members', err)
                 })
 
-            emit('loading-change', false)
+            loading.value = false
         }
         initData()
-        
-        function createPoc(poc: PointOfContact) {
-            emit('loading-change', true)
 
-            PointOfContactService.create(poc)
+        const formatPosition = (poc: PointOfContact) => poc.title?.title
+
+        function createPoc() {
+            loading.value = true
+            PointOfContactService.create(newPoc.value)
                 .then((res) => {
                     pocs.value.push(res.data)
+                    toast.add({
+                        severity: 'success',
+                        summary: 'Created',
+                        detail: 'Team Member Created',
+                        life: 3000,
+                    })
                 })
                 .catch((err) => {
                     console.warn('Error Creating Point of Contact', err)
+                    toast.add({
+                        severity: 'error',
+                        summary: 'Error',
+                        detail: 'Error Creating Team Member',
+                        life: 3000,
+                    })
                 })
                 .finally(() => {
-                    emit('loading-change', false)
+                    loading.value = false
                     closeModal()
                 })
         }
 
         function savePoc(idx: number, poc: PointOfContact) {
-            emit('loading-change', true)
+            loading.value = true
             const formatPoc = {
                 id: poc.id,
                 first_name: poc.first_name,
@@ -328,44 +282,86 @@ export default defineComponent({
                 prefix: poc.prefix,
                 title_id: poc.title?.id,
             }
-            const editIndex = edit.value.findIndex((p) => p === poc.id)
 
             PointOfContactService.update(poc.id, formatPoc)
                 .then((res) => {
                     pocs.value[idx] = res.data
-                    edit.value.splice(editIndex, 1)
+                    toast.add({
+                        severity: 'success',
+                        summary: 'Saved',
+                        detail: 'Team Member Data Updated',
+                        life: 3000,
+                    })
                 })
                 .catch((err) => {
                     console.warn('Error Updating Point of Contact', err)
+                    toast.add({
+                        severity: 'error',
+                        summary: 'Error',
+                        detail: 'Error Updating Team Member Data',
+                        life: 3000,
+                    })
                 })
                 .finally(() => {
-                    emit('loading-change', false)
+                    loading.value = false
+                    selectedRow.value = {} as PointOfContact
                 })
         }
-        
-        function deletePoc(idx: number, poc: PointOfContact) {
-            emit('loading-change', true)
-            const editIndex = edit.value.findIndex((p) => p === poc.id)
 
-            PointOfContactService.delete(poc.id)
-                .then((res) => {
-                    pocs.value.splice(idx, 1)
-                    edit.value.splice(editIndex, 1)
-                })
-                .catch((err) => {
-                    console.warn('Error Deleting Point of Contact', err)
-                })
-                .finally(() => {
-                    emit('loading-change', false)
-                })
+        function deletePoc() {
+            confirm.require({
+                message: 'Do you want to delete this team member?',
+                header: 'Delete Confirmation',
+                icon: 'pi pi-info-circle',
+                acceptClass: 'p-button-danger',
+                accept: () => {
+                    loading.value = true
+                    const idx = pocs.value.findIndex((p) => p.id === selectedRow.value.id)
+
+                    PointOfContactService.delete(selectedRow.value.id)
+                        .then((res) => {
+                            pocs.value.splice(idx, 1)
+                            toast.add({
+                                severity: 'success',
+                                summary: 'Saved',
+                                detail: 'Team Member Deleted',
+                                life: 3000,
+                            })
+                        })
+                        .catch((err) => {
+                            console.warn('Error Deleting Point of Contact', err)
+                            toast.add({
+                                severity: 'error',
+                                summary: 'Error',
+                                detail: 'Error Deleting Team Member',
+                                life: 3000,
+                            })
+                        })
+                        .finally(() => {
+                            loading.value = false
+                            selectedRow.value = {} as PointOfContact
+                        })
+                },
+                reject: () => {}
+            })
         }
 
         return {
-            edit, toggleEdit, newPoc, pocs, positions,
-            createPoc, savePoc, deletePoc,
-            showModal, openModal, closeModal,
+            loading,
+            editingRows,
+            selectedRow,
+            newPoc,
+            pocs,
+            positions,
+            formatPosition,
+            createPoc,
+            savePoc,
+            deletePoc,
+            showModal,
+            openModal,
+            closeModal,
         }
-    }
+    },
 })
 </script>
 

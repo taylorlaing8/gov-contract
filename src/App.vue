@@ -1,35 +1,39 @@
 <template>
-    <v-app>
+    <div class="app-container">
+        <Toast />
         <header-nav />
-        <!-- <side-nav /> -->
-        <v-main>
-            <v-container fluid fill-height class="pa-0 fill-height">
-                <router-view />
-            </v-container>
-        </v-main>
-    </v-app>
+        <div class="app-content py-5">
+            <router-view />
+        </div>
+    </div>
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue'
+import { defineComponent, ref } from 'vue'
 // import SideNav from '@/components/SideNav.vue'
 import HeaderNav from './components/HeaderNav.vue'
+import Toast from 'primevue/toast'
 
 export default defineComponent({
     name: 'App',
 
     components: {
         // SideNav,
+        Toast,
         HeaderNav,
     },
 
     setup() {
-        return
+        return {}
     },
 })
 </script>
 <style lang="scss" scoped>
-.v-main {
-    height: calc(100vh - 70px);
+.app-content {
+    position: absolute;
+    width: 100%;
+    top: 75.5px;
+    min-height: calc(100vh - 75.5px);
+    background: #f7f7f7;
 }
 </style>

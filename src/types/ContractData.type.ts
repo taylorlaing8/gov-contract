@@ -32,6 +32,14 @@ export interface Position {
     created?: Date
 }
 
+export interface PointOfContactBuild {
+    first_name: String
+    last_name: String
+    email: String
+    prefix: String | null
+    title_id?: Number | null
+}
+
 export interface PointOfContact {
     id: Number
     first_name: String

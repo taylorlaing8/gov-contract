@@ -1,8 +1,13 @@
 <template>
-    <div class="d-flex" :class="centered ? 'justify-center' : 'justify-end'">
-        <h1>{{}}</h1>
-        <v-icon :size="size ? size : 'default'" :color="icon.color">{{icon.mdi}}</v-icon>
-        <h4 class="pl-2" v-if="showTitle">{{icon.title}}</h4>
+    <!-- <div class="d-flex" :class="centered ? 'justify-center' : 'justify-end'">
+        <i :class="`pi ${currStatus.icon} icon-${currStatus.color}`"></i>
+        <h4 class="pl-2" v-if="showTitle">{{currStatus.title}}</h4>
+    </div> -->
+    <div class="status-wrapper flex">
+        <div :class="currStatus.color" class="py-1 px-2 border-round-sm flex">
+            <i :class="`pi ${currStatus.icon}`"></i>
+            <span v-if="showTitle" class="ml-2">{{ currStatus.title }}</span>
+        </div>
     </div>
 </template>
 
@@ -12,7 +17,7 @@ import { StatusType } from '@/types/ContractData.type'
 
 interface IconMeta {
     title: String,
-    mdi: String,
+    icon: String,
     color: String,
 }
 
@@ -39,28 +44,28 @@ export default defineComponent({
     },
 
     setup(props) {
-        const icon: Ref<IconMeta> = ref({
+        const currStatus: Ref<IconMeta> = ref({
             title: '',
-            mdi: '',
+            icon: '',
             color: '',
         })
 
         function updateIcon(status: StatusType) {
             switch(status) {
                 case StatusType.INCOMPLETE:
-                    icon.value.title = 'Incomplete',
-                    icon.value.mdi = 'mdi-minus-circle',
-                    icon.value.color = 'red'
+                    currStatus.value.title = 'Incomplete',
+                    currStatus.value.icon = 'pi-times-circle',
+                    currStatus.value.color = 'status-warning'
                     break
                 case StatusType.INPROGRESS:
-                    icon.value.title = 'In-Progress',
-                    icon.value.mdi = 'mdi-cached',
-                    icon.value.color = 'blue'
+                    currStatus.value.title = 'In-Progress',
+                    currStatus.value.icon = 'pi-sync',
+                    currStatus.value.color = 'status-primary-color'
                     break
                 case StatusType.COMPLETE:
-                    icon.value.title = 'Complete',
-                    icon.value.mdi = 'mdi-check-circle',
-                    icon.value.color = 'green'
+                    currStatus.value.title = 'Complete',
+                    currStatus.value.icon = 'pi-check-circle',
+                    currStatus.value.color = 'status-success'
                     break
             }
         }
@@ -69,10 +74,25 @@ export default defineComponent({
         watch(() => props.status, (nStatus) => updateIcon(nStatus));
         
         return {
-            icon,
+            currStatus,
         }
     },
 })
 </script>
 
-<style scoped></style>
+<style lang="scss" scoped>
+.status-wrapper {
+    & .status-warning {
+        color: $error;
+        background: $error-lighten-2;
+    }
+    & .status-primary-color {
+        color: $info;
+        background: $info-lighten-2;
+    }
+    & .status-success {
+        color: $success;
+        background: $success-lighten-2;
+    }
+}
+</style>

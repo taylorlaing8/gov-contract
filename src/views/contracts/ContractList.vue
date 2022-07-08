@@ -1,67 +1,86 @@
 <template>
-    <div class="contract-content-wrapper">
-        <v-row class="justify-center" :no-gutters="true">
-            <v-col cols="11">
-                <v-card class="px-8 py-5 my-5" elevation="2">
-                    <v-row class="justify-space-between">
-                        <v-col cols="12">
-                            <h5 class="text-h5">Contracts</h5>
-                        </v-col>
-                    </v-row>
-                </v-card>
-                <v-card class="px-8 py-5 my-5" elevation="2">
-                    <v-row class="justify-space-between">
-                        <v-col cols="12">
-                            <table class="contracts-table">
-                                <thead>
-                                    <tr>
-                                        <th width="15%" class="text-left">UCID</th>
-                                        <th width="24%" class="text-left">Title</th>
-                                        <th width="15%" class="text-left">Type</th>
-                                        <th width="10%" class="text-left">Value</th>
-                                        <th width="15%" class="text-left">Awarded</th>
-                                        <th width="15%" class="text-left">Need Date</th>
-                                        <th width="5%" class="text-center">Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <template
-                                        v-for="contract in contracts"
-                                        :key="contract.id"
-                                    >
-                                        <tr @click="openContract(contract.id)">
-                                            <td width="15%" class="text-left">{{ contract.ucid }}</td>
-                                            <td width="24%" class="text-left">{{ contract.title }}</td>
-                                            <td width="15%" class="text-left">{{ contract.type }}</td>
-                                            <td width="10%" class="text-left">{{ contract.value }}</td>
-                                            <td width="15%" class="text-left">{{ new Date().toDateString(contract.award_date) }}</td>
-                                            <td width="15%" class="text-left">{{ new Date().toDateString(contract.need_date) }}</td>
-                                            <td width="5%" class="text-center">
-                                                <StatusIcon
-                                                    size="small"
-                                                    :centered="true"
-                                                    :status="contract.status"
-                                                ></StatusIcon>
-                                            </td>
-                                        </tr>
-                                    </template>
-                                </tbody>
-                            </table>
-                        </v-col>
-                    </v-row>
-                </v-card>
-            </v-col>
-        </v-row>
-
-        <router-link to="/contracts/create">
-            <v-btn
-                color="primary"
-                icon="mdi-plus"
-                size="default"
-                elevation="10"
-                class="fab-primary"
-            ></v-btn>
-        </router-link>
+    <div class="content-wrapper">
+        <div class="grid justify-content-center">
+            <div class="col-11 px-5 py-4 bg-white border-1 surface-border border-round-sm">
+                <div class="grid align-items-center">
+                    <div class="col-8">
+                        <h1>Contract List</h1>
+                    </div>
+                    <div class="col-4 text-right">
+                        <router-link to="/contracts/create">
+                            <Button
+                                label="Contract"
+                                icon="pi pi-plus"
+                                class="p-button-secondary header-button"
+                            />
+                        </router-link>
+                    </div>
+                    <div class="col-12 mt-4">
+                        <DataTable
+                            :value="contracts"
+                            removableSort
+                            responsiveLayout="scroll"
+                            :paginator="true"
+                            :rows="10"
+                            :loading="loading"
+                            :rowHover="true"
+                            stripedRows
+                            class="p-datatable-sm"
+                            paginatorTemplate="CurrentPageReport FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
+                            :rowsPerPageOptions="[10, 20, 50]"
+                            currentPageReportTemplate="Showing {first} to {last} of {totalRecords}"
+                            @row-click="openContract($event.data.id)"
+                        >
+                            <Column
+                                field="ucid"
+                                header="UCID"
+                                :sortable="true"
+                            ></Column>
+                            <Column
+                                field="title"
+                                header="Title"
+                                :sortable="true"
+                            ></Column>
+                            <Column
+                                field="value"
+                                header="Value"
+                                :sortable="true"
+                            ></Column>
+                            <Column
+                                field="award_date"
+                                header="Awarded"
+                                :sortable="true"
+                            ></Column>
+                            <Column
+                                field="need_date"
+                                header="Need Date"
+                                :sortable="true"
+                            ></Column>
+                            <Column
+                                field="status"
+                                header="Status"
+                                :sortable="true"
+                            >
+                                <template #body="slotProps">
+                                    <StatusIcon
+                                        size="small"
+                                        :centered="true"
+                                        :status="slotProps.data.status"
+                                        :showTitle="true"
+                                    ></StatusIcon>
+                                </template>
+                            </Column>
+                            <!-- <template #paginatorstart>
+                                <Button icon="pi pi-refresh" class="p-button-text" :loading="loading" @click="getContracts"/>
+                            </template>
+                            <template #paginatorend>
+                                <Button icon="pi pi-cloud" class="p-button-text" />
+                            </template> -->
+                        </DataTable>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -72,30 +91,39 @@ import StatusIcon from '@/components/StatusIcon.vue'
 import { ContractService } from '@/api/ContractService'
 import type { Contract } from '@/types/ContractData.type'
 
+import Button from 'primevue/button'
+import DataTable from 'primevue/datatable'
+import Column from 'primevue/column'
+
 export default defineComponent({
     name: 'ContractList',
 
     components: {
         StatusIcon,
+        Button,
+        DataTable,
+        Column,
     },
 
-    emits: ['loading-change'],
-
-    setup(props, { emit }) {
+    setup(props) {
         const showNewContract = ref(false)
+        const loading = ref(false)
 
-        emit('loading-change', true)
         const contracts = ref([] as Contract[])
-        ContractService.list()
-            .then((res) => {
-                contracts.value = res.data
-            })
-            .catch((err) => {
-                console.warn('Error Fetching Contracts', err)
-            })
-            .finally(() => {
-                emit('loading-change', false)
-            })
+        function getContracts() {
+            loading.value = true
+            ContractService.list()
+                .then((res) => {
+                    contracts.value = res.data
+                })
+                .catch((err) => {
+                    console.warn('Error Fetching Contracts', err)
+                })
+                .finally(() => {
+                    loading.value = false
+                })
+        }
+        getContracts()
 
         function openContract(id: number) {
             router.push({
@@ -108,22 +136,16 @@ export default defineComponent({
         }
 
         return {
-            showNewContract, contracts, openContract,
+            showNewContract,
+            loading,
+            getContracts,
+            contracts,
+            openContract,
         }
     },
 })
 </script>
 
 <style lang="scss" scoped>
-.contracts-table {
-    & tbody {
-        & tr {
-            &:hover {
-                cursor: pointer;
-                background-color: #1d9fca25;
-                border-radius: 3px;
-            }
-        }
-    }
-}
+//
 </style>
