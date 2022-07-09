@@ -1,275 +1,242 @@
 <template>
-    <div class="contract-content-wrapper">
-        <v-row class="justify-center" :no-gutters="true">
-            <v-col cols="11">
-                <v-card class="px-8 py-5 my-5" elevation="2">
-                    <v-row class="justify-space-between">
-                        <v-col cols="12">
-                            <h5 class="text-h5">Holidays</h5>
-                        </v-col>
-                    </v-row>
-                </v-card>
-                <Calendar
-                    :columns="4"
-                    :rows="1"
-                    :is-expanded="true"
-                    :attributes="calHolidays"
-                ></Calendar>
-                <v-card
-                    class="px-8 py-5 my-5"
-                    elevation="2"
+    <div class="grid align-items-center">
+        <div class="col-8">
+            <h1>Holidays</h1>
+        </div>
+        <div class="col-4 text-right">
+            <Button
+                label="Holiday"
+                icon="pi pi-plus"
+                class="p-button-secondary header-button"
+                @click="openModal"
+            />
+        </div>
+        <div class="col-12 mt-4">
+            <Calendar
+                :columns="4"
+                :rows="1"
+                :is-expanded="true"
+                :attributes="calHolidays"
+                class="mb-5"
+            ></Calendar>
+            <DataTable
+                :value="holidays"
+                removableSort
+                :paginator="true"
+                :rows="10"
+                :loading="loading"
+                stripedRows
+                class="p-datatable-sm"
+                paginatorTemplate="CurrentPageReport FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
+                :rowsPerPageOptions="[10, 20, 50]"
+                currentPageReportTemplate="Showing {first} to {last} of {totalRecords}"
+                dataKey="id"
+                v-model:selection="selectedRow"
+                selectionMode="single"
+                @row-click="openEditModal"
+            >
+                <Column
+                    field="title"
+                    header="Holiday"
+                    :sortable="true"
+                    style="width: 25%"
+                ></Column>
+                <Column
+                    field="details"
+                    header="Details"
+                    style="width: 35%"
                 >
-                    <v-row class="justify-space-between">
-                        <v-col cols="12">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th class="text-left">Holiday</th>
-                                        <th class="text-left">Details</th>
-                                        <th class="text-left">Date</th>
-                                        <th class="text-left">Observed</th>
-                                        <th class="text-left"></th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <template
-                                        v-for="(holiday, idx) in holidays"
-                                        :key="holiday.id"
-                                    >
-                                        <tr v-if="edit.includes(holiday.id)" >
-                                            <td>
-                                                <v-text-field
-                                                    color="primary"
-                                                    label="Title"
-                                                    variant="outlined"
-                                                    density="compact"
-                                                    :hide-details="true"
-                                                    v-model="holiday.title"
-                                                ></v-text-field>
-                                            </td>
-                                            <td>
-                                                <v-text-field
-                                                    color="primary"
-                                                    label="Details"
-                                                    variant="outlined"
-                                                    density="compact"
-                                                    :hide-details="true"
-                                                    v-model="holiday.details"
-                                                ></v-text-field>
-                                            </td>
-                                            <td>
-                                                <DatePicker v-model="holiday.date">
-                                                    <template v-slot="{ inputValue, inputEvents }">
-                                                        <v-text-field
-                                                            color="primary"
-                                                            label="Date"
-                                                            variant="outlined"
-                                                            density="compact"
-                                                            :hide-details="true"
-                                                            v-model="holiday.date"
-                                                            :value="inputValue"
-                                                            v-on="inputEvents"
-                                                        ></v-text-field>
-                                                    </template>
-                                                </DatePicker>
-                                            </td>
-                                            <td>
-                                                <DatePicker v-model="holiday.observed">
-                                                    <template v-slot="{ inputValue, inputEvents }">
-                                                        <v-text-field
-                                                            color="primary"
-                                                            label="Observed"
-                                                            variant="outlined"
-                                                            density="compact"
-                                                            :hide-details="true"
-                                                            v-model="holiday.observed"
-                                                            :value="inputValue"
-                                                            v-on="inputEvents"
-                                                        ></v-text-field>
-                                                    </template>
-                                                </DatePicker>
-                                            </td>
-                                            <td class="text-right">
-                                                <v-btn
-                                                    color="grey"
-                                                    icon="mdi-close"
-                                                    size="x-small"
-                                                    variant="plain"
-                                                    @click.prevent="toggleEdit()"
-                                                ></v-btn>
-                                                <v-btn
-                                                    color="success"
-                                                    icon="mdi-check"
-                                                    size="x-small"
-                                                    variant="plain"
-                                                    @click.prevent="saveHoliday(idx, holiday)"
-                                                ></v-btn>
-                                            </td>
-                                        </tr>
-                                        <tr v-else>
-                                            <td>{{ holiday.title }}</td>
-                                            <td>{{ holiday.details }}</td>
-                                            <td>{{ dateString(holiday.date) }}</td>
-                                            <td>{{ dateString(holiday.observed) }}</td>
-                                            <td class="text-right">
-                                                <v-btn
-                                                    color="grey"
-                                                    icon="mdi-pencil"
-                                                    size="x-small"
-                                                    variant="plain"
-                                                    @click.prevent="edit.push(holiday.id)"
-                                                ></v-btn>
-                                                <v-btn
-                                                    color="error"
-                                                    icon="mdi-delete"
-                                                    size="x-small"
-                                                    variant="plain"
-                                                    @click.prevent="deleteHoliday(idx, holiday)"
-                                                ></v-btn>
-                                            </td>
-                                        </tr>
-                                    </template>
-                                </tbody>
-                            </table>
-                        </v-col>
-                    </v-row>
-                </v-card>
-            </v-col>
-        </v-row>
-
-        <v-btn
-            color="primary"
-            icon="mdi-plus"
-            size="default"
-            elevation="10"
-            class="fab-primary"
-            @click.prevent="openModal()"
-        ></v-btn>
+                </Column>
+                <Column
+                    field="date"
+                    header="Date"
+                    :sortable="true"
+                    style="width: 20%"
+                >
+                    <template #body="slotProps">
+                        {{ dateString(slotProps.data.date) }}
+                    </template>
+                </Column>
+                <Column
+                    field="observed"
+                    header="Observed"
+                    :sortable="true"
+                    style="width: 20%"
+                >
+                    <template #body="slotProps">
+                        {{ dateString(slotProps.data.observed) }}
+                    </template>
+                </Column>
+                <!-- <template #paginatorstart>
+                    <Button icon="pi pi-refresh" class="p-button-text" :loading="loading" @click="getHolidays"/>
+                </template>
+                <template #paginatorend>
+                    <Button icon="pi pi-cloud" class="p-button-text" />
+                </template> -->
+            </DataTable>
+        </div>
+        <ConfirmDialog></ConfirmDialog>
+        <Dialog
+            v-model:visible="showEditModal"
+            :style="{ width: '700px' }"
+            header="Edit Holiday"
+            :modal="true"
+            class="p-fluid"
+            :closeOnEscape="true"
+            :dismissableMask="true"
+            :draggable="false"
+            @hide="selectedRow = {}"
+        >
+            <div class="formgrid grid">
+                <div class="field col-6">
+                    <label for="title">Title</label>
+                    <InputText id="title" v-model="selectedRow.title" />
+                </div>
+                <div class="field col-6">
+                    <label for="details">Details</label>
+                    <InputText
+                        id="details"
+                        v-model="selectedRow.details"
+                    />
+                </div>
+                <div class="field col-6">
+                    <label for="date">Date</label>
+                    <p-calendar id="date" v-model="selectedRow.date" :showIcon="true" />
+                </div>
+                <div class="field col-6">
+                    <label for="observed">Observed</label>
+                    <p-calendar id="observed" v-model="selectedRow.observed" :showIcon="true"/>
+                </div>
+            </div>
+            <template #footer>
+                <div class="flex">
+                    <Button
+                        label="Delete"
+                        icon="pi pi-trash"
+                        class="p-button-danger"
+                        @click="deleteHoliday"
+                    />
+                    <span class="flex-auto"></span>
+                    <Button
+                        label="Cancel"
+                        icon="pi pi-times"
+                        class="p-button-text"
+                        @click="closeEditModal"
+                    />
+                    <Button
+                        label="Save"
+                        icon="pi pi-check"
+                        class="p-button-success"
+                        @click="saveHoliday"
+                    />
+                </div>
+            </template>
+        </Dialog>
+        <Dialog
+            v-model:visible="showModal"
+            :style="{ width: '700px' }"
+            header="Add Holiday"
+            :modal="true"
+            class="p-fluid"
+            :closeOnEscape="true"
+            :dismissableMask="true"
+            :draggable="false"
+        >
+            <div class="formgrid grid">
+                <div class="field col-6">
+                    <label for="title">Title</label>
+                    <InputText id="title" v-model="newHoliday.title" />
+                </div>
+                <div class="field col-6">
+                    <label for="details">Details</label>
+                    <InputText id="details" v-model="newHoliday.details" />
+                </div>
+                <div class="field col-6">
+                    <label for="date">Date</label>
+                    <p-calendar id="date" v-model="newHoliday.date" :showIcon="true" />
+                </div>
+                <div class="field col-6">
+                    <label for="observed">Observed</label>
+                    <p-calendar id="observed" v-model="newHoliday.observed" :showIcon="true"/>
+                </div>
+            </div>
+            <template #footer>
+                <Button
+                    label="Cancel"
+                    icon="pi pi-times"
+                    class="p-button-text"
+                    @click="closeModal"
+                />
+                <Button
+                    label="Save"
+                    icon="pi pi-check"
+                    class="p-button-success"
+                    @click="createHoliday"
+                />
+            </template>
+        </Dialog>
     </div>
-    <v-dialog
-        v-model="showModal"
-        scrollable
-        width="auto"
-        class="create-modal"
-    >
-        <v-card class="pa-8 my-5" elevation="2" width="800px" min-height="500px">
-            <v-row class="justify-start">
-                 <v-col cols="12">
-                    <h5 class="text-h5">Create New Holiday</h5>
-                </v-col>
-            </v-row>
-            <v-row class="justify-start py-10">
-                <v-col cols="6">
-                    <v-text-field
-                        color="primary"
-                        label="Title"
-                        variant="outlined"
-                        density="compact"
-                        :hide-details="true"
-                        v-model="newHoliday.title"
-                    ></v-text-field>
-                </v-col>
-                <v-col cols="6">
-                    <v-text-field
-                        color="primary"
-                        label="Details"
-                        variant="outlined"
-                        density="compact"
-                        :hide-details="true"
-                        v-model="newHoliday.details"
-                    ></v-text-field>
-                </v-col>
-                <v-col cols="6">
-                    <DatePicker v-model="newHoliday.date">
-                        <template v-slot="{ inputValue, inputEvents }">
-                            <v-text-field
-                                color="primary"
-                                label="Date"
-                                variant="outlined"
-                                density="compact"
-                                :hide-details="true"
-                                v-model="newHoliday.date"
-                                :value="inputValue"
-                                v-on="inputEvents"
-                            ></v-text-field>
-                        </template>
-                    </DatePicker>
-                </v-col>
-                <v-col cols="6">
-                    <DatePicker v-model="newHoliday.observed">
-                        <template v-slot="{ inputValue, inputEvents }">
-                            <v-text-field
-                                color="primary"
-                                label="Observed"
-                                variant="outlined"
-                                density="compact"
-                                :hide-details="true"
-                                v-model="newHoliday.observed"
-                                :value="inputValue"
-                                v-on="inputEvents"
-                            ></v-text-field>
-                        </template>
-                    </DatePicker>
-                </v-col>
-            </v-row>
-            <v-spacer></v-spacer>
-             <v-row class="text-right">
-                <v-col cols="12">
-                    <v-btn
-                        prepend-icon="mdi-close"
-                        label="Save"
-                        size="default"
-                        variant="flat"
-                        @click.prevent="closeModal()"
-                    >
-                        Cancel
-                    </v-btn>
-                    <v-btn
-                        color="success"
-                        prepend-icon="mdi-check"
-                        label="Save"
-                        size="default"
-                        variant="flat"
-                        @click.prevent="createHoliday(newHoliday)"
-                    >
-                        Create
-                    </v-btn>
-                </v-col>
-             </v-row>
-        </v-card>
-    </v-dialog>
 </template>
 
 <script lang="ts">
 import { HolidayService } from '@/api/ContractService'
-import type { Holiday } from '@/types/ContractData.type'
-import { defineComponent, ref } from 'vue'
+import type { Holiday, HolidayBuild } from '@/types/ContractData.type'
+import { defineComponent, nextTick, ref } from 'vue'
 import { Calendar } from 'v-calendar'
-import { DatePicker } from 'v-calendar'
-import { formatDate, dateString } from '@/composables/ContractCalcs.composable'
+import { formatDate, dateString, ymdDateFormat } from '@/composables/ContractCalcs.composable'
+
+import Button from 'primevue/button'
+import Dialog from 'primevue/dialog'
+import DataTable from 'primevue/datatable'
+import Column from 'primevue/column'
+import InputText from 'primevue/inputtext'
+
+import { useToast } from 'primevue/usetoast'
+import ConfirmDialog from 'primevue/confirmdialog'
+import { useConfirm } from 'primevue/useconfirm'
 
 export default defineComponent({
     name: 'HolidayList',
 
     components: {
-        DatePicker,
         Calendar,
+        Button,
+        Dialog,
+        DataTable,
+        Column,
+        InputText,
+        ConfirmDialog,
     },
 
-    emits: ['loading-change'],
+    setup(props) {
+        const selectedRow = ref({} as Holiday)
+        const loading = ref(false)
+        const toast = useToast()
+        const confirm = useConfirm()
 
-    setup(props,{ emit }) {
-        const edit = ref([])
         const showModal = ref(false)
         const newHoliday = ref({
             title: '',
             details: '',
-            date: null,
-            observed: null,
-        })
+            date: new Date(),
+            observed: new Date(),
+        } as HolidayBuild)
 
-        function toggleEdit(type: string, value: number) {
-            edit.value.splice(edit.value.findIndex((p) => { return p === value }))
+        const showEditModal = ref(false)
+        function openEditModal() {
+            nextTick(() => {
+                selectedRow.value = {
+                    ...selectedRow.value,
+                    date: new Date(selectedRow.value.date.toString()),
+                    observed: new Date(selectedRow.value.observed.toString()),
+                }
+                showEditModal.value = true
+            })
+            
+        }
+        function closeEditModal() {
+            showEditModal.value = false
+            selectedRow.value = {} as Holiday
         }
 
         function openModal() {
@@ -280,8 +247,8 @@ export default defineComponent({
             newHoliday.value = {
                 title: '',
                 details: '',
-                date: null,
-                observed: null,
+                date: new Date(),
+                observed: new Date(),
             }
         }
 
@@ -294,96 +261,185 @@ export default defineComponent({
             },
         ] as any[])
 
-        emit('loading-change', true)
         const holidays = ref([] as Holiday[])
-        HolidayService.list()
-            .then((res) => {
-                holidays.value = res.data
-            })
-            .catch((err) => {
-                console.warn('Error Fetching Holidays', err)
-            })
-            .finally(() => {
-                holidays.value.forEach(hol => {
-                    calHolidays.value.push({
-                        highlight: {
-                            start: { color: 'red', fillMode: 'solid' },
-                            base: { color: 'red', fillMode: 'light' },
-                            end: { color: 'red', fillMode: 'solid' },
-                        },
-                        dates: { start: formatDate(hol.date.toString()), end: formatDate(hol.observed.toString()) },
-                        popover: { label: hol.title },
+        function getHolidays() {
+            loading.value = true
+            HolidayService.list()
+                .then((res) => {
+                    holidays.value = res.data
+                    holidays.value.forEach((holiday) => {
+                        holiday.date = formatDate(holiday.date.toString())
+                        holiday.observed = formatDate(holiday.observed.toString())
                     })
                 })
-                emit('loading-change', false)
-            })
+                .then(() => {
+                    holidays.value.forEach(hol => {
+                        calHolidays.value.push({
+                            highlight: {
+                                start: { color: 'red', fillMode: 'solid' },
+                                base: { color: 'red', fillMode: 'light' },
+                                end: { color: 'red', fillMode: 'solid' },
+                            },
+                            dates: { start: hol.date, end: hol.observed },
+                            popover: { label: hol.title },
+                        })
+                    })
+                })
+                .catch((err) => {
+                    console.warn('Error Fetching Holidays', err)
+                    toast.add({
+                        severity: 'error',
+                        summary: 'Error',
+                        detail: 'Error Loading Holidays',
+                        life: 3000,
+                    })
+                })
+                .finally(() => {
+                    loading.value = false
+                })
+        }
+        getHolidays()
 
-        function createHoliday(holiday: Holiday) {
-            emit('loading-change', true)
+        function createHoliday() {
+            loading.value = true
 
-            const data: Holiday = {
-                ...holiday,
-                details: holiday.details && holiday.details !== "" ? holiday.details : null,
+            const data: HolidayBuild = {
+                title: newHoliday.value.title,
+                details: newHoliday.value.details !== "" ? newHoliday.value.details : null,
+                date: ymdDateFormat(new Date(newHoliday.value.date.toString())),
+                observed: ymdDateFormat(new Date(newHoliday.value.observed.toString())),
             }
 
             HolidayService.create(data)
                 .then((res) => {
-                    holidays.value.push(res.data)
+                    holidays.value.push({
+                        ...res.data,
+                        date: formatDate(res.data.date.toString()),
+                        observed: formatDate(res.data.observed.toString()),
+                    })
+                    toast.add({
+                        severity: 'success',
+                        summary: 'Created',
+                        detail: 'Holiday Created',
+                        life: 3000,
+                    })
                 })
                 .catch((err) => {
                     console.warn('Error Creating Holiday', err)
+                    toast.add({
+                        severity: 'error',
+                        summary: 'Error',
+                        detail: 'Error Creating Holiday',
+                        life: 3000,
+                    })
                 })
                 .finally(() => {
-                    emit('loading-change', false)
+                    loading.value = false
                     closeModal()
                 })
         }
 
-        function saveHoliday(idx: number, holiday: Holiday) {
-            emit('loading-change', true)
-            const editIndex = edit.value.findIndex((h) => h === holiday.id)
+        function saveHoliday() {
+            const idx = holidays.value.findIndex(
+                (h) => h.id === selectedRow.value.id,
+            )
+            loading.value = true
 
             const data: Holiday = {
-                ...holiday,
-                details: holiday.details && holiday.details !== "" ? holiday.details : null,
+                ...selectedRow.value,
+                details: selectedRow.value.details !== "" ? selectedRow.value.details : null,
+                date: ymdDateFormat(new Date(selectedRow.value.date.toString())),
+                observed: ymdDateFormat(new Date(selectedRow.value.observed.toString())),
             }
 
-            HolidayService.update(holiday.id, data)
+            HolidayService.update(data.id, data)
                 .then((res) => {
-                    holidays.value[idx] = res.data
-                    edit.value.splice(editIndex, 1)
+                    holidays.value[idx] = {
+                        ...res.data,
+                        date: formatDate(res.data.date.toString()),
+                        observed: formatDate(res.data.observed.toString()),
+                    }
+                    toast.add({
+                        severity: 'success',
+                        summary: 'Saved',
+                        detail: 'Holiday Updated',
+                        life: 3000,
+                    })
                 })
                 .catch((err) => {
                     console.warn('Error Updating Holiday', err)
+                    toast.add({
+                        severity: 'error',
+                        summary: 'Error',
+                        detail: 'Error Updating Holiday',
+                        life: 3000,
+                    })
                 })
                 .finally(() => {
-                    emit('loading-change', false)
+                    loading.value = false
+                    selectedRow.value = {} as Holiday
+                    showEditModal.value = false
                 })
         }
 
-        function deleteHoliday(idx: number, holiday: Holiday) {
-            emit('loading-change', true)
-            const editIndex = edit.value.findIndex((h) => h === holiday.id)
+        function deleteHoliday() {
+            confirm.require({
+                message: 'Do you want to delete this holiday?',
+                header: 'Delete Confirmation',
+                icon: 'pi pi-info-circle',
+                acceptClass: 'p-button-danger',
+                accept: () => {
+                    loading.value = true
+                    const idx = holidays.value.findIndex(
+                        (h) => h.id === selectedRow.value.id,
+                    )
 
-            HolidayService.delete(holiday.id)
-                .then((res) => {
-                    holidays.value.splice(idx, 1)
-                    edit.value.splice(editIndex, 1)
-                })
-                .catch((err) => {
-                    console.warn('Error Deleting Holiday', err)
-                })
-                .finally(() => {
-                    emit('loading-change', false)
-                })
+                    HolidayService.delete(selectedRow.value.id)
+                        .then((res) => {
+                            holidays.value.splice(idx, 1)
+                            toast.add({
+                                severity: 'success',
+                                summary: 'Saved',
+                                detail: 'Holiday Deleted',
+                                life: 3000,
+                            })
+                        })
+                        .catch((err) => {
+                            console.warn('Error Deleting Holiday', err)
+                            toast.add({
+                                severity: 'error',
+                                summary: 'Error',
+                                detail: 'Error Deleting Holiday',
+                                life: 3000,
+                            })
+                        })
+                        .finally(() => {
+                            loading.value = false
+                            closeEditModal()
+                        })
+                },
+                reject: () => {},
+            })
         }
 
         
         return {
-            edit, toggleEdit, newHoliday, holidays,
-            calHolidays, dateString,
-            createHoliday, saveHoliday, deleteHoliday,
-            showModal, openModal, closeModal,
+            loading,
+            selectedRow,
+            newHoliday,
+            holidays,
+            calHolidays,
+            getHolidays,
+            createHoliday,
+            saveHoliday,
+            deleteHoliday,
+            showModal,
+            showEditModal,
+            dateString,
+            openModal,
+            openEditModal,
+            closeModal,
+            closeEditModal,
         }
     }
 })

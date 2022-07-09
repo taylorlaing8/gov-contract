@@ -33,6 +33,8 @@ app.use(ConfirmationService)
 // app.component('p-data-table', DataTable)
 // import Column from 'primevue/column'
 // app.component('p-column', Column)
+import Calendar from 'primevue/calendar'
+app.component('p-calendar', Calendar)
 
 app.use(VueClipboard, {
     autoSetContainer: true,

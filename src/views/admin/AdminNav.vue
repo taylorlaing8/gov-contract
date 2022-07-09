@@ -88,7 +88,7 @@ export default defineComponent({
                 params: {},
             })
         }
-        defaultRoute()
+        if (route.name === 'admin') defaultRoute()
 
         watch(() => route.name, () => {
             if (route.name === 'admin') {

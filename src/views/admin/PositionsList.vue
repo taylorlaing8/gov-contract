@@ -1,191 +1,176 @@
 <template>
-    <div class="contract-content-wrapper">
-        <v-row class="justify-center" :no-gutters="true">
-            <v-col cols="11">
-                <v-card class="px-8 py-5 my-5" elevation="2">
-                    <v-row class="justify-space-between">
-                        <v-col cols="12">
-                            <h5 class="text-h5">Positions</h5>
-                        </v-col>
-                    </v-row>
-                </v-card>
-                <v-card
-                    class="px-8 py-5 my-5"
-                    elevation="2"
+    <div class="grid align-items-center">
+        <div class="col-8">
+            <h1>Positions</h1>
+        </div>
+        <div class="col-4 text-right">
+            <Button
+                label="Position"
+                icon="pi pi-plus"
+                class="p-button-secondary header-button"
+                @click="openModal"
+            />
+        </div>
+        <div class="col-12 mt-4">
+            <DataTable
+                :value="positions"
+                removableSort
+                :paginator="true"
+                :rows="10"
+                :loading="loading"
+                stripedRows
+                class="p-datatable-sm"
+                paginatorTemplate="CurrentPageReport FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
+                :rowsPerPageOptions="[10, 20, 50]"
+                currentPageReportTemplate="Showing {first} to {last} of {totalRecords}"
+                dataKey="id"
+                v-model:selection="selectedRow"
+                selectionMode="single"
+                @row-click="openEditModal"
+            >
+                <Column
+                    field="title"
+                    header="Title"
+                    :sortable="true"
+                    style="width: 50%"
+                ></Column>
+                <Column
+                    field="department"
+                    header="Department"
+                    :sortable="true"
+                    style="width: 50%"
                 >
-                    <v-row class="justify-space-between">
-                        <v-col cols="12">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th class="text-left">Title</th>
-                                        <th class="text-left">Department</th>
-                                        <th class="text-left"></th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <template
-                                        v-for="(position, idx) in positions"
-                                        :key="position.id"
-                                    >
-                                        <tr v-if="edit.includes(position.id)" >
-                                            <td>
-                                                <v-text-field
-                                                    color="primary"
-                                                    label="Title"
-                                                    variant="outlined"
-                                                    density="compact"
-                                                    :hide-details="true"
-                                                    v-model="position.title"
-                                                ></v-text-field>
-                                            </td>
-                                            <td>
-                                                <v-text-field
-                                                    color="primary"
-                                                    label="Department"
-                                                    variant="outlined"
-                                                    density="compact"
-                                                    :hide-details="true"
-                                                    v-model="position.department"
-                                                ></v-text-field>
-                                            </td>
-                                            <td class="text-right">
-                                                <v-btn
-                                                    color="grey"
-                                                    icon="mdi-close"
-                                                    size="x-small"
-                                                    variant="plain"
-                                                    @click.prevent="toggleEdit()"
-                                                ></v-btn>
-                                                <v-btn
-                                                    color="success"
-                                                    icon="mdi-check"
-                                                    size="x-small"
-                                                    variant="plain"
-                                                    @click.prevent="savePosition(idx, position)"
-                                                ></v-btn>
-                                            </td>
-                                        </tr>
-                                        <tr v-else>
-                                            <td>{{ position.title }}</td>
-                                            <td>{{ position.department }}</td>
-                                            <td class="text-right">
-                                                <v-btn
-                                                    color="grey"
-                                                    icon="mdi-pencil"
-                                                    size="x-small"
-                                                    variant="plain"
-                                                    @click.prevent="edit.push(position.id)"
-                                                ></v-btn>
-                                                <v-btn
-                                                    color="error"
-                                                    icon="mdi-delete"
-                                                    size="x-small"
-                                                    variant="plain"
-                                                    @click.prevent="deletePosition(idx, position)"
-                                                ></v-btn>
-                                            </td>
-                                        </tr>
-                                    </template>
-                                </tbody>
-                            </table>
-                        </v-col>
-                    </v-row>
-                </v-card>
-            </v-col>
-        </v-row>
-
-        <v-btn
-            color="primary"
-            icon="mdi-plus"
-            size="default"
-            elevation="10"
-            class="fab-primary"
-            @click.prevent="openModal()"
-        ></v-btn>
+                </Column>
+                <!-- <template #paginatorstart>
+                    <Button icon="pi pi-refresh" class="p-button-text" :loading="loading" @click="getPocs"/>
+                </template>
+                <template #paginatorend>
+                    <Button icon="pi pi-cloud" class="p-button-text" />
+                </template> -->
+            </DataTable>
+        </div>
+        <ConfirmDialog></ConfirmDialog>
+        <Dialog
+            v-model:visible="showEditModal"
+            :style="{ width: '700px' }"
+            header="Edit Position"
+            :modal="true"
+            class="p-fluid"
+            :closeOnEscape="true"
+            :dismissableMask="true"
+            :draggable="false"
+            @hide="selectedRow = {}"
+        >
+            <div class="formgrid grid">
+                <div class="field col-6">
+                    <label for="title">Title</label>
+                    <InputText id="title" v-model="selectedRow.title" />
+                </div>
+                <div class="field col-6">
+                    <label for="department">department</label>
+                    <InputText id="department" v-model="selectedRow.department" />
+                </div>
+            </div>
+            <template #footer>
+                <div class="flex">
+                    <Button
+                        label="Delete"
+                        icon="pi pi-trash"
+                        class="p-button-danger"
+                        @click="deletePosition"
+                    />
+                    <span class="flex-auto"></span>
+                    <Button
+                        label="Cancel"
+                        icon="pi pi-times"
+                        class="p-button-text"
+                        @click="closeEditModal"
+                    />
+                    <Button
+                        label="Save"
+                        icon="pi pi-check"
+                        class="p-button-success"
+                        @click="savePosition"
+                    />
+                </div>
+            </template>
+        </Dialog>
+        <Dialog
+            v-model:visible="showModal"
+            :style="{ width: '700px' }"
+            header="Add Position"
+            :modal="true"
+            class="p-fluid"
+            :closeOnEscape="true"
+            :dismissableMask="true"
+            :draggable="false"
+        >
+            <div class="formgrid grid">
+                <div class="field col-6">
+                    <label for="title">Title</label>
+                    <InputText id="title" v-model="newPosition.title" />
+                </div>
+                <div class="field col-6">
+                    <label for="department">Department</label>
+                    <InputText id="department" v-model="newPosition.department" />
+                </div>
+            </div>
+            <template #footer>
+                <Button
+                    label="Cancel"
+                    icon="pi pi-times"
+                    class="p-button-text"
+                    @click="closeModal"
+                />
+                <Button
+                    label="Save"
+                    icon="pi pi-check"
+                    class="p-button-success"
+                    @click="createPosition"
+                />
+            </template>
+        </Dialog>
     </div>
-    <v-dialog
-        v-model="showModal"
-        scrollable
-        width="auto"
-    >
-        <v-card class="pa-8 my-5" elevation="2" width="800px">
-            <v-row class="justify-start">
-                 <v-col cols="12">
-                    <h5 class="text-h5">Create New Position</h5>
-                </v-col>
-            </v-row>
-            <v-row class="justify-start py-10">
-                <v-col cols="6">
-                    <v-text-field
-                        color="primary"
-                        label="Title"
-                        variant="outlined"
-                        density="compact"
-                        :hide-details="true"
-                        v-model="newPosition.title"
-                    ></v-text-field>
-                </v-col>
-                <v-col cols="6">
-                    <v-text-field
-                        color="primary"
-                        label="Department"
-                        variant="outlined"
-                        density="compact"
-                        :hide-details="true"
-                        v-model="newPosition.department"
-                    ></v-text-field>
-                </v-col>
-            </v-row>
-             <v-row class="text-right">
-                <v-col cols="12">
-                    <v-btn
-                        prepend-icon="mdi-close"
-                        label="Save"
-                        size="default"
-                        variant="flat"
-                        @click.prevent="closeModal()"
-                    >
-                        Cancel
-                    </v-btn>
-                    <v-btn
-                        color="success"
-                        prepend-icon="mdi-check"
-                        label="Save"
-                        size="default"
-                        variant="flat"
-                        @click.prevent="createPosition(newPosition)"
-                    >
-                        Create
-                    </v-btn>
-                </v-col>
-             </v-row>
-        </v-card>
-    </v-dialog>
 </template>
 
 <script lang="ts">
 import { PositionService } from '@/api/ContractService'
-import type { Position } from '@/types/ContractData.type'
+import type { Position, PositionBuild } from '@/types/ContractData.type'
 import { defineComponent, ref } from 'vue'
 
+import Button from 'primevue/button'
+import Dialog from 'primevue/dialog'
+import DataTable from 'primevue/datatable'
+import Column from 'primevue/column'
+import InputText from 'primevue/inputtext'
+
+import { useToast } from 'primevue/usetoast'
+import ConfirmDialog from 'primevue/confirmdialog'
+import { useConfirm } from 'primevue/useconfirm'
 
 export default defineComponent({
     name: 'PositionsList',
 
-    emits: ['loading-change'],
+    components: {
+        Button,
+        Dialog,
+        DataTable,
+        Column,
+        InputText,
+        ConfirmDialog,
+    },
 
-    setup(props, { emit }) {
-        const edit = ref([])
+    setup(props) {
+        const selectedRow = ref({} as Position)
+        const loading = ref(false)
+        const toast = useToast()
+        const confirm = useConfirm()
+
         const showModal = ref(false)
         const newPosition = ref({
             title: '',
             department: '',
-        })
-
-        function toggleEdit(type: string, value: number) {
-            edit.value.splice(edit.value.findIndex((p) => { return p === value }))
-        }
+        } as PositionBuild)
 
         function openModal() {
             showModal.value = true
@@ -198,74 +183,158 @@ export default defineComponent({
             }
         }
 
-        emit('loading-change', true)
+        const showEditModal = ref(false)
+        function openEditModal() {
+            showEditModal.value = true
+        }
+        function closeEditModal() {
+            showEditModal.value = false
+            selectedRow.value = {} as Position
+        }
+
         const positions = ref([] as Position[])
-        PositionService.list()
-            .then((res) => {
-                positions.value = res.data
-            })
-            .catch((err) => {
-                console.warn('Error Fetching Positions', err)
-            })
-            .finally(() => {
-                emit('loading-change', false)
-            })
+        function getPositions() {
+            loading.value = true
+            PositionService.list()
+                .then((res) => {
+                    positions.value = res.data
+                })
+                .catch((err) => {
+                    console.warn('Error Fetching Positions', err)
+                    toast.add({
+                        severity: 'error',
+                        summary: 'Error',
+                        detail: 'Error Loading Positions',
+                        life: 3000,
+                    })
+                })
+                .finally(() => {
+                    loading.value = false
+                })
+        }
+        getPositions()
 
-        function createPosition(pos: Position) {
-            emit('loading-change', true)
-
-            PositionService.create(pos)
+        function createPosition() {
+            loading.value = true
+            PositionService.create(newPosition.value)
                 .then((res) => {
                     positions.value.push(res.data)
+                    toast.add({
+                        severity: 'success',
+                        summary: 'Created',
+                        detail: 'Position Created',
+                        life: 3000,
+                    })
                 })
                 .catch((err) => {
                     console.warn('Error Creating Position', err)
+                    toast.add({
+                        severity: 'error',
+                        summary: 'Error',
+                        detail: 'Error Creating Position',
+                        life: 3000,
+                    })
                 })
                 .finally(() => {
-                    emit('loading-change', false)
+                    loading.value = false
                     closeModal()
                 })
         }
 
-        function savePosition(idx: number, pos: Position) {
-            emit('loading-change', true)
-            const editIndex = edit.value.findIndex((p) => p === pos.id)
+        function savePosition() {
+            const idx = positions.value.findIndex(
+                (p) => p.id === selectedRow.value.id,
+            )
+            loading.value = true
 
-            PositionService.update(pos.id, pos)
+            const formatPosition = {
+                id: selectedRow.value.id,
+                title: selectedRow.value.title,
+                department: selectedRow.value.department,
+            }
+
+            PositionService.update(formatPosition.id, formatPosition)
                 .then((res) => {
                     positions.value[idx] = res.data
-                    edit.value.splice(editIndex, 1)
+                    toast.add({
+                        severity: 'success',
+                        summary: 'Saved',
+                        detail: 'Position Updated',
+                        life: 3000,
+                    })
                 })
                 .catch((err) => {
                     console.warn('Error Updating Position', err)
+                    toast.add({
+                        severity: 'error',
+                        summary: 'Error',
+                        detail: 'Error Updating Position',
+                        life: 3000,
+                    })
                 })
                 .finally(() => {
-                    emit('loading-change', false)
+                    loading.value = false
+                    selectedRow.value = {} as Position
+                    showEditModal.value = false
                 })
         }
 
-        function deletePosition(idx: number, pos: Position) {
-            emit('loading-change', true)
-            const editIndex = edit.value.findIndex((p) => p === pos.id)
+        function deletePosition() {
+            confirm.require({
+                message: 'Do you want to delete this position?',
+                header: 'Delete Confirmation',
+                icon: 'pi pi-info-circle',
+                acceptClass: 'p-button-danger',
+                accept: () => {
+                    loading.value = true
+                    const idx = positions.value.findIndex(
+                        (p) => p.id === selectedRow.value.id,
+                    )
 
-            PositionService.delete(pos.id)
-                .then((res) => {
-                    positions.value.splice(idx, 1)
-                    edit.value.splice(editIndex, 1)
-                })
-                .catch((err) => {
-                    console.warn('Error Deleting Position', err)
-                })
-                .finally(() => {
-                    emit('loading-change', false)
-                })
+                    PositionService.delete(selectedRow.value.id)
+                        .then((res) => {
+                            positions.value.splice(idx, 1)
+                            toast.add({
+                                severity: 'success',
+                                summary: 'Saved',
+                                detail: 'Position Deleted',
+                                life: 3000,
+                            })
+                        })
+                        .catch((err) => {
+                            console.warn('Error Deleting Position', err)
+                            toast.add({
+                                severity: 'error',
+                                summary: 'Error',
+                                detail: 'Error Deleting Position',
+                                life: 3000,
+                            })
+                        })
+                        .finally(() => {
+                            loading.value = false
+                            closeEditModal()
+                        })
+                },
+                reject: () => {},
+            })
         }
 
         
         return {
-            edit, toggleEdit, newPosition, positions,
-            createPosition, savePosition, deletePosition,
-            showModal, openModal, closeModal,
+            loading,
+            selectedRow,
+            newPosition,
+            positions,
+            getPositions,
+            createPosition,
+            savePosition,
+            deletePosition,
+            showModal,
+            showEditModal,
+            openModal,
+            openEditModal,
+            closeModal,
+            closeEditModal,
         }
     }
 })

@@ -4,28 +4,12 @@
             <h1>Team Members</h1>
         </div>
         <div class="col-4 text-right">
-            <template v-if="selectedRow.id">
-                <Button
-                    label="Cancel"
-                    icon="pi pi-times"
-                    class="p-button-plain header-button ml-2"
-                    @click="selectedRow = {}"
-                />
-                <Button
-                    label="Delete"
-                    icon="pi pi-trash"
-                    class="p-button-danger header-button ml-2"
-                    @click="deletePoc"
-                />
-            </template>
-            <template v-else>
-                <Button
-                    label="Team Member"
-                    icon="pi pi-plus"
-                    class="p-button-secondary header-button"
-                    @click="openModal"
-                />
-            </template>
+            <Button
+                label="Team Member"
+                icon="pi pi-plus"
+                class="p-button-secondary header-button"
+                @click="openModal"
+            />
         </div>
         <div class="col-12 mt-4">
             <DataTable
@@ -39,58 +23,50 @@
                 paginatorTemplate="CurrentPageReport FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
                 :rowsPerPageOptions="[10, 20, 50]"
                 currentPageReportTemplate="Showing {first} to {last} of {totalRecords}"
-                editMode="row"
                 dataKey="id"
-                v-model:editingRows="editingRows"
                 v-model:selection="selectedRow"
                 selectionMode="single"
-                @row-edit-save="savePoc($event.index, $event.newData)"
+                @row-click="openEditModal"
             >
-                <Column field="prefix" header="Prefix" :sortable="true">
-                    <template #editor="{ data, field }">
-                        <InputText v-model="data[field]" autofocus />
-                    </template>
+                <Column
+                    field="prefix"
+                    header="Prefix"
+                    :sortable="true"
+                    style="width: 10%"
+                ></Column>
+                <Column
+                    field="first_name"
+                    header="First Name"
+                    :sortable="true"
+                    style="width: 20%"
+                >
                 </Column>
-                <Column field="first_name" header="First Name" :sortable="true">
-                    <template #editor="{ data, field }">
-                        <InputText v-model="data[field]" autofocus />
-                    </template>
+                <Column
+                    field="last_name"
+                    header="Last Name"
+                    :sortable="true"
+                    style="width: 20%"
+                >
                 </Column>
-                <Column field="last_name" header="Last Name" :sortable="true">
-                    <template #editor="{ data, field }">
-                        <InputText v-model="data[field]" autofocus />
-                    </template>
+                <Column
+                    field="email"
+                    header="Email"
+                    :sortable="true"
+                    style="width: 25%"
+                >
                 </Column>
-                <Column field="email" header="Email" :sortable="true">
-                    <template #editor="{ data, field }">
-                        <InputText v-model="data[field]" autofocus />
-                    </template>
-                </Column>
-                <Column field="title.title" header="Position" :sortable="true">
-                    <template #editor="{ data }">
-                        <Dropdown
-                            v-model="data['title'].id"
-                            :options="positions"
-                            optionLabel="title"
-                            optionValue="id"
-                            placeholder="Select Position"
-                        >
-                            <template #option="slotProps">
-                                <span>{{ slotProps.option.title }}</span>
-                            </template>
-                        </Dropdown>
-                    </template>
+                <Column
+                    field="title.title"
+                    header="Position"
+                    :sortable="true"
+                    style="width: 25%"
+                >
                     <template #body="slotProps">
                         {{ formatPosition(slotProps.data) }}
                     </template>
                 </Column>
-                <Column
-                    :rowEditor="true"
-                    style="min-width: 8rem"
-                    bodyStyle="text-align:center"
-                ></Column>
                 <!-- <template #paginatorstart>
-                    <Button icon="pi pi-refresh" class="p-button-text" :loading="loading" @click="getContracts"/>
+                    <Button icon="pi pi-refresh" class="p-button-text" :loading="loading" @click="getPocs"/>
                 </template>
                 <template #paginatorend>
                     <Button icon="pi pi-cloud" class="p-button-text" />
@@ -98,6 +74,77 @@
             </DataTable>
         </div>
         <ConfirmDialog></ConfirmDialog>
+        <Dialog
+            v-model:visible="showEditModal"
+            :style="{ width: '700px' }"
+            header="Edit Team Member"
+            :modal="true"
+            class="p-fluid"
+            :closeOnEscape="true"
+            :dismissableMask="true"
+            :draggable="false"
+            @hide="selectedRow = {}"
+        >
+            <div class="formgrid grid">
+                <div class="field col-2">
+                    <label for="prefix">Prefix</label>
+                    <InputText id="prefix" v-model="selectedRow.prefix" />
+                </div>
+                <div class="field col-5">
+                    <label for="first-name">First Name</label>
+                    <InputText
+                        id="first-name"
+                        v-model="selectedRow.first_name"
+                    />
+                </div>
+                <div class="field col-5">
+                    <label for="last-name">Last Name</label>
+                    <InputText id="last-name" v-model="selectedRow.last_name" />
+                </div>
+                <div class="field col-6">
+                    <label for="email">Email</label>
+                    <InputText id="email" v-model="selectedRow.email" />
+                </div>
+                <div class="field col-6">
+                    <label for="title">Title</label>
+                    <Dropdown
+                        v-model="selectedRow.title.id"
+                        id="title"
+                        :options="positions"
+                        optionLabel="title"
+                        optionValue="id"
+                        placeholder="Select Position"
+                    >
+                        <template #option="slotProps">
+                            <span>{{ slotProps.option.title }}</span>
+                        </template>
+                    </Dropdown>
+                </div>
+            </div>
+            <template #footer>
+                <div class="flex">
+                    <Button
+                        label="Delete"
+                        icon="pi pi-trash"
+                        class="p-button-danger"
+                        @click="deletePoc"
+                    />
+                    <span class="flex-auto"></span>
+                    <Button
+                        label="Cancel"
+                        icon="pi pi-times"
+                        class="p-button-text"
+                        @click="closeEditModal"
+                    />
+                    <Button
+                        label="Save"
+                        icon="pi pi-check"
+                        class="p-button-success"
+                        @click="savePoc"
+                    />
+                </div>
+            </template>
+        </Dialog>
         <Dialog
             v-model:visible="showModal"
             :style="{ width: '700px' }"
@@ -161,7 +208,11 @@
 
 <script lang="ts">
 import { PointOfContactService, PositionService } from '@/api/ContractService'
-import type { PointOfContact, Position } from '@/types/ContractData.type'
+import type {
+    PointOfContact,
+    PointOfContactBuild,
+    Position,
+} from '@/types/ContractData.type'
 import { defineComponent, ref } from 'vue'
 
 import Button from 'primevue/button'
@@ -173,7 +224,7 @@ import InputText from 'primevue/inputtext'
 
 import { useToast } from 'primevue/usetoast'
 import ConfirmDialog from 'primevue/confirmdialog'
-import { useConfirm } from "primevue/useconfirm"
+import { useConfirm } from 'primevue/useconfirm'
 
 export default defineComponent({
     name: 'PocList',
@@ -189,7 +240,6 @@ export default defineComponent({
     },
 
     setup(props) {
-        const editingRows = ref([])
         const selectedRow = ref({} as PointOfContact)
         const loading = ref(false)
         const toast = useToast()
@@ -202,7 +252,7 @@ export default defineComponent({
             email: '',
             prefix: '',
             title_id: null,
-        })
+        } as PointOfContactBuild)
 
         function openModal() {
             showModal.value = true
@@ -218,30 +268,47 @@ export default defineComponent({
             }
         }
 
+        const showEditModal = ref(false)
+        function openEditModal() {
+            showEditModal.value = true
+        }
+        function closeEditModal() {
+            showEditModal.value = false
+            selectedRow.value = {} as PointOfContact
+        }
+
         const positions = ref([] as Position[])
         const pocs = ref([] as PointOfContact[])
 
-        async function initData() {
+        function getPocs() {
             loading.value = true
-            await PositionService.list()
-                .then((res) => {
-                    positions.value = res.data
-                })
-                .catch((err) => {
-                    console.warn('Error Fetching Positions', err)
-                })
-
-            await PointOfContactService.list()
+            PointOfContactService.list()
                 .then((res) => {
                     pocs.value = res.data
                 })
                 .catch((err) => {
                     console.warn('Error Fetching Team Members', err)
+                    toast.add({
+                        severity: 'error',
+                        summary: 'Error',
+                        detail: 'Error Loading Team Members',
+                        life: 3000,
+                    })
                 })
-
-            loading.value = false
+                .finally(() => {
+                    loading.value = false
+                })
         }
-        initData()
+
+        PositionService.list()
+            .then((res) => {
+                positions.value = res.data
+            })
+            .catch((err) => {
+                console.warn('Error Fetching Positions', err)
+            })
+
+        getPocs()
 
         const formatPosition = (poc: PointOfContact) => poc.title?.title
 
@@ -272,24 +339,28 @@ export default defineComponent({
                 })
         }
 
-        function savePoc(idx: number, poc: PointOfContact) {
+        function savePoc() {
+            const idx = pocs.value.findIndex(
+                (p) => p.id === selectedRow.value.id,
+            )
             loading.value = true
+
             const formatPoc = {
-                id: poc.id,
-                first_name: poc.first_name,
-                last_name: poc.last_name,
-                email: poc.email,
-                prefix: poc.prefix,
-                title_id: poc.title?.id,
+                id: selectedRow.value.id,
+                first_name: selectedRow.value.first_name,
+                last_name: selectedRow.value.last_name,
+                email: selectedRow.value.email,
+                prefix: selectedRow.value.prefix,
+                title_id: selectedRow.value.title?.id,
             }
 
-            PointOfContactService.update(poc.id, formatPoc)
+            PointOfContactService.update(formatPoc.id, formatPoc)
                 .then((res) => {
                     pocs.value[idx] = res.data
                     toast.add({
                         severity: 'success',
                         summary: 'Saved',
-                        detail: 'Team Member Data Updated',
+                        detail: 'Team Member Updated',
                         life: 3000,
                     })
                 })
@@ -298,13 +369,14 @@ export default defineComponent({
                     toast.add({
                         severity: 'error',
                         summary: 'Error',
-                        detail: 'Error Updating Team Member Data',
+                        detail: 'Error Updating Team Member',
                         life: 3000,
                     })
                 })
                 .finally(() => {
                     loading.value = false
                     selectedRow.value = {} as PointOfContact
+                    showEditModal.value = false
                 })
         }
 
@@ -316,7 +388,9 @@ export default defineComponent({
                 acceptClass: 'p-button-danger',
                 accept: () => {
                     loading.value = true
-                    const idx = pocs.value.findIndex((p) => p.id === selectedRow.value.id)
+                    const idx = pocs.value.findIndex(
+                        (p) => p.id === selectedRow.value.id,
+                    )
 
                     PointOfContactService.delete(selectedRow.value.id)
                         .then((res) => {
@@ -339,27 +413,30 @@ export default defineComponent({
                         })
                         .finally(() => {
                             loading.value = false
-                            selectedRow.value = {} as PointOfContact
+                            closeEditModal()
                         })
                 },
-                reject: () => {}
+                reject: () => {},
             })
         }
 
         return {
             loading,
-            editingRows,
             selectedRow,
             newPoc,
             pocs,
             positions,
+            getPocs,
             formatPosition,
             createPoc,
             savePoc,
             deletePoc,
             showModal,
+            showEditModal,
             openModal,
+            openEditModal,
             closeModal,
+            closeEditModal,
         }
     },
 })

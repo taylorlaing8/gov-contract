@@ -6,12 +6,19 @@ export enum StatusType {
     COMPLETE = 'CP',
 }
 
+export interface HolidayBuild {
+    title: String
+    details: String | null
+    date: Date | String
+    observed: Date | String
+}
+
 export interface Holiday {
     id: Number
     title: String
     details: String | null
-    date: Date
-    observed: Date
+    date: Date | String
+    observed: Date | String
 }
 
 interface TemplateData {
@@ -23,6 +30,11 @@ export interface Template {
     title: String
     subtitle: String | null
     data: TemplateData
+}
+
+export interface PositionBuild {
+    title: String,
+    department: String,
 }
 
 export interface Position {

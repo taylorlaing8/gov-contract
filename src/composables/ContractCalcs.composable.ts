@@ -4,9 +4,13 @@ export function formatDate(date: string) {
     return new Date(date.replace(/-/g, '/'))
 }
 
-export function dateString(date: string) {
-    return new Date(date.replace(/-/g, '/')).toLocaleDateString('en-us', { weekday:"long", year:"numeric", month:"short", day:"numeric"})
+export function dateString(date: Date) {
+    return date.toLocaleDateString('en-us', { weekday:"short", year:"numeric", month:"short", day:"numeric"})
 }
+
+export function ymdDateFormat(date: Date) {
+    return date.toISOString().slice(0, 10)
+  }
 
 export function formatPOC(poc: PointOfContact | null) {
     if (poc !== null) {
