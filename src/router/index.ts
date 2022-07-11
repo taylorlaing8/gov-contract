@@ -2,22 +2,28 @@ import store from '@/store'
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '@/views/HomeView.vue'
 import LoginView from '@/views/LoginView.vue'
+
 import ContractWrapper from '@/views/contracts/ContractWrapper.vue'
 import ContractList from '@/views/contracts/ContractList.vue'
 import ContractBuilder from '@/views/contracts/ContractBuilder.vue'
 import ContractNavigation from '@/views/contracts/ContractNavigation.vue'
+import ContractOverview from '@/views/contracts/ContractOverview.vue'
+import TaskDetail from '@/views/contracts/TaskDetail.vue'
+
 import PageNotFound from '@/views/PageNotFound.vue'
 import ErrorView from '@/views/ErrorView.vue'
 
 import AdminNav from '@/views/admin/AdminNav.vue'
 import PocList from '@/views/admin/PocList.vue'
 import PositionsList from '@/views/admin/PositionsList.vue'
-import TemplateList from '@/views/admin/TemplateList.vue'
+
+import TemplateList from '@/views/admin/admin-templates/TemplateList.vue'
+import TemplateWrapper from '@/views/admin/admin-templates/TemplateWrapper.vue'
+import TemplateBuilder from '@/views/admin/admin-templates/TemplateBuilder.vue'
+import TemplateContent from '@/views/admin/admin-templates/TemplateContent.vue'
+
 import HolidayList from '@/views/admin/HolidayList.vue'
 
-import TemplateWrapper from '@/views/admin/contract-templates/TemplateWrapper.vue'
-import TemplateBuilder from '@/views/admin/contract-templates/TemplateBuilder.vue'
-import TemplateContent from '@/views/admin/contract-templates/TemplateContent.vue'
 
 const routes = [
     {
@@ -37,24 +43,56 @@ const routes = [
         children: [
             {
                 path: '',
+                name: 'contract-list',
                 component: ContractList,
-                name: 'contract-list'
             },
             {
                 path: 'create',
+                name: 'contract-create',
                 component: ContractBuilder,
-                name: 'contract-create'
             },
             {
-              path: ':contract_id/:task?',
-              component: ContractNavigation,
-              name: 'contract-view',
-              props(route) {
-                return {
-                    contract_id: parseInt(route.params.contract_id)
-                }
-              },
+                path: ':contract_id',
+                name: 'contract-detail',
+                component: ContractNavigation,
+                props(route) {
+                    return {
+                        contract_id: parseInt(route.params.contract_id)
+                    }
+                },
+                children: [
+                    {
+                        path: '',
+                        name: 'contract-overview',
+                        component: ContractOverview,
+                        props(route) {
+                            return {
+                                contract_id: parseInt(route.params.contract_id)
+                            }
+                        },
+                    },
+                    {
+                        path: ':task',
+                        name: 'contract-task-detail',
+                        component: TaskDetail,
+                        // props(route) {
+                        //     return {
+                        //         task_id: parseInt(route.params.task_id)
+                        //     }
+                        // },
+                    },
+                ]
             },
+            // {
+            //   path: ':contract_id/:task?',
+            //   component: ContractNavigation,
+            //   name: 'contract-view',
+            //   props(route) {
+            //     return {
+            //         contract_id: parseInt(route.params.contract_id)
+            //     }
+            //   },
+            // },
         ],
         beforeEnter: [verifyAuthorization],
     },
@@ -82,10 +120,37 @@ const routes = [
             },
             {
                 path: 'templates',
-                component: TemplateList,
                 name: 'admin-templates',
-                props: true,
+                component: TemplateWrapper,
+                children: [
+                    {
+                        path: '',
+                        component: TemplateList,
+                        name: 'template-list'
+                    },
+                    {
+                        path: 'create',
+                        component: TemplateBuilder,
+                        name: 'template-create'
+                    },
+                    {
+                      path: ':template_id',
+                      component: TemplateContent,
+                      name: 'template-content',
+                      props(route) {
+                        return {
+                            template_id: parseInt(route.params.template_id)
+                        }
+                      },
+                    },
+                ],
             },
+            // {
+            //     path: 'templates',
+            //     component: TemplateList,
+            //     name: 'admin-templates',
+            //     props: true,
+            // },
             {
                 path: 'holidays',
                 component: HolidayList,
@@ -95,29 +160,29 @@ const routes = [
         ],
         beforeEnter: [verifyAuthorization],
     },
-    {
-        path: '/template',
-        name: 'template',
-        component: TemplateWrapper,
-        children: [
-            {
-                path: 'create',
-                component: TemplateBuilder,
-                name: 'template-create'
-            },
-            {
-              path: ':template_id',
-              component: TemplateContent,
-              name: 'template-content',
-              props(route) {
-                return {
-                    template_id: parseInt(route.params.template_id)
-                }
-              },
-            },
-        ],
-        beforeEnter: [verifyAuthorization],
-    },
+    // {
+    //     path: '/template',
+    //     name: 'template',
+    //     component: TemplateWrapper,
+    //     children: [
+    //         {
+    //             path: 'create',
+    //             component: TemplateBuilder,
+    //             name: 'template-create'
+    //         },
+    //         {
+    //           path: ':template_id',
+    //           component: TemplateContent,
+    //           name: 'template-content',
+    //           props(route) {
+    //             return {
+    //                 template_id: parseInt(route.params.template_id)
+    //             }
+    //           },
+    //         },
+    //     ],
+    //     beforeEnter: [verifyAuthorization],
+    // },
     {
         path: '/template/build',
         component: TemplateBuilder,

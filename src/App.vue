@@ -2,7 +2,7 @@
     <div class="app-container">
         <Toast />
         <header-nav />
-        <div class="app-content py-5">
+        <div class="app-content">
             <router-view />
         </div>
     </div>

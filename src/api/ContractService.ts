@@ -90,8 +90,8 @@ export class ContractService {
     static get(id: Number|String) {
         return govHttp.get(`/contracts/${id}/`)
     }
-    static getTasks(id: Number|String) {
-        return govHttp.get(`/contracts/${id}/tasks/`)
+    static getOverview(id: Number|String) {
+        return govHttp.get(`/contracts/${id}/overview/`)
     }
     static list() {
         return govHttp.get('/contracts/')

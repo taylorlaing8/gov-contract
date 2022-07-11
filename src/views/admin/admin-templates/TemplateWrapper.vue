@@ -6,8 +6,8 @@
 import { defineComponent, ref } from 'vue'
 
 export default defineComponent({
-    name: 'ContractWrapper',
-
+    name: 'TemplateWrapper',
+    
     setup() {
     }
 })

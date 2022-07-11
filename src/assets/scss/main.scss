@@ -50,8 +50,20 @@ a {
 
 // TABLES
 .p-datatable {
-    &.p-datatable-hoverable-rows .p-datatable-tbody > tr:hover {
-        cursor: pointer;
+    // &.p-datatable-hoverable-rows .p-datatable-tbody > tr:hover {
+    //     cursor: pointer;
+    // }
+
+    & .p-datatable-row-expansion {
+        background: $med-grey !important;
+
+        &:hover {
+            background: $med-grey !important;
+        }
+
+        & .p-datatable-thead {
+            display: none !important;
+        }
     }
 
     & .p-paginator-bottom {

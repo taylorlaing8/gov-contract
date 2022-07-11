@@ -1,4 +1,4 @@
-import type { Holiday, PointOfContact, Task } from '@/types/ContractData.type'
+import type { Holiday, PointOfContact, SimpleTask, Task } from '@/types/ContractData.type'
 
 export function formatDate(date: string) {
     return new Date(date.replace(/-/g, '/'))
@@ -26,6 +26,14 @@ export function formatUpdateTask(task: Task) {
         poc: task.poc ? task.poc.id : null
     }
     return { data }
+}
+
+export function formatTaskParam (task: SimpleTask) {
+    return (`${task.id}-${task.slug}`)
+}
+
+export function unformatTaskParam(routeSlug: string): number {
+    return parseInt(routeSlug.slice(0, routeSlug.indexOf('-')))
 }
 
 export function generateSlug(text: string) {

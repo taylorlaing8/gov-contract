@@ -1,9 +1,5 @@
 <template>
-    <!-- <div class="d-flex" :class="centered ? 'justify-center' : 'justify-end'">
-        <i :class="`pi ${currStatus.icon} icon-${currStatus.color}`"></i>
-        <h4 class="pl-2" v-if="showTitle">{{currStatus.title}}</h4>
-    </div> -->
-    <div class="status-wrapper flex">
+    <div class="status-wrapper flex" :class="`justify-content-${justify}`">
         <div :class="currStatus.color" class="py-1 px-2 border-round-sm flex">
             <i :class="`pi ${currStatus.icon}`"></i>
             <span v-if="showTitle" class="ml-2">{{ currStatus.title }}</span>
@@ -33,13 +29,10 @@ export default defineComponent({
             type: Boolean,
             required: false,
         },
-        centered: {
-            type: Boolean,
-            required: false,
-        },
-        size: {
+        justify: {
             type: String,
             required: false,
+            default: 'start',
         }
     },
 

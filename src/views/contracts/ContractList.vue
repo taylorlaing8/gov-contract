@@ -1,5 +1,5 @@
 <template>
-    <div class="content-wrapper">
+    <div class="content-wrapper py-5">
         <div class="grid justify-content-center">
             <div class="col-11 px-5 py-4 bg-white border-1 surface-border border-round-sm">
                 <div class="grid align-items-center">
@@ -63,8 +63,6 @@
                             >
                                 <template #body="slotProps">
                                     <StatusIcon
-                                        size="small"
-                                        :centered="true"
                                         :status="slotProps.data.status"
                                         :showTitle="true"
                                     ></StatusIcon>
@@ -90,6 +88,7 @@ import router from '@/router'
 import StatusIcon from '@/components/StatusIcon.vue'
 import { ContractService } from '@/api/ContractService'
 import type { Contract } from '@/types/ContractData.type'
+import { useToast } from 'primevue/usetoast'
 
 import Button from 'primevue/button'
 import DataTable from 'primevue/datatable'
@@ -108,6 +107,7 @@ export default defineComponent({
     setup(props) {
         const showNewContract = ref(false)
         const loading = ref(false)
+        const toast = useToast()
 
         const contracts = ref([] as Contract[])
         function getContracts() {
@@ -118,6 +118,12 @@ export default defineComponent({
                 })
                 .catch((err) => {
                     console.warn('Error Fetching Contracts', err)
+                    toast.add({
+                        severity: 'error',
+                        summary: 'Error',
+                        detail: 'Error Loading Contracts',
+                        life: 3000,
+                    })
                 })
                 .finally(() => {
                     loading.value = false
@@ -127,10 +133,9 @@ export default defineComponent({
 
         function openContract(id: number) {
             router.push({
-                name: 'contract-view',
+                name: 'contract-detail',
                 params: {
                     contract_id: id.toString(),
-                    task: null,
                 },
             })
         }

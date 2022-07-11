@@ -1,163 +1,130 @@
 <template>
-    <v-card class="contract-wrapper fill-height">
-        <div v-if="error">{{error}}</div>
-        <v-layout class="fill-height" v-else-if="!loading">
-            <div class="contract-nav-wrapper">
-                <div class="contract-title">
-                    <router-link :to="`${$route.params.contract_id}`">
-                        <h4>Contract ID: {{ simpleContract.ucid }}</h4>
-                    </router-link>
-                </div>
-                <div class="contract-nav-item-wrapper" v-if="simpleContract.tasks.length > 0">
-                    <template v-for="task in simpleContract.tasks" :key="task.id">
-                        <div
-                            class="contract-nav-item"
+    <div class="flex" v-if="!loading">
+        <div class="contract-nav-wrapper">
+            <div class="contract-title">
+                <router-link :to="`/contracts/${contract.id.toString()}`">
+                    <h4>Contract ID: {{ contract.ucid }}</h4>
+                </router-link>
+            </div>
+            <div
+                class="contract-nav-item-wrapper"
+                v-if="contract.tasks.length > 0"
+            >
+                <template v-for="task in contract.tasks" :key="task.id">
+                    <div
+                        class="contract-nav-item"
+                        :class="
+                            $route.params.task === formatTaskParam(task)
+                                ? 'active'
+                                : ''
+                        "
+                        @click="openTask(task)"
+                    >
+                        <StatusIcon :status="task.status"></StatusIcon>
+                        <h5 class="contract-nav-title">{{ task.title }}</h5>
+                        <i v-if="task.comments" class="pl-3 pi pi-comment"></i>
+                        <span class="flex-auto"></span>
+                        <i
+                            v-if="task.tasks.length > 0"
+                            class="contract-nav-expand pi pi-angle-down"
                             :class="
-                                $route.params.task === formatTaskParam(task)
-                                    ? 'active'
+                                openTasks.indexOf(task.id) >= 0
+                                    ? 'expanded'
                                     : ''
                             "
-                            @click="setActiveTask(task.id)"
+                            @click.stop="toggleSubtasks(task.id)"
+                        ></i>
+                    </div>
+                    <div class="contract-subtask-wrapper">
+                        <div
+                            class="contract-subtasks"
+                            :class="
+                                openTasks.indexOf(task.id) >= 0
+                                    ? 'expanded'
+                                    : ''
+                            "
                         >
-                            <StatusIcon
-                                size="x-small"
-                                :status="task.status"
-                            ></StatusIcon>
-                            <h5 class="contract-nav-title">{{ task.title }}</h5>
-                            <v-icon
-                                v-if="task.comments"
-                                size="x-small"
-                                class="pl-3"
-                            >
-                                mdi-comment-text-outline
-                            </v-icon>
-                            <v-spacer></v-spacer>
-                            <v-icon
-                                class="contract-nav-expand"
-                                :class="
-                                    openTasks.indexOf(task.id) >= 0
-                                        ? 'expanded'
-                                        : ''
-                                "
-                                v-if="task.tasks.length > 0"
-                                size="x-small"
-                                @click.stop="toggleSubtasks(task.id)"
-                            >
-                                mdi-chevron-down
-                            </v-icon>
-                        </div>
-                        <div class="contract-subtask-wrapper">
                             <div
-                                class="contract-subtasks"
+                                v-for="subtask in task.tasks"
+                                :key="subtask.id"
+                                class="contract-nav-item subtask"
                                 :class="
-                                    openTasks.indexOf(task.id) >= 0
-                                        ? 'expanded'
+                                    $route.params.task ===
+                                    formatTaskParam(subtask)
+                                        ? 'active'
                                         : ''
                                 "
+                                @click="openTask(subtask)"
                             >
-                                <div
-                                    v-for="subtask in task.tasks"
-                                    :key="subtask.id"
-                                    class="contract-nav-item subtask"
-                                    :class="
-                                        $route.params.task ===
-                                        formatTaskParam(subtask)
-                                            ? 'active'
-                                            : ''
-                                    "
-                                    @click="setActiveTask(subtask.id)"
-                                >
-                                    <StatusIcon
-                                        size="x-small"
-                                        :status="subtask.status"
-                                    ></StatusIcon>
-                                    <span class="contract-nav-title">{{
-                                        subtask.title
-                                    }}</span>
-                                    <v-icon
-                                        v-if="subtask.comments"
-                                        size="x-small"
-                                        class="pl-3"
-                                    >
-                                        mdi-comment-text-outline
-                                    </v-icon>
-                                </div>
+                                <StatusIcon :status="subtask.status"></StatusIcon>
+                                <h5 class="contract-nav-title">
+                                    {{ subtask.title }}
+                                </h5>
+                                <i
+                                    v-if="subtask.comments"
+                                    class="pl-3 pi pi-comment"
+                                ></i>
                             </div>
                         </div>
-                    </template>
-                </div>
+                    </div>
+                </template>
             </div>
-            <template v-if="activeTask">
-                <TaskContent
-                    :simpleTask="activeTask"
-                    :contract="simpleContract"
-                    @refresh_data="refreshTaskData"
-                ></TaskContent>
-            </template>
-            <template v-else>
-                <ContractOverview :contract="simpleContract"></ContractOverview>
-            </template>
-        </v-layout>
-    </v-card>
+        </div>
+        <div class="contract-content-wrapper grid justify-content-center w-full py-5">
+            <router-view :pocs="contract.pocs" @refresh_data="refreshTaskData"></router-view>
+        </div>
+    </div>
 </template>
 
 <script lang="ts">
 import { defineComponent, ref, Ref, watch } from 'vue'
 import router from '@/router'
 import { useRoute } from 'vue-router'
+import { useToast } from 'primevue/usetoast'
 import StatusIcon from '@/components/StatusIcon.vue'
-import TaskContent from './TaskContent.vue'
-import ContractOverview from './ContractOverview.vue'
 import type { SimpleContract, SimpleTask } from '@/types/ContractData.type'
 import { StatusType } from '@/types/ContractData.type'
 import { ContractService } from '@/api/ContractService'
+import { formatTaskParam, unformatTaskParam } from '@/composables/ContractCalcs.composable'
 
 export default defineComponent({
     name: 'ContractNavigation',
 
     components: {
         StatusIcon,
-        TaskContent,
-        ContractOverview,
     },
 
     props: {
         contract_id: {
             type: Number,
-            required: true
-        }
+            required: true,
+        },
     },
 
-    emits: ['loading-change'],
-
-    setup(props, { emit }) {
+    setup(props) {
         const route = useRoute()
         const loading = ref(true)
-        const simpleContract = ref({} as SimpleContract)
+        const toast = useToast()
+        const contract = ref({} as SimpleContract)
         const openTasks: Ref<Number[]> = ref([])
-        const error = ref('')
 
-        const formatTaskParam = (task: SimpleTask) => `${task.id}-${task.slug}`
-        function unformatTaskParam(routeSlug: string): number {
-            return parseInt(routeSlug.slice(0, routeSlug.indexOf('-')))
-        }
-        watch(
-            () => route.params.task,
-            (nTask) => {
-                if (nTask) {
-                    const nTaskFormat = unformatTaskParam(nTask.toString())
-                    if (
-                        activeTask.value !== null &&
-                        activeTask.value.id !== nTaskFormat
-                    )
-                        setActiveTask(nTaskFormat)
-                }
-            },
-        )
+        // watch(
+        //     () => route.params.task,
+        //     (nTask) => {
+        //         if (nTask) {
+        //             const nTaskFormat = unformatTaskParam(nTask.toString())
+        //             if (
+        //                 activeTask.value !== null &&
+        //                 activeTask.value.id !== nTaskFormat
+        //             )
+        //                 setActiveTask(nTaskFormat)
+        //         }
+        //     },
+        // )
 
         function findTask(taskId: number): SimpleTask | null {
             let tsk: SimpleTask | null = null
-            simpleContract.value.tasks.forEach((task) => {
+            contract.value.tasks.forEach((task) => {
                 if (task.id === taskId) tsk = task
                 else {
                     if (task.tasks) {
@@ -172,42 +139,52 @@ export default defineComponent({
             return tsk
         }
 
-        const activeTask = ref({} as SimpleTask | null)
-
-        function setActiveTask(taskId?: number) {
-            let currTask: SimpleTask | null = null
-
-            if (taskId) currTask = findTask(taskId)
-            else
-                currTask = route.params.task ? findTask(unformatTaskParam(route.params.task.toString())) : null
-
-            if (currTask === null) {
-                activeTask.value = null
-                router.push({
-                    name: 'contract-view',
-                    params: {
-                        contract_id: route.params.contract_id,
-                        task: null,
-                    },
-                })
-            } else {
-                activeTask.value = currTask
-                router.push({
-                    name: 'contract-view',
-                    params: {
-                        contract_id: route.params.contract_id,
-                        task: `${currTask.id}-${currTask.slug.toString()}`,
-                    },
-                })
-            }
+        function openTask(task: SimpleTask) {
+            router.push({
+                name: 'contract-task-detail',
+                params: {
+                    task: formatTaskParam(task),
+                    // task: null,
+                },
+            })
         }
+
+        // const activeTask = ref({} as SimpleTask | null)
+
+        // function setActiveTask(taskId?: number) {
+        //     let currTask: SimpleTask | null = null
+
+        //     if (taskId) currTask = findTask(taskId)
+        //     else
+        //         currTask = route.params.task ? findTask(unformatTaskParam(route.params.task.toString())) : null
+
+        //     if (currTask === null) {
+        //         activeTask.value = null
+        //         router.push({
+        //             name: 'contract-detail',
+        //             params: {
+        //                 contract_id: route.params.contract_id,
+        //                 // task: null,
+        //             },
+        //         })
+        //     } else {
+        //         activeTask.value = currTask
+        //         router.push({
+        //             name: 'contract-view',
+        //             params: {
+        //                 contract_id: route.params.contract_id,
+        //                 // task: `${currTask.id}-${currTask.slug.toString()}`,
+        //             },
+        //         })
+        //     }
+        // }
 
         function refreshTaskData(task: SimpleTask) {
             if (task.task_id) {
-                const idx = simpleContract.value.tasks.map(tsk => tsk.id).indexOf(task.task_id)
+                const idx = contract.value.tasks.map(tsk => tsk.id).indexOf(task.task_id)
                 const status = ref(task.status as StatusType)
 
-                simpleContract.value.tasks[idx].tasks?.forEach(tsk => {
+                contract.value.tasks[idx].tasks?.forEach(tsk => {
                     if (tsk.id === task.id) {
                         if (tsk.status !== task.status) tsk.status = task.status
                         tsk.comments = task.comments
@@ -218,32 +195,42 @@ export default defineComponent({
                     }
                 })
 
-                simpleContract.value.tasks[idx].status = status.value
+                contract.value.tasks[idx].status = status.value
             }
             else {
-                const idx = simpleContract.value.tasks.map(tsk => tsk.id).indexOf(task.id)
-                if(simpleContract.value.tasks[idx].status !== task.status) simpleContract.value.tasks[idx].status = task.status
-                simpleContract.value.tasks[idx].comments = task.comments
+                const idx = contract.value.tasks.map(tsk => tsk.id).indexOf(task.id)
+                if(contract.value.tasks[idx].status !== task.status) contract.value.tasks[idx].status = task.status
+                contract.value.tasks[idx].comments = task.comments
             }
         }
 
-        emit('loading-change', true)
-        ContractService.getTasks(props.contract_id)
-            .then((res) => {
-                simpleContract.value = res.data
-            })
-            .catch((err) => {
-                console.warn('Error Fetching Contract', err)
-                error.value = 'Contract Not Found'
-            })
-            .finally(() => {
-                emit('loading-change', false)
-                loading.value = false
-                setActiveTask()
-                if (activeTask.value !== null && activeTask.value.task_id !== null) {
-                    openTasks.value.push(activeTask.value.task_id)
-                }
-            })
+        function getContract() {
+            loading.value = true
+
+            ContractService.getOverview(props.contract_id)
+                .then((res) => {
+                    contract.value = res.data
+                })
+                .then(() => {
+                    if (route.params.task) {
+                        const task = findTask(unformatTaskParam(route.params.task.toString()))
+                        if (task && task.task_id) toggleSubtasks(task.task_id)
+                    }
+                })
+                .catch((err) => {
+                    console.warn('Error Fetching Contract', err)
+                    toast.add({
+                        severity: 'error',
+                        summary: 'Error',
+                        detail: 'Error Loading Contract',
+                        life: 3000,
+                    })
+                })
+                .finally(() => {
+                    loading.value = false
+                })
+        }
+        getContract()
 
         function toggleSubtasks(id: Number) {
             const idx = openTasks.value.indexOf(id)
@@ -253,13 +240,13 @@ export default defineComponent({
 
         return {
             StatusType,
-            error,
             loading,
-            simpleContract,
+            contract,
             refreshTaskData,
             formatTaskParam,
-            activeTask,
-            setActiveTask,
+            // activeTask,
+            // setActiveTask,
+            openTask,
             openTasks,
             toggleSubtasks,
         }
@@ -269,31 +256,33 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 .contract-nav-wrapper {
-    min-width: 350px;
-    width: 350px;
-    height: calc(100vh - 60px);
+    width: 375px;
+    min-width: 375px;
+    height: calc(100vh - 75.5px);
     overflow-x: hidden;
     overflow-y: scroll;
 
     & .contract-title {
         padding: 1rem 0.75rem;
-        // background: linear-gradient(35deg, #1d9fca 30%, #ffffff 100%);
-        background-color: rgb(var(--v-theme-dark-grey));
-        box-shadow: 0px 0px 1px -2px rgb(0 0 0 / 20%),
-            0px 2px 2px 0px rgb(0 0 0 / 14%), 0px 1px 5px 0px rgb(0 0 0 / 12%);
-        color: white;
+        background-color: $dark-grey;
 
         & a {
             text-decoration: none;
-            color: inherit;
+        }
+
+        & h4 {
+            color: white;
         }
     }
 
     & .contract-nav-item-wrapper {
-        padding: 0.75rem 0rem;
+        padding: 0.5rem;
+        min-height: 100%;
+        background: $med-grey;
 
         & .contract-nav-expand {
             transition: all 0.3s;
+            padding: 0rem 0.5rem;
 
             &.expanded {
                 transform: rotateX(180deg);
@@ -308,9 +297,9 @@ export default defineComponent({
                 transition: all 0.4s;
 
                 &.expanded {
-                    margin-bottom: 0;
-                    border-right: 2px solid rgba(var(--v-theme-primary), 0.75);
-                    background-color: rgb(var(--v-theme-light-grey));
+                    margin: auto auto 0px 10px;
+                    background: $med-grey;
+                    border-left: 3px solid $primary-color;
                 }
             }
         }
@@ -318,11 +307,14 @@ export default defineComponent({
         & .contract-nav-item {
             display: flex;
             align-items: center;
-            padding: 0.3rem 0.75rem;
+            padding: 0.5rem 0.75rem;
+            margin: 4px;
+            border-radius: 3px;
+            background: white;
             transition: 0.3s;
 
             &.subtask {
-                padding-left: 2rem;
+                margin-left: 10px;
 
                 & .contract-nav-title {
                     padding-left: 8px;
@@ -330,17 +322,13 @@ export default defineComponent({
                     font-weight: 400;
                 }
 
-                &.active {
-                    background-color: rgb(var(--v-theme-light-grey));
-                    font-weight: 500;
-                    color: rgb(var(--v-theme-secondary))
+                &.active > h5 {
+                    color: $warning;
                 }
             }
 
-            &.active {
-                background-color: rgb(var(--v-theme-light-grey));
-                font-weight: 500;
-                color: rgb(var(--v-theme-secondary))
+            &.active > h5 {
+                color: $warning;
             }
 
             & .contract-nav-title {
@@ -351,7 +339,7 @@ export default defineComponent({
 
             &:hover {
                 cursor: pointer;
-                background-color: rgb(var(--v-theme-grey), 0.5);
+                background-color: $light-grey;
             }
         }
     }

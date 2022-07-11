@@ -1,5 +1,28 @@
 <template>
-    <v-main class="contract-content-wrapper">
+    <div v-if="taskData.id" class="task-content col-11 px-5 py-4 bg-white" :class="`border-${taskData.status}`">
+        <div class="grid align-items-center">
+            <div class="col-9">
+                <h2 class="">{{ taskData.title }}</h2>
+                <p class="m-0">
+                    {{
+                        taskData.sub_title
+                            ? taskData.sub_title
+                            : '-'
+                    }}
+                </p>
+            </div>
+            <div class="col-3 justify-content-end">
+                <StatusIcon
+                    justify="end"
+                    :status="taskData.status"
+                    :showTitle="true"
+                ></StatusIcon>
+            </div>
+            <div class="col-12 mt-4">
+            </div>
+        </div>
+    </div>
+    <!-- <v-main class="contract-content-wrapper">
         <LoadingScreen v-if="loading"></LoadingScreen>
         <template v-else-if="!edit">
             <v-row class="justify-center" :no-gutters="true">
@@ -61,7 +84,6 @@
                                     <br />
                                 </span>
                                 <p class="text-box">
-                                    <!-- CALCULATE PALT ACTUAL -->
                                     {{ taskData.palt_actual || '-' }}
                                 </p>
                             </v-col>
@@ -290,35 +312,32 @@
                 @click.prevent="cancel()"
             ></v-btn>
         </template>
-    </v-main>
+    </v-main> -->
 </template>
 
 <script lang="ts">
 import { defineComponent, PropType, ref, watch } from 'vue'
+import { useRoute } from 'vue-router'
 import type { Task, Contract, PointOfContact, SimpleTask, StatusType } from '@/types/ContractData.type'
-import { TaskService } from '@/api/ContractService'
+import { ContractService, TaskService } from '@/api/ContractService'
 import DateRange from '@/components/DateRange.vue'
-import { formatDate, dateString, formatPOC, formatUpdateTask } from '@/composables/ContractCalcs.composable'
+import { formatDate, dateString, formatPOC, formatUpdateTask, unformatTaskParam } from '@/composables/ContractCalcs.composable'
 
+import Button from 'primevue/button'
 import StatusIcon from '@/components/StatusIcon.vue'
-import LoadingScreen from '@/components/LoadingScreen.vue'
 
 export default defineComponent({
     name: 'TaskContent',
 
     components: {
+        // Button,
         StatusIcon,
-        DateRange,
-        LoadingScreen,
+        // DateRange,
     },
 
     props: {
-        simpleTask: {
-            type: Object as PropType<SimpleTask>,
-            required: true,
-        },
-        contract: {
-            type: Object as PropType<Contract>,
+        pocs: {
+            type: Array as PropType<PointOfContact[]>,
             required: true,
         },
     },
@@ -326,6 +345,7 @@ export default defineComponent({
     emits: ['refresh_data'],
 
     setup(props, { emit }) {
+        const route = useRoute()
         const loading = ref(true)
         const edit = ref(false)
         const taskData = ref({} as Task)
@@ -353,7 +373,7 @@ export default defineComponent({
             }
         }
 
-        function fetchTask(id: Number) {
+        function getTask(id: Number) {
             loading.value = true
             TaskService.get(id)
                 .then((res) => {
@@ -366,25 +386,27 @@ export default defineComponent({
                     loading.value = false
                 })
         }
+        getTask(unformatTaskParam(route.params.task.toString()))
 
-        fetchTask(props.simpleTask.id)
+        const fPocs = props.pocs.map((poc: PointOfContact) => formatPOC(poc))
 
-        watch(() => props.simpleTask, (nTask: SimpleTask) => {
-            let cnfm = true
-            if (edit.value) {
-                cnfm = false
-                if(!confirm('Navigating away from this page will lose any unsaved changes. Do you wish to continue?')){
-                    cnfm = false
-                }
-                else {
-                    cnfm = true
-                    edit.value = false
-                }
+        watch(() => route.params.task?.toString(), (nTask: String) => {
+            if(route.params.task) {
+                getTask(unformatTaskParam(nTask.toString()))
             }
-            if(cnfm) fetchTask(nTask.id)
+            // let cnfm = true
+            // if (edit.value) {
+            //     cnfm = false
+            //     if(!confirm('Navigating away from this page will lose any unsaved changes. Do you wish to continue?')){
+            //         cnfm = false
+            //     }
+            //     else {
+            //         cnfm = true
+            //         edit.value = false
+            //     }
+            // }
+            // if(cnfm) getTask(unformatTaskParam(nTask.toString()))
         })
-
-        const fPocs = props.contract.pocs.map((poc: PointOfContact) => ({ ...poc, fpoc: formatPOC(poc), }))
 
         function save() {
             loading.value = true
@@ -425,5 +447,19 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-//
+.task-content {
+    border-width: 1px;
+    border-style: solid;
+    border-radius: 0.25rem;
+
+    &.border-IC {
+        border-color: $error-lighten-1;
+    }
+    &.border-IP {
+        border-color: $info-lighten-1;
+    }
+    &.border-CP {
+        border-color: $success-lighten-1;
+    }
+}
 </style>

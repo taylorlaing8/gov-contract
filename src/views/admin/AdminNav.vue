@@ -1,5 +1,5 @@
 <template>
-    <div class="grid justify-content-center">
+    <div class="grid justify-content-center py-5">
         <div class="col-11 p-0">
             <div class="grid">
                 <div class="col p-0 inline-flex">
@@ -73,7 +73,7 @@ export default defineComponent({
                         icon: 'pi pi-th-large',
                         command: () => {
                             router.push({
-                                name: 'admin-templates',
+                                name: 'template-list',
                                 params: {},
                             })
                         }
@@ -100,7 +100,7 @@ export default defineComponent({
     },
 })
 </script>
-<style lang="scss">
+<style lang="scss" scoped>
 .admin-content {
     .p-inputtext {
         width: 100%;

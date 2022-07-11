@@ -1,5 +1,7 @@
 <template>
-    <v-main class="contract-content-wrapper">
+    <div>
+    </div>
+    <!-- <v-main class="contract-content-wrapper">
         <v-row no-gutters class="justify-center">
             <v-col cols="11">
                 <v-card class="px-8 py-5 my-5" elevation="2">
@@ -27,25 +29,25 @@
             size="default"
             class="fab-primary"
         ></v-btn>
-    </v-main>
+    </v-main> -->
 </template>
 
 <script lang="ts">
 import { defineComponent, PropType } from 'vue'
 // import type { Contract } from '@/types/ContractData.type'
-import StatusIcon from '@/components/StatusIcon.vue'
+// import StatusIcon from '@/components/StatusIcon.vue'
 import type { Contract } from '@/types/ContractData.type'
 
 export default defineComponent({
     name: 'ContractOverview',
 
     components: {
-        StatusIcon,
+        // StatusIcon,
     },
 
     props: {
-        contract: {
-            type: Object as PropType<Contract>,
+        contract_id: {
+            type: Number,
             required: true,
         },
     },

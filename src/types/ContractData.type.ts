@@ -122,6 +122,7 @@ export interface SimpleContract {
     ucid: String
     status: Status
     tasks: SimpleTask[]
+    pocs: PointOfContact[]
 }
 
 export interface Contract {
