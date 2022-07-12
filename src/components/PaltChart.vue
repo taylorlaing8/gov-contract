@@ -46,6 +46,10 @@ export default defineComponent({
             setChartData()
         })
 
+        watch(() => props.palt_actual, () => {
+            setChartData()
+        })
+
         function setChartData() {
             const chart = paltChart.value.chart
             chart.data.datasets[0] = {
