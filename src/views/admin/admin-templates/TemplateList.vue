@@ -8,6 +8,7 @@
                 label="Template"
                 icon="pi pi-plus"
                 class="p-button-secondary header-button"
+                :disabled="true"
                 @click="newTemplate"
             />
         </div>

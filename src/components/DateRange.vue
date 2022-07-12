@@ -5,6 +5,7 @@
             :rows="displayRows"
             :attributes="calendarAttrs"
             :from-page="fromDate"
+            :is-expanded="isExpanded"
         ></Calendar>
     </template>
 </template>
@@ -28,6 +29,10 @@ export default defineComponent({
         endDate: {
             type: Date,
             required: true,
+        },
+        isExpanded: {
+            type: Boolean,
+            required: false,
         }
     },
 
@@ -59,7 +64,8 @@ export default defineComponent({
             months = (months <= 0 ? 0 : months) + 1
 
             displayRows.value = 1
-            displayCols.value = (months > 3) ? 3 : months
+            // displayCols.value = (months > 3) ? 3 : 1
+            displayCols.value = 2
         }
         getColRow()
 

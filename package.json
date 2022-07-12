@@ -11,6 +11,7 @@
         "@mdi/font": "5.9.55",
         "auth0-js": "^9.19.0",
         "axios": "^0.27.2",
+        "chart.js": "^3.8.0",
         "core-js": "^3.8.3",
         "eventemitter3": "^4.0.7",
         "jwt-decode": "^3.1.2",

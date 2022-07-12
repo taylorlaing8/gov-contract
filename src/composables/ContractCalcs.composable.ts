@@ -22,6 +22,7 @@ export function formatPOC(poc: PointOfContact | null) {
 export function formatUpdateTask(task: Task) {
     const data = {
         ...task,
+        sub_title: task.sub_title && task.sub_title !== "" ? task.sub_title : null,
         comments: task.comments && task.comments !== "" ? task.comments : null,
         poc: task.poc ? task.poc.id : null
     }

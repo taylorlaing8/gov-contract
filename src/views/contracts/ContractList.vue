@@ -25,6 +25,7 @@
                             :loading="loading"
                             :rowHover="true"
                             stripedRows
+                            selectionMode="single"
                             class="p-datatable-sm"
                             paginatorTemplate="CurrentPageReport FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
                             :rowsPerPageOptions="[10, 20, 50]"

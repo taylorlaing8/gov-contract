@@ -1,338 +1,389 @@
 <template>
-    <div v-if="taskData.id" class="task-content col-11 px-5 py-4 bg-white" :class="`border-${taskData.status}`">
+    <div
+        v-if="taskData.id"
+        class="task-content col-11 px-5 py-4 bg-white"
+        :class="`border-${taskData.status}`"
+    >
         <div class="grid align-items-center">
             <div class="col-9">
-                <h2 class="">{{ taskData.title }}</h2>
-                <p class="m-0">
-                    {{
-                        taskData.sub_title
-                            ? taskData.sub_title
-                            : '-'
-                    }}
-                </p>
+                <div class="flex align-items-center">
+                    <template v-if="!edit.includes('title')">
+                        <h2 @click="edit.push('title')">{{ taskData.title }}</h2>
+                        <i
+                            class="pi pi-pencil hover-edit-btn"
+                            @click="edit.push('title')"
+                        ></i>
+                    </template>
+                    <template v-else>
+                        <InputText
+                            class="p-inputtext-lg w-full"
+                            v-model="taskData.title"
+                        />
+                        <template v-if="!loading.includes('title')">
+                            <Button
+                                icon="pi pi-times"
+                                class="p-button-rounded p-button-text"
+                                @click="getTask(taskData.id, 'title')"
+                            />
+                            <Button
+                                icon="pi pi-check"
+                                class="p-button-rounded p-button-success p-button-text"
+                                @click="saveTask('title')"
+                            />
+                        </template>
+                        <template v-else>
+                            <i class="pi pi-spin pi-spinner mx-3"></i>
+                        </template>
+                    </template>
+                </div>
+                <div class="flex align-items-center">
+                    <template v-if="!edit.includes('sub_title')">
+                        <p class="m-0" @click="edit.push('sub_title')">{{ taskData.sub_title || '-' }}</p>
+                        <i
+                            class="pi pi-pencil hover-edit-btn"
+                            @click="edit.push('sub_title')"
+                        ></i>
+                    </template>
+                    <template v-else>
+                        <InputText
+                            class="p-inputtext-sm w-full"
+                            v-model="taskData.sub_title"
+                        />
+                        <template v-if="!loading.includes('sub_title')">
+                            <Button
+                                icon="pi pi-times"
+                                class="p-button-rounded p-button-text"
+                                @click="getTask(taskData.id, 'sub_title')"
+                            />
+                            <Button
+                                icon="pi pi-check"
+                                class="p-button-rounded p-button-success p-button-text"
+                                @click="saveTask('sub_title')"
+                            />
+                        </template>
+                        <template v-else>
+                            <i class="pi pi-spin pi-spinner mx-3"></i>
+                        </template>
+                    </template>
+                </div>
             </div>
             <div class="col-3 justify-content-end">
-                <StatusIcon
-                    justify="end"
-                    :status="taskData.status"
-                    :showTitle="true"
-                ></StatusIcon>
+                <div class="flex align-items-center justify-content-end -mr-4">
+                    <template v-if="taskData.tasks && taskData.tasks.length > 0">
+                        <StatusIcon
+                            class="mr-4"
+                            justify="end"
+                            :status="taskData.status"
+                            :showTitle="true"
+                            @click="cannotEdit('status')"
+                        ></StatusIcon>
+                    </template>
+                    <template v-else>
+                        <template v-if="!edit.includes('status')">
+                            <StatusIcon
+                                justify="end"
+                                :status="taskData.status"
+                                :showTitle="true"
+                                @click="edit.push('status')"
+                            ></StatusIcon>
+                            <i
+                                class="pi pi-pencil hover-edit-btn"
+                                @click="edit.push('status')"
+                            ></i>
+                        </template>
+                        <template v-else>
+                            <Dropdown
+                                v-model="taskData.status"
+                                :options="statusTypes"
+                                optionLabel="title"
+                                optionValue="value"
+                                placeholder="Select Status"
+                            >
+                                <template #value="slotProps">
+                                    <StatusIcon
+                                        justify="start"
+                                        :status="slotProps.value"
+                                        :showTitle="true"
+                                    ></StatusIcon>
+                                </template>
+                                <template #option="slotProps">
+                                    <StatusIcon
+                                        justify="start"
+                                        :status="slotProps.option.value"
+                                        :showTitle="true"
+                                    ></StatusIcon>
+                                    <!-- <span>{{ slotProps.option.title }}</span> -->
+                                </template>
+                            </Dropdown>
+                            <template v-if="!loading.includes('status')">
+                                <Button
+                                    icon="pi pi-times"
+                                    class="p-button-rounded p-button-text"
+                                    @click="getTask(taskData.id, 'status')"
+                                />
+                                <Button
+                                    icon="pi pi-check"
+                                    class="p-button-rounded p-button-success p-button-text"
+                                    @click="saveTask('status')"
+                                />
+                            </template>
+                            <template v-else>
+                                <i class="pi pi-spin pi-spinner mx-3"></i>
+                            </template>
+                        </template>
+                    </template>
+                </div>
             </div>
-            <div class="col-12 mt-4">
+        </div>
+        <div class="grid mt-4 align-items-center">
+            <div class="col-4 flex align-items-center">
+                <template v-if="taskData.tasks && taskData.tasks.length > 0">
+                    <p class="text-large">
+                        Business Days:
+                        <span
+                            class="border-round text-white surface-900 ml-3 mr-1 px-3 py-1"
+                            @click="cannotEdit('bus_days')"
+                        >
+                            {{ taskData.bus_days }}
+                        </span>
+                    </p>
+                </template>
+                <template v-else>
+                    <template v-if="!edit.includes('bus_days')">
+                        <p class="text-large">
+                            Business Days:
+                            <span
+                                class="border-round bg-primary ml-3 mr-1 px-3 py-1"
+                                @click="edit.push('bus_days')"
+                            >
+                                {{ taskData.bus_days }}
+                            </span>
+                        </p>
+                        <i
+                            class="pi pi-pencil hover-edit-btn"
+                            @click="edit.push('bus_days')"
+                        ></i>
+                    </template>
+                    <template v-else>
+                        <label for="bus-days" class="mr-3">Business Days</label>
+                        <InputNumber
+                            id="bus-days"
+                            v-model="taskData.bus_days"
+                            :maxFractionDigits="1"
+                            showButtons
+                            mode="decimal"
+                            :step="0.5"
+                            :disabled="taskData.tasks && taskData.tasks.length > 0"
+                        />
+                        <template v-if="!loading.includes('bus_days')">
+                            <Button
+                                icon="pi pi-times"
+                                class="p-button-rounded p-button-text"
+                                @click="getTask(taskData.id, 'bus_days')"
+                            />
+                            <Button
+                                icon="pi pi-check"
+                                class="p-button-rounded p-button-success p-button-text"
+                                @click="saveTask('bus_days')"
+                            />
+                        </template>
+                        <template v-else>
+                            <i class="pi pi-spin pi-spinner mx-3"></i>
+                        </template>
+                    </template>
+                </template>
+            </div>
+            <div class="col-4 flex align-items-center">
+                <span class="mr-3">Gate</span>
+                <template v-for="gate in gateOptions" :key="gate">
+                    <span
+                        class="border-circle w-2rem h-2rem flex align-items-center justify-content-center mx-1"
+                        :class="
+                            taskData.gate == gate
+                                ? 'text-white surface-900'
+                                : 'text-400 border-1 border-400'
+                        "
+                        >{{ gate }}</span
+                    >
+                </template>
+            </div>
+            <div class="col-4 flex align-items-center">
+                <span class="mr-3">Subgate</span>
+                <template v-for="subgate in subgateOptions" :key="subgate">
+                    <span
+                        class="border-circle w-2rem h-2rem flex align-items-center justify-content-center mx-1"
+                        :class="
+                            taskData.subgate == subgate
+                                ? 'text-white surface-900'
+                                : 'text-400 border-1 border-400'
+                        "
+                        >{{ subgate }}</span
+                    >
+                </template>
+            </div>
+        </div>
+        <div class="grid mt-4 align-items-center">
+            <div class="col-4">
+                <div class="flex align-items-center">
+                    <p class="text-large">
+                        Palt Status:
+                        <span class="border-round text-white ml-3 mr-1 px-3 py-1" :class="paltStatus(taskData.palt_plan, taskData.palt_actual, 'color')">
+                            {{ paltStatus(taskData.palt_plan, taskData.palt_actual, 'text') }}
+                        </span>
+                    </p>
+                </div>
+                <PaltChart :task_id="taskData.id" :palt_plan="taskData.palt_plan" :palt_actual="taskData.palt_actual"></PaltChart>
+            </div>
+            <div class="col-8">
+                <div class="flex align-items-center">
+                    <p class="text-large w-6">
+                        Start Date:
+                        <span class="border-round text-white surface-900 ml-3 mr-1 px-3 py-1">
+                            {{ dateString(formatDate(taskData.start_date)) }}
+                        </span>
+                    </p>
+                    <p class="text-large ml-3 w-6 pl-2">
+                        End Date:
+                        <span class="border-round text-white surface-900 ml-3 mr-1 px-3 py-1">
+                            {{ dateString(formatDate(taskData.end_date)) }}
+                        </span>
+                    </p>
+                </div>
+                <DateRange
+                    :startDate="formatDate(taskData.start_date)"
+                    :endDate="formatDate(taskData.end_date)"
+                    :isExpanded="true"
+                ></DateRange>
+            </div>
+        </div>
+        <div class="grid mt-4 align-items-center">
+            <div class="col-12">
+                <template v-if="!edit.includes('poc')">
+                    <div class="flex align-items-center">
+                        <p class="text-large">Point of Contact:</p>
+                        <span class="border-round text-white bg-primary ml-3 px-4 py-2" @click="edit.push('poc')">
+                            {{ taskData.poc ? formatPOC(taskData.poc) : '-' }}
+                        </span>
+                        <template v-if="taskData.poc">
+                            <a :href="`mailto:${taskData.poc.email}`"><Button icon="pi pi-inbox" class="p-button-rounded p-button-outlined p-button-sm ml-2" /></a>
+                            <Button icon="pi pi-copy" class="p-button-rounded p-button-outlined p-button-sm ml-2" v-clipboard:copy="taskData.poc.email" @click="copyEmail"/>
+                        </template>
+                        <i
+                            class="pi pi-pencil hover-edit-btn ml-1"
+                            @click="edit.push('poc')"
+                        ></i>
+                    </div>
+                </template>
+                <template v-else>
+                    <div class="flex align-items-center">
+                        <p class="text-large mr-4">Point of Contact:</p>
+                        <Dropdown
+                            v-model="taskPocId"
+                            :options="fPocs"
+                            optionLabel="title"
+                            optionValue="value"
+                            placeholder="Select Point of Contact"
+                        ></Dropdown>
+                        <template v-if="!loading.includes('poc')">
+                            <Button
+                                icon="pi pi-times"
+                                class="p-button-rounded p-button-text"
+                                @click="getTask(taskData.id, 'poc')"
+                            />
+                            <Button
+                                icon="pi pi-check"
+                                class="p-button-rounded p-button-success p-button-text"
+                                @click="saveTask('poc')"
+                            />
+                        </template>
+                        <template v-else>
+                            <i class="pi pi-spin pi-spinner mx-3"></i>
+                        </template>
+                    </div>
+                </template>
+            </div>
+        </div>
+        <div class="grid mt-4 align-items-center">
+            <div class="col-12">
+                <template v-if="!edit.includes('comments')">
+                    <div class="flex align-items-center">
+                        <p class="text-large m-0">Comments:</p>
+                        <i
+                            class="pi pi-pencil hover-edit-btn"
+                            @click="edit.push('comments')"
+                        ></i>
+                    </div>
+                    <p class="text-sm text-800 p-4 bg-blue-50" @click="edit.push('comments')">{{ taskData.comments }}</p>
+                </template>
+                <template v-else>
+                    <div class="flex align-items-center">
+                        <p class="text-large">Comments:</p>
+                        <div class="flex-auto"></div>
+                        <template v-if="!loading.includes('comments')">
+                            <Button
+                                icon="pi pi-times"
+                                class="p-button-rounded p-button-text"
+                                @click="getTask(taskData.id, 'comments')"
+                            />
+                            <Button
+                                icon="pi pi-check"
+                                class="p-button-rounded p-button-success p-button-text"
+                                @click="saveTask('comments')"
+                            />
+                        </template>
+                        <template v-else>
+                            <i class="pi pi-spin pi-spinner mx-3"></i>
+                        </template>
+                    </div>
+                    <Textarea v-model="taskData.comments" :autoResize="true" class="w-full" rows="5" />
+                </template>
             </div>
         </div>
     </div>
-    <!-- <v-main class="contract-content-wrapper">
-        <LoadingScreen v-if="loading"></LoadingScreen>
-        <template v-else-if="!edit">
-            <v-row class="justify-center" :no-gutters="true">
-                <v-col cols="11">
-                    <v-card class="px-8 py-5 my-5" elevation="2">
-                        <v-row class="justify-space-between">
-                            <v-col cols="8">
-                                <h5 class="text-h5">{{ taskData.title }}</h5>
-                                <p class="text-subtitle-1">
-                                    {{
-                                        taskData.sub_title
-                                            ? taskData.sub_title
-                                            : '-'
-                                    }}
-                                </p>
-                            </v-col>
-                            <v-col cols="4" class="d-flex justify-end align-center">
-                                <StatusIcon
-                                    :status="taskData.status"
-                                    :showTitle="true"
-                                ></StatusIcon>
-                            </v-col>
-                        </v-row>
-                    </v-card>
-                    <v-card class="pa-8 my-5" elevation="2">
-                        <v-row class="justify-start">
-                            <v-col cols="3">
-                                <span class="text-caption">
-                                    Gate:
-                                    <br />
-                                </span>
-                                <p class="text-box">
-                                    {{ taskData.gate || '-' }}
-                                </p>
-                            </v-col>
-                            <v-col cols="3">
-                                <span class="text-caption">
-                                    Sub-Gate:
-                                    <br />
-                                </span>
-                                <p class="text-box">
-                                    {{ taskData.subgate || '-' }}
-                                </p>
-                            </v-col>
-                        </v-row>
-                        <v-row class="justify-start">
-                            <v-col cols="3">
-                                <span class="text-caption">
-                                    Palt Planned:
-                                    <br />
-                                </span>
-                                <p class="text-box">
-                                    {{ taskData.palt_plan || '-' }}
-                                </p>
-                            </v-col>
-                            <v-col cols="3">
-                                <span class="text-caption">
-                                    Palt Actual:
-                                    <br />
-                                </span>
-                                <p class="text-box">
-                                    {{ taskData.palt_actual || '-' }}
-                                </p>
-                            </v-col>
-                            <v-col cols="3">
-                                <span class="text-caption">
-                                    Business Days:
-                                    <br />
-                                </span>
-                                <p class="text-box">
-                                    {{ taskData.bus_days || '-' }}
-                                </p>
-                            </v-col>
-                        </v-row>
-                        <v-row class="justify-start">
-                            <v-col cols="12">
-                                <span class="text-caption">
-                                    Start Date - End Date
-                                    <br />
-                                </span>
-                                <p class="text-box mb-4">
-                                    {{ `${dateString(taskData.start_date)} - ${dateString(taskData.end_date)}` }}
-                                </p>
-                                <DateRange
-                                    :startDate="formatDate(taskData.start_date)"
-                                    :endDate="formatDate(taskData.end_date)"
-                                ></DateRange>
-                            </v-col>
-                        </v-row>
-                    </v-card>
-                    <v-card class="pa-8 my-5" elevation="2">
-                        <v-row class="justify-start align-center">
-                            <v-col cols="4">
-                                <span class="text-caption">
-                                    Point of Contact:
-                                    <br />
-                                </span>
-                                <p class="text-box">
-                                    {{ formatPOC(taskData.poc) }}
-                                </p>
-                            </v-col>
-                            <v-col cols="4">
-                                <span class="text-caption">
-                                    Title:
-                                    <br />
-                                </span>
-                                <p class="text-box">
-                                    {{ taskData.poc ? taskData.poc.title.title : '-' }}
-                                </p>
-                            </v-col>
-                            <v-col cols="4" class="text-right" v-if="taskData.poc && taskData.poc.email" >
-                                <a class="plain-link" :href="`mailto:${taskData.poc.email}`">
-                                    <v-btn icon size="small">
-                                        <v-icon size="small" >
-                                            mdi-email-edit
-                                        </v-icon>
-                                        <v-tooltip
-                                            activator="parent"
-                                            location="bottom"
-                                        >Open Email</v-tooltip>
-                                    </v-btn>
-                                </a>
-                                <v-btn icon size="small" class="ml-3" v-clipboard:copy="taskData.poc.email">
-                                    <v-icon size="small" >
-                                        mdi-content-copy
-                                    </v-icon>
-                                    <v-tooltip
-                                        activator="parent"
-                                        location="bottom"
-                                    >Copy Email</v-tooltip>
-                                </v-btn>
-                            </v-col>
-                        </v-row>
-                    </v-card>
-                    <v-card class="pa-8 my-5" elevation="2">
-                        <v-row class="justify-start">
-                            <v-col cols="12">
-                                <span class="text-caption">
-                                    Comments:
-                                    <br />
-                                </span>
-                                <p class="text-box">
-                                    {{ taskData.comments || '-' }}
-                                </p>
-                            </v-col>
-                        </v-row>
-                    </v-card>
-                </v-col>
-            </v-row>
-            <v-btn
-                v-if="taskData.tasks.length === 0"
-                color="primary"
-                icon="mdi-pencil"
-                size="default"
-                class="fab-primary"
-                @click.prevent="edit = true"
-            ></v-btn>
-        </template>
-        <template v-else>
-            <v-row class="justify-center" :no-gutters="true">
-                <v-col cols="11">
-                    <v-card class="px-8 py-5 my-5" elevation="2">
-                        <v-row class="justify-space-between">
-                            <v-col cols="8">
-                                <h5 class="text-h5">{{ taskData.title }}</h5>
-                                <p class="text-subtitle-1">
-                                    {{
-                                        taskData.sub_title
-                                            ? taskData.sub_title
-                                            : '-'
-                                    }}
-                                </p>
-                            </v-col>
-                            <v-col cols="4" class="d-flex justify-end align-center">
-                                <StatusIcon
-                                    :status="taskData.status"
-                                ></StatusIcon>
-                                <v-select
-                                    :items="statusTypes"
-                                    color="primary"
-                                    label="Task Status"
-                                    v-model="taskData.status"
-                                    hide-details
-                                    class="pl-3"
-                                ></v-select>
-                            </v-col>
-                        </v-row>
-                    </v-card>
-                    <v-card class="pa-8 my-5" elevation="2">
-                        <v-row class="justify-start">
-                            <v-col cols="3">
-                                <v-select
-                                    color="primary"
-                                    label="Gate"
-                                    v-model="taskData.gate"
-                                    :disabled="true"
-                                    hide-details
-                                ></v-select>
-                            </v-col>
-                            <v-col cols="3">
-                                <v-select
-                                    color="primary"
-                                    label="Sub Gate"
-                                    v-model="taskData.subgate"
-                                    :disabled="true"
-                                    hide-details
-                                ></v-select>
-                            </v-col>
-                        </v-row>
-                        <v-row class="justify-start">
-                            <v-col cols="3">
-                                <v-text-field
-                                    color="primary"
-                                    label="Palt Planned"
-                                    v-model="taskData.palt_plan"
-                                    :disabled="true"
-                                    hide-details
-                                ></v-text-field>
-                            </v-col>
-                            <v-col cols="3">
-                                <v-text-field
-                                    color="primary"
-                                    label="Palt Actual"
-                                    v-model="taskData.palt_actual"
-                                    :disabled="true"
-                                    hide-details
-                                ></v-text-field>
-                            </v-col>
-                            <v-col cols="3">
-                                <v-text-field
-                                    color="primary"
-                                    label="Business Days"
-                                    v-model="taskData.bus_days"
-                                    type="number"
-                                    @change="formatData('bus_days')"
-                                ></v-text-field>
-                            </v-col>
-                        </v-row>
-                    </v-card>
-                    <v-card class="pa-8 my-5" elevation="2">
-                        <v-row class="justify-start">
-                            <v-col cols="12">
-                                <v-select
-                                    :items="fPocs"
-                                    item-value="id"
-                                    item-title="fpoc"
-                                    color="primary"
-                                    label="Point of Contact"
-                                    :return-object="true"
-                                    v-model="taskData.poc"
-                                    hide-details
-                                ></v-select>
-                            </v-col>
-                        </v-row>
-                    </v-card>
-                    <v-card class="pa-8 my-5" elevation="2">
-                        <v-row class="justify-start">
-                            <v-col cols="12">
-                                <v-textarea
-                                    color="primary"
-                                    label="Comments"
-                                    auto-grow
-                                    outlined
-                                    rows="3"
-                                    row-height="25"
-                                    shaped
-                                    v-model="taskData.comments"
-                                    hide-details
-                                ></v-textarea>
-                            </v-col>
-                        </v-row>
-                    </v-card>
-                </v-col>
-            </v-row>
-            <v-btn
-                color="success"
-                icon="mdi-check"
-                size="default"
-                class="fab-primary"
-                @click.prevent="save()"
-            ></v-btn>
-            <v-btn
-                color="error"
-                icon="mdi-close"
-                size="small"
-                class="fab-secondary"
-                @click.prevent="cancel()"
-            ></v-btn>
-        </template>
-    </v-main> -->
 </template>
 
 <script lang="ts">
 import { defineComponent, PropType, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import type { Task, Contract, PointOfContact, SimpleTask, StatusType } from '@/types/ContractData.type'
+import type {
+    Task,
+    Contract,
+    PointOfContact,
+    SimpleTask,
+    StatusType,
+} from '@/types/ContractData.type'
 import { ContractService, TaskService } from '@/api/ContractService'
-import DateRange from '@/components/DateRange.vue'
-import { formatDate, dateString, formatPOC, formatUpdateTask, unformatTaskParam } from '@/composables/ContractCalcs.composable'
+import {
+    formatDate,
+    dateString,
+    formatPOC,
+    formatUpdateTask,
+    unformatTaskParam,
+} from '@/composables/ContractCalcs.composable'
+import { useToast } from 'primevue/usetoast'
 
 import Button from 'primevue/button'
+import InputText from 'primevue/inputtext'
+import InputNumber from 'primevue/inputnumber'
+import Textarea from 'primevue/textarea'
+import Dropdown from 'primevue/dropdown'
+
 import StatusIcon from '@/components/StatusIcon.vue'
+import DateRange from '@/components/DateRange.vue'
+import PaltChart from '@/components/PaltChart.vue'
 
 export default defineComponent({
     name: 'TaskContent',
 
     components: {
-        // Button,
+        Button,
+        InputText,
+        InputNumber,
+        Textarea,
         StatusIcon,
-        // DateRange,
+        Dropdown,
+        DateRange,
+        PaltChart,
     },
 
     props: {
@@ -346,9 +397,21 @@ export default defineComponent({
 
     setup(props, { emit }) {
         const route = useRoute()
-        const loading = ref(true)
-        const edit = ref(false)
+        const toast = useToast()
         const taskData = ref({} as Task)
+
+        const loading = ref([] as string[])
+        const edit = ref([] as string[])
+
+        // const loading = ref(true)
+        // const edit = ref(false)
+
+        const editTitle = ref(false)
+        const editSubtitle = ref(false)
+        const editStatus = ref(false)
+        const editBusDays = ref(false)
+
+        const changeDetected = ref(false)
 
         const statusTypes = [
             {
@@ -363,90 +426,185 @@ export default defineComponent({
                 title: 'Complete',
                 value: 'CP',
             },
-        ] as { title: string, value: StatusType }[]
+        ] as { title: string; value: StatusType }[]
 
-        function formatData(dType: string) {
-            switch(dType) {
-                case 'bus_days':
-                    taskData.value.bus_days = Math.round(taskData.value.bus_days.valueOf()*2)/2
+        function getToastTitle(field: string) {
+            let title: string = ''
+
+            switch (field) {
+                case 'title':
+                    title = 'Title'
                     break
+                case 'sub_title':
+                    title = 'Subtitle'
+                    break
+                case 'status':
+                    title = 'Status'
+                    break
+                case 'bus_days':
+                    title = 'Business Days'
+                    break
+            }
+
+            return title
+        }
+
+        function paltStatus(plan: number, actual: number, returnType: string) {
+            if (plan > actual) {
+                if (returnType == 'text') {
+                    return 'EARLY'
+                }
+                else return 'bg-green-500'
+            }
+            else if (plan < actual) {
+                if (returnType == 'text') {
+                    return 'LATE'
+                }
+                else return 'bg-red-500'
+            }
+            else {
+                if (returnType == 'text') {
+                    return 'ON TIME'
+                }
+                else return 'bg-blue-500'
             }
         }
 
-        function getTask(id: Number) {
-            loading.value = true
+        function cannotEdit(field: string) {
+            toast.add({
+                severity: 'warn',
+                summary: 'Invalid Command',
+                detail: `Cannot Edit ${getToastTitle(field)} of Parent Task`,
+                life: 3000,
+            })
+        }
+
+        function copyEmail() {
+            toast.add({
+                severity: 'success',
+                summary: 'Copied!',
+                detail: `Email copied to clipboard`,
+                life: 3000,
+            })
+        }
+
+        const gateOptions = [1, 2, 3, 4]
+        const subgateOptions = [1, 2, 3, 4, 5]
+        const taskPocId = ref(null as null|number)
+
+        function getTask(id: number, field: string = 'task') {
+            loading.value.push(field)
             TaskService.get(id)
                 .then((res) => {
                     taskData.value = res.data
+                    if (res.data.poc) {
+                        taskPocId.value = res.data.poc.id
+                    }
+                    // toast.add({
+                    //     severity: 'info',
+                    //     summary: 'Fetched',
+                    //     detail: 'Task Data Retrieved',
+                    //     life: 3000,
+                    // })
                 })
                 .catch((err) => {
                     console.warn('Error Fetching Task', err)
+                    toast.add({
+                        severity: 'error',
+                        summary: 'Error',
+                        detail: 'Error Loading Task',
+                        life: 3000,
+                    })
                 })
                 .finally(() => {
-                    loading.value = false
+                    if (field != 'task') {
+                        edit.value.splice(edit.value.findIndex((e) => { return e === field }), 1)
+                        loading.value.splice(loading.value.findIndex((l) => { return l === field }), 1)
+                    }
                 })
         }
         getTask(unformatTaskParam(route.params.task.toString()))
 
-        const fPocs = props.pocs.map((poc: PointOfContact) => formatPOC(poc))
+        const fPocs = [
+            {
+                value: null,
+                title: '-',
+            },
+            ...props.pocs.map((poc: PointOfContact) => {
+                return {
+                    value: poc.id,
+                    title: formatPOC(poc),
+                }
+            }),
+        ]
 
-        watch(() => route.params.task?.toString(), (nTask: String) => {
-            if(route.params.task) {
-                getTask(unformatTaskParam(nTask.toString()))
-            }
-            // let cnfm = true
-            // if (edit.value) {
-            //     cnfm = false
-            //     if(!confirm('Navigating away from this page will lose any unsaved changes. Do you wish to continue?')){
-            //         cnfm = false
-            //     }
-            //     else {
-            //         cnfm = true
-            //         edit.value = false
-            //     }
-            // }
-            // if(cnfm) getTask(unformatTaskParam(nTask.toString()))
-        })
+        watch(
+            () => route.params.task?.toString(),
+            (nTask: String) => {
+                if (route.params.task) {
+                    getTask(unformatTaskParam(nTask.toString()))
+                }
+            },
+        )
 
-        function save() {
-            loading.value = true
-            const { data }  = formatUpdateTask(taskData.value)
+        function saveTask(field: string) {
+            loading.value.push(field)
+            taskData.value.poc = taskPocId.value ? (props.pocs[props.pocs.findIndex((poc) => { return poc.id === taskPocId.value })] || null) : null
+            const { data } = formatUpdateTask(taskData.value)
             TaskService.update(data.id, data)
                 .then((res) => {
-                    edit.value = false
-                    emit('refresh_data', res.data)
                     taskData.value = res.data
+                    toast.add({
+                        severity: 'success',
+                        summary: 'Saved',
+                        detail: `${getToastTitle(field)} Updated`,
+                        life: 3000,
+                    })
+                    emit('refresh_data', taskData.value)
                 })
                 .catch((err) => {
                     console.warn('Error Updating Task', err)
+                    toast.add({
+                        severity: 'error',
+                        summary: 'Error',
+                        detail: `Error Saving ${getToastTitle(field)}`,
+                        life: 3000,
+                    })
                 })
                 .finally(() => {
-                    loading.value = false
-                })
-        }
-
-        function cancel() {
-            TaskService.get(taskData.value.id)
-                .then((res) => {
-                    edit.value = false
-                    taskData.value = res.data
-                })
-                .catch((err) => {
-                    console.warn('Error Fetching Task', err)
+                    edit.value.splice(edit.value.findIndex((e) => { return e === field }), 1)
+                    loading.value.splice(loading.value.findIndex((l) => { return l === field }), 1)
+                    changeDetected.value = true
                 })
         }
 
         return {
-            loading, edit, taskData, formatData, statusTypes,
-            formatPOC, fPocs,
-            formatDate, dateString,
-            save, cancel,
+            loading,
+            edit,
+            editTitle,
+            editSubtitle,
+            editStatus,
+            editBusDays,
+            taskData,
+            statusTypes,
+            paltStatus,
+            cannotEdit,
+            copyEmail,
+            gateOptions,
+            subgateOptions,
+            formatPOC,
+            fPocs,
+            taskPocId,
+            getTask,
+            formatDate,
+            dateString,
+            saveTask,
         }
     },
 })
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .task-content {
     border-width: 1px;
     border-style: solid;
@@ -461,5 +619,8 @@ export default defineComponent({
     &.border-CP {
         border-color: $success-lighten-1;
     }
+}
+#bus-days {
+    width: 4rem !important;
 }
 </style>

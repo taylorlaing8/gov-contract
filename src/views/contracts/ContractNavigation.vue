@@ -1,4 +1,7 @@
 <template>
+    <div class="loading" v-if="loading">
+        <ProgressSpinner />
+    </div>
     <div class="flex" v-if="!loading">
         <div class="contract-nav-wrapper">
             <div class="contract-title">
@@ -60,6 +63,7 @@
                                 <h5 class="contract-nav-title">
                                     {{ subtask.title }}
                                 </h5>
+                                <div class="flex-auto"></div>
                                 <i
                                     v-if="subtask.comments"
                                     class="pl-3 pi pi-comment"
@@ -82,6 +86,7 @@ import router from '@/router'
 import { useRoute } from 'vue-router'
 import { useToast } from 'primevue/usetoast'
 import StatusIcon from '@/components/StatusIcon.vue'
+import ProgressSpinner from 'primevue/progressspinner'
 import type { SimpleContract, SimpleTask } from '@/types/ContractData.type'
 import { StatusType } from '@/types/ContractData.type'
 import { ContractService } from '@/api/ContractService'
@@ -92,6 +97,7 @@ export default defineComponent({
 
     components: {
         StatusIcon,
+        ProgressSpinner,
     },
 
     props: {
@@ -107,20 +113,6 @@ export default defineComponent({
         const toast = useToast()
         const contract = ref({} as SimpleContract)
         const openTasks: Ref<Number[]> = ref([])
-
-        // watch(
-        //     () => route.params.task,
-        //     (nTask) => {
-        //         if (nTask) {
-        //             const nTaskFormat = unformatTaskParam(nTask.toString())
-        //             if (
-        //                 activeTask.value !== null &&
-        //                 activeTask.value.id !== nTaskFormat
-        //             )
-        //                 setActiveTask(nTaskFormat)
-        //         }
-        //     },
-        // )
 
         function findTask(taskId: number): SimpleTask | null {
             let tsk: SimpleTask | null = null
@@ -149,36 +141,6 @@ export default defineComponent({
             })
         }
 
-        // const activeTask = ref({} as SimpleTask | null)
-
-        // function setActiveTask(taskId?: number) {
-        //     let currTask: SimpleTask | null = null
-
-        //     if (taskId) currTask = findTask(taskId)
-        //     else
-        //         currTask = route.params.task ? findTask(unformatTaskParam(route.params.task.toString())) : null
-
-        //     if (currTask === null) {
-        //         activeTask.value = null
-        //         router.push({
-        //             name: 'contract-detail',
-        //             params: {
-        //                 contract_id: route.params.contract_id,
-        //                 // task: null,
-        //             },
-        //         })
-        //     } else {
-        //         activeTask.value = currTask
-        //         router.push({
-        //             name: 'contract-view',
-        //             params: {
-        //                 contract_id: route.params.contract_id,
-        //                 // task: `${currTask.id}-${currTask.slug.toString()}`,
-        //             },
-        //         })
-        //     }
-        // }
-
         function refreshTaskData(task: SimpleTask) {
             if (task.task_id) {
                 const idx = contract.value.tasks.map(tsk => tsk.id).indexOf(task.task_id)
@@ -190,8 +152,8 @@ export default defineComponent({
                         tsk.comments = task.comments
                     }
 
-                    if (status.value != tsk.status && status.value != StatusType.INPROGRESS) {
-                        status.value = tsk.status as StatusType
+                    if (status.value != tsk.status && tsk.status != StatusType.COMPLETE) {
+                        if (status.value != StatusType.INPROGRESS) status.value = tsk.status as StatusType
                     }
                 })
 
@@ -244,8 +206,6 @@ export default defineComponent({
             contract,
             refreshTaskData,
             formatTaskParam,
-            // activeTask,
-            // setActiveTask,
             openTask,
             openTasks,
             toggleSubtasks,
@@ -255,6 +215,16 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
+.loading {
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+}
+
 .contract-nav-wrapper {
     width: 375px;
     min-width: 375px;
@@ -343,5 +313,10 @@ export default defineComponent({
             }
         }
     }
+}
+.contract-content-wrapper {
+    height: calc(100vh - 75.5px);
+    overflow-x: hidden;
+    overflow-y: scroll;
 }
 </style>
