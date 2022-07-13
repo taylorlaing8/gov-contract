@@ -1,6 +1,6 @@
 <template>
     <div class="grid justify-content-center">
-        <div class="col-6 mt-6">
+        <div class="col-5 mt-6">
             <div class="surface-card p-6 shadow-2 border-round w-full">
                 <div class="text-center mb-5">
                     <img src="../../public/SVG/favicon.svg" alt="Image" height="50" class="mb-3">
