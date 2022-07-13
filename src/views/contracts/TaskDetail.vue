@@ -18,6 +18,7 @@
                         <InputText
                             class="p-inputtext-lg w-full"
                             v-model="taskData.title"
+                            :autofocus="true"
                         />
                         <template v-if="!loading.includes('title')">
                             <Button
@@ -48,6 +49,7 @@
                         <InputText
                             class="p-inputtext-sm w-full"
                             v-model="taskData.sub_title"
+                            :autofocus="true"
                         />
                         <template v-if="!loading.includes('sub_title')">
                             <Button
@@ -139,9 +141,9 @@
             <div class="col-4 flex align-items-center">
                 <template v-if="taskData.tasks && taskData.tasks.length > 0">
                     <p class="text-large">
-                        Business Days:
+                        Business Days
                         <span
-                            class="border-round text-white surface-900 ml-3 mr-1 px-3 py-1"
+                            class="border-round text-white surface-800 ml-3 mr-1 px-3 py-1"
                             @click="cannotEdit('bus_days')"
                         >
                             {{ taskData.bus_days }}
@@ -151,7 +153,7 @@
                 <template v-else>
                     <template v-if="!edit.includes('bus_days')">
                         <p class="text-large">
-                            Business Days:
+                            Business Days
                             <span
                                 class="border-round bg-primary ml-3 mr-1 px-3 py-1"
                                 @click="edit.push('bus_days')"
@@ -174,6 +176,7 @@
                             mode="decimal"
                             :step="0.5"
                             :disabled="taskData.tasks && taskData.tasks.length > 0"
+                            :autofocus="true"
                         />
                         <template v-if="!loading.includes('bus_days')">
                             <Button
@@ -200,7 +203,7 @@
                         class="border-circle w-2rem h-2rem flex align-items-center justify-content-center mx-1"
                         :class="
                             taskData.gate == gate
-                                ? 'text-white surface-900'
+                                ? 'text-white surface-800'
                                 : 'text-400 border-1 border-400'
                         "
                         >{{ gate }}</span
@@ -214,7 +217,7 @@
                         class="border-circle w-2rem h-2rem flex align-items-center justify-content-center mx-1"
                         :class="
                             taskData.subgate == subgate
-                                ? 'text-white surface-900'
+                                ? 'text-white surface-800'
                                 : 'text-400 border-1 border-400'
                         "
                         >{{ subgate }}</span
@@ -223,10 +226,10 @@
             </div>
         </div>
         <div class="grid mt-4 align-items-center">
-            <div class="col-4">
-                <div class="flex align-items-center">
+            <div class="col-4 pr-5">
+                <div class="flex align-items-center pb-2">
                     <p class="text-large">
-                        Palt Status:
+                        Palt Status
                         <span class="border-round text-white ml-3 mr-1 px-3 py-1" :class="paltStatus(taskData.palt_plan, taskData.palt_actual, 'color')">
                             {{ paltStatus(taskData.palt_plan, taskData.palt_actual, 'text') }}
                         </span>
@@ -235,16 +238,16 @@
                 <PaltChart :task_id="taskData.id" :palt_plan="taskData.palt_plan" :palt_actual="taskData.palt_actual"></PaltChart>
             </div>
             <div class="col-8">
-                <div class="flex align-items-center">
+                <div class="flex align-items-center pb-2">
                     <p class="text-large w-6">
-                        Start Date:
-                        <span class="border-round text-white surface-900 ml-3 mr-1 px-3 py-1">
+                        Start Date
+                        <span class="border-round text-white surface-800 ml-3 mr-1 px-3 py-1">
                             {{ dateString(formatDate(taskData.start_date)) }}
                         </span>
                     </p>
                     <p class="text-large ml-3 w-6 pl-2">
-                        End Date:
-                        <span class="border-round text-white surface-900 ml-3 mr-1 px-3 py-1">
+                        End Date
+                        <span class="border-round text-white surface-800 ml-3 mr-1 px-3 py-1">
                             {{ dateString(formatDate(taskData.end_date)) }}
                         </span>
                     </p>
@@ -260,7 +263,7 @@
             <div class="col-12">
                 <template v-if="!edit.includes('poc')">
                     <div class="flex align-items-center">
-                        <p class="text-large">Point of Contact:</p>
+                        <p class="text-large">Point of Contact</p>
                         <span class="border-round text-white bg-primary ml-3 px-4 py-2" @click="edit.push('poc')">
                             {{ taskData.poc ? formatPOC(taskData.poc) : '-' }}
                         </span>
@@ -276,7 +279,7 @@
                 </template>
                 <template v-else>
                     <div class="flex align-items-center">
-                        <p class="text-large mr-4">Point of Contact:</p>
+                        <p class="text-large mr-4">Point of Contact</p>
                         <Dropdown
                             v-model="taskPocId"
                             :options="fPocs"
@@ -307,17 +310,24 @@
             <div class="col-12">
                 <template v-if="!edit.includes('comments')">
                     <div class="flex align-items-center">
-                        <p class="text-large m-0">Comments:</p>
+                        <p class="text-large m-0">Comments</p>
                         <i
                             class="pi pi-pencil hover-edit-btn"
                             @click="edit.push('comments')"
                         ></i>
                     </div>
-                    <p class="text-sm text-800 p-4 bg-blue-50" @click="edit.push('comments')">{{ taskData.comments }}</p>
+                    <p class="text-sm text-800 p-4 bg-blue-50 mb-0" @click="edit.push('comments')">
+                        <template v-if="taskData.comments">
+                            {{ taskData.comments }}
+                        </template>
+                        <template v-else>
+                            <span class="text-500"><em>Click to add comments...</em></span>
+                        </template>
+                    </p>
                 </template>
                 <template v-else>
                     <div class="flex align-items-center">
-                        <p class="text-large">Comments:</p>
+                        <p class="text-large">Comments</p>
                         <div class="flex-auto"></div>
                         <template v-if="!loading.includes('comments')">
                             <Button
@@ -335,15 +345,126 @@
                             <i class="pi pi-spin pi-spinner mx-3"></i>
                         </template>
                     </div>
-                    <Textarea v-model="taskData.comments" :autoResize="true" class="w-full" rows="5" />
+                    <Textarea v-model="taskData.comments" :autoResize="true" class="w-full" rows="5" :autofocus="true"/>
                 </template>
             </div>
         </div>
+        <div class="grid mt-4 align-items-center">
+            <div class="col-12">
+                <p class="text-large">Quick Links</p>
+                <template v-if="taskData.links">
+                    <template v-for="(link, idx) in taskData.links" :key="link.url">
+                        <div class="flex align-items-center">
+                            <a :href="link.url" class="flex w-full my-1" target="_blank">
+                                <Button class="text-sm px-3 w-full text-left" icon="pi pi-arrow-up-right" iconPos="right" :label="link.title" />
+                            </a>
+                            <Button
+                                v-if="!loading.includes(`link-${idx}`)"
+                                icon="pi pi-pencil"
+                                class="p-button-link p-button-sm"
+                                @click="openEditLinkModal(idx)"
+                            />
+                            <i v-else class="pi pi-spin pi-spinner mx-3"></i>
+                        </div>
+                    </template>
+                </template>
+                <Button class="p-button-text p-button-sm px-1 mt-2" icon="pi pi-plus" iconPos="left" label="Link" @click="showNewLinkModal = true"/>
+            </div>
+        </div>
+        <Dialog
+            v-model:visible="showEditLinkModal"
+            :style="{ width: '700px' }"
+            header="Edit Link"
+            :modal="true"
+            class="p-fluid"
+            :closeOnEscape="true"
+            :dismissableMask="true"
+            :draggable="false"
+            @hide="closeEditLinkModal"
+        >
+            <div class="formgrid grid">
+                <div class="field col-6">
+                    <label for="title">Title</label>
+                    <InputText id="title" v-model="taskData.links[currIdx].title" />
+                </div>
+                <div class="field col-6">
+                    <label for="department">Meta</label>
+                    <InputText id="department" v-model="taskData.links[currIdx].meta" />
+                </div>
+                <div class="field col-12">
+                    <label for="url">Url</label>
+                    <InputText id="url" v-model="taskData.links[currIdx].url" />
+                </div>
+            </div>
+            <template #footer>
+                <div class="flex">
+                    <Button
+                        label="Delete"
+                        icon="pi pi-trash"
+                        class="p-button-danger"
+                        @click="deleteLink()"
+                    />
+                    <span class="flex-auto"></span>
+                    <Button
+                        label="Cancel"
+                        icon="pi pi-times"
+                        class="p-button-text"
+                        @click="getTask(taskData.id, `link-${currIdx}`)"
+                    />
+                    <Button
+                        label="Save"
+                        icon="pi pi-check"
+                        class="p-button-success"
+                        @click="saveTask(`link-${currIdx}`)"
+                    />
+                </div>
+            </template>
+        </Dialog>
+        <Dialog
+            v-model:visible="showNewLinkModal"
+            :style="{ width: '700px' }"
+            header="Add Link"
+            :modal="true"
+            class="p-fluid"
+            :closeOnEscape="true"
+            :dismissableMask="true"
+            :draggable="false"
+            @hide="closeNewLinkModule"
+        >
+            <div class="formgrid grid">
+                <div class="field col-6">
+                    <label for="title">Title</label>
+                    <InputText id="title" v-model="newLink.title" />
+                </div>
+                <div class="field col-6">
+                    <label for="department">Meta</label>
+                    <InputText id="department" v-model="newLink.meta" />
+                </div>
+                <div class="field col-12">
+                    <label for="url">Url</label>
+                    <InputText id="url" v-model="newLink.url" />
+                </div>
+            </div>
+            <template #footer>
+                <Button
+                    label="Cancel"
+                    icon="pi pi-times"
+                    class="p-button-text"
+                    @click="closeNewLinkModule"
+                />
+                <Button
+                    label="Save"
+                    icon="pi pi-check"
+                    class="p-button-success"
+                    @click="addLink"
+                />
+            </template>
+        </Dialog>
     </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType, ref, watch } from 'vue'
+import { defineComponent, PropType, ref, watch, nextTick } from 'vue'
 import { useRoute } from 'vue-router'
 import type {
     Task,
@@ -351,6 +472,7 @@ import type {
     PointOfContact,
     SimpleTask,
     StatusType,
+	Link,
 } from '@/types/ContractData.type'
 import { ContractService, TaskService } from '@/api/ContractService'
 import {
@@ -367,6 +489,7 @@ import InputText from 'primevue/inputtext'
 import InputNumber from 'primevue/inputnumber'
 import Textarea from 'primevue/textarea'
 import Dropdown from 'primevue/dropdown'
+import Dialog from 'primevue/dialog'
 
 import StatusIcon from '@/components/StatusIcon.vue'
 import DateRange from '@/components/DateRange.vue'
@@ -382,6 +505,7 @@ export default defineComponent({
         Textarea,
         StatusIcon,
         Dropdown,
+        Dialog,
         DateRange,
         PaltChart,
     },
@@ -444,6 +568,18 @@ export default defineComponent({
                 case 'bus_days':
                     title = 'Business Days'
                     break
+                case 'poc':
+                    title = 'Point of Contact'
+                    break
+                case 'comments':
+                    title = 'Comments'
+                    break
+                case 'link':
+                    title = "Links"
+                    break
+                case `link-${currIdx.value}`:
+                    title = "Link"
+                    break
             }
 
             return title
@@ -492,6 +628,44 @@ export default defineComponent({
         const subgateOptions = [1, 2, 3, 4, 5]
         const taskPocId = ref(null as null|number)
 
+        const currIdx = ref(0)
+        const showEditLinkModal = ref(false)
+
+        function openEditLinkModal(idx: number) {
+            currIdx.value = idx
+            showEditLinkModal.value = true
+        }
+
+        function closeEditLinkModal() {
+            showEditLinkModal.value = false
+            getTask(taskData.value.id, `link-${currIdx.value}`)
+            nextTick(() => {
+                currIdx.value = 0
+            })
+        }
+
+        function deleteLink() {
+            showEditLinkModal.value = false
+            taskData.value.links?.splice(currIdx.value, 1)
+            saveTask('task')
+        }
+
+        const showNewLinkModal = ref(false)
+        const newLink = ref({} as Link)
+
+        function closeNewLinkModule() {
+            showNewLinkModal.value = false
+            newLink.value = {} as Link
+        }
+
+        function addLink() {
+            if (!newLink.value.url.includes('https://') && !newLink.value.url.includes('http://')) {
+                newLink.value.url = 'https://' + newLink.value.url
+            }
+            taskData.value.links?.push(newLink.value)
+            saveTask('link')
+        }
+
         function getTask(id: number, field: string = 'task') {
             loading.value.push(field)
             TaskService.get(id)
@@ -520,6 +694,7 @@ export default defineComponent({
                     if (field != 'task') {
                         edit.value.splice(edit.value.findIndex((e) => { return e === field }), 1)
                         loading.value.splice(loading.value.findIndex((l) => { return l === field }), 1)
+                        showEditLinkModal.value = false
                     }
                 })
         }
@@ -557,7 +732,7 @@ export default defineComponent({
                     toast.add({
                         severity: 'success',
                         summary: 'Saved',
-                        detail: `${getToastTitle(field)} Updated`,
+                        detail: `${getToastTitle(field)} Saved`,
                         life: 3000,
                     })
                     emit('refresh_data', taskData.value)
@@ -574,7 +749,7 @@ export default defineComponent({
                 .finally(() => {
                     edit.value.splice(edit.value.findIndex((e) => { return e === field }), 1)
                     loading.value.splice(loading.value.findIndex((l) => { return l === field }), 1)
-                    changeDetected.value = true
+                    changeDetected.value = showNewLinkModal.value = showEditLinkModal.value = false
                 })
         }
 
@@ -592,6 +767,15 @@ export default defineComponent({
             copyEmail,
             gateOptions,
             subgateOptions,
+            currIdx,
+            showEditLinkModal,
+            openEditLinkModal,
+            closeEditLinkModal,
+            deleteLink,
+            addLink,
+            showNewLinkModal,
+            closeNewLinkModule,
+            newLink,
             formatPOC,
             fPocs,
             taskPocId,
@@ -606,7 +790,7 @@ export default defineComponent({
 
 <style lang="scss">
 .task-content {
-    border-width: 1px;
+    border-width: 2px;
     border-style: solid;
     border-radius: 0.25rem;
 

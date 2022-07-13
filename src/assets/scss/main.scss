@@ -24,13 +24,13 @@ body {
         }
         &.p-button-secondary {
             background: $secondary-color;
-            border: 1px solid $secondary-color;
+            border: 1px solid $secondary-color !important;
 
             &:hover, &:focus {
-                background: $secondary-lighten-1;
+                background: $secondary-lighten-1 !important;
             }
             &:active {
-                background: $secondary-darken-1;
+                background: $secondary-darken-1 !important;
             }
         }
     }

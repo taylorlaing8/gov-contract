@@ -32,9 +32,15 @@ export interface Template {
     data: TemplateData
 }
 
+export interface Link {
+    title: string
+    url: string
+    meta: string | null
+}
+
 export interface PositionBuild {
-    title: string,
-    department: string,
+    title: string
+    department: string
 }
 
 export interface Position {
@@ -76,6 +82,7 @@ export interface TaskBuild {
     comments: string | null
     poc: number | null
     tasks: TaskBuild[] | null
+    links: Link[] | null
 }
 
 export interface SimpleTask {
@@ -89,6 +96,7 @@ export interface SimpleTask {
     order_id: number
     comments: string | null
     tasks: Task[] | null
+    links: Link[] | null
 }
 
 export interface Task {
@@ -110,6 +118,7 @@ export interface Task {
     ssp_date: Date | null
     poc: PointOfContact | null
     comments: string | null
+    links: Link[] | null
     tasks: Task[] | null
     status_updated: Date | null
 }

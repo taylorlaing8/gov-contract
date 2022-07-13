@@ -111,6 +111,9 @@ export default defineComponent({
                         grid: {
                             display: false,
                         },
+                        ticks: {
+                            stepSize: 1 // this worked as expected
+                        }
                     },
                     x: {
                         grid: {
