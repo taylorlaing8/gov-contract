@@ -74,8 +74,8 @@
                 </template>
             </div>
         </div>
-        <div class="contract-content-wrapper grid justify-content-center w-full py-5">
-            <router-view :pocs="contract.pocs" @refresh_data="refreshTaskData"></router-view>
+        <div class="contract-content-wrapper grid justify-content-center w-full p-3" :class="`status-bg-${currentTaskStatus}`">
+            <router-view :pocs="contract.pocs" @refresh_data="refreshTaskData" @get_status="getStatus"></router-view>
         </div>
     </div>
 </template>
@@ -166,6 +166,12 @@ export default defineComponent({
             }
         }
 
+        const currentTaskStatus = ref('' as StatusType)
+        function getStatus(status: StatusType) {
+            console.log('getStatus', status)
+            currentTaskStatus.value = status
+        }
+
         function getContract() {
             loading.value = true
 
@@ -205,6 +211,8 @@ export default defineComponent({
             loading,
             contract,
             refreshTaskData,
+            currentTaskStatus,
+            getStatus,
             formatTaskParam,
             openTask,
             openTasks,
@@ -318,5 +326,16 @@ export default defineComponent({
     height: calc(100vh - 75.5px);
     overflow-x: hidden;
     overflow-y: scroll;
+    background: white;
+
+    &.status-bg-IC {
+        background: linear-gradient(0deg, $light-grey 50%, $error-lighten-1 100%);
+    }
+    &.status-bg-IP {
+        background: linear-gradient(0deg, $light-grey 50%, $info-lighten-1 100%);
+    }
+    &.status-bg-CP {
+        background: linear-gradient(0deg, $light-grey 50%, $success-lighten-1 100%);
+    }
 }
 </style>

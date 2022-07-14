@@ -1,5 +1,26 @@
 <template>
-    <div class="contract-content-wrapper pb-8">
+    <div class="content-wrapper py-5">
+        <div class="grid justify-content-center">
+            <div class="col-10 px-5 py-4 bg-white border-1 surface-border border-round-sm">
+                <div class="grid align-items-center">
+                    <div class="col-12 text-center">
+                        <h1>Contract Builder</h1>
+                    </div>
+                    <div class="col-12 mt-2">
+                        <Steps :model="buildSteps" :readonly="true" />
+                    </div>
+                    <div class="col-12">
+                        <router-view v-slot="{Component}" :contract="contract" @prevPage="prevPage($event)" @nextPage="nextPage($event)" @complete="complete">
+                            <keep-alive>
+                                <component :is="Component" />
+                            </keep-alive>
+                        </router-view>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- <div class="contract-content-wrapper pb-8">
         <v-row class="justify-center py-5" :no-gutters="true">
             <v-col cols="7">
                 <v-card class="px-8 py-5" elevation="2">
@@ -274,7 +295,7 @@
                 </v-card>
             </v-col>
         </v-row>
-    </div>
+    </div> -->
 </template>
 
 <script lang="ts">
@@ -284,22 +305,59 @@ import { defineComponent, ref } from 'vue'
 import { contractBase } from '@/views/contracts/cTemplates/ContractBase'
 import contractCycles from '@/views/contracts/cTemplates/ContractCycles'
 import { generateSlug } from '@/composables/ContractCalcs.composable'
-import { DatePicker } from 'v-calendar'
+
+import { useToast } from 'primevue/usetoast'
+import router from '@/router'
+import Steps from 'primevue/steps'
 
 export default defineComponent({
     name: 'ContractBuilder',
 
     components: {
-        DatePicker,
+        Steps,
     },
     
     emits: ['loading-change'],
     
     setup(props , { emit }) {
-        const loading = ref(false)
+        const toast = useToast()
+
+        const buildSteps = ref([
+            {
+                label: 'Details',
+                to: "/"
+            },
+            {
+                label: 'POCs',
+                to: "/seat",
+            },
+            {
+                label: 'Schedule',
+                to: "/payment",
+            },
+            {
+                label: 'Confirmation',
+                to: "/confirmation",
+            }
+        ])
+
         const contract = ref({
             ...contractBase,
         })
+
+        const nextPage = (event) => {
+            for (let field in event.formData) {
+                contract.value[field] = event.formData[field]
+            }
+
+            router.push(buildSteps.value[event.pageIndex + 1].to)
+        };
+        const prevPage = (event) => {
+            router.push(buildSteps.value[event.pageIndex - 1].to)
+        };
+        const complete = () => {
+            toast.add({severity:'success', summary:'Order submitted', detail: 'Dear, cxxx your order completed.'})
+        };
 
         // g_o_p: 0,
         // g_t_p: 0,
@@ -314,8 +372,8 @@ export default defineComponent({
 
         const templates = ref([] as Template[])
         function getTemplates() {
-            loading.value = true
-            emit('loading-change', true)
+            // loading.value = true
+            // emit('loading-change', true)
             TemplateService.list()
                 .then((res) => {
                     templates.value = res.data
@@ -324,16 +382,16 @@ export default defineComponent({
                     console.warn('Error Fetching Templates', err)
                 })
                 .finally(() => {
-                    loading.value = false
-                    emit('loading-change', false)
+                    // loading.value = false
+                    // emit('loading-change', false)
                 })
         }
         getTemplates()
 
         const pocs = ref([] as PointOfContact[])
         function getPocs() {
-            loading.value = true
-            emit('loading-change', true)
+            // loading.value = true
+            // emit('loading-change', true)
             PointOfContactService.list()
                 .then((res) => {
                     pocs.value = res.data.map((poc) => {
@@ -348,8 +406,8 @@ export default defineComponent({
                     console.warn('Error Fetching Team Members')
                 })
                 .finally(() => {
-                    loading.value = false
-                    emit('loading-change', false)
+                    // loading.value = false
+                    // emit('loading-change', false)
                 })
         }
         getPocs()
@@ -378,7 +436,8 @@ export default defineComponent({
         }
 
         return {
-            contract, templates, pocs, pocList, updatePocList,
+            buildSteps, contract, prevPage, nextPage, complete,
+            templates, pocs, pocList, updatePocList,
             contractCycles, getCycleCodes,
         }
     }

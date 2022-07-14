@@ -1,7 +1,7 @@
 <template>
     <div
         v-if="taskData.id"
-        class="task-content col-11 px-5 py-4 bg-white"
+        class="task-content col-12 px-5 py-4 bg-white border-round"
         :class="`border-${taskData.status}`"
     >
         <div class="grid align-items-center">
@@ -380,7 +380,7 @@
             :closeOnEscape="true"
             :dismissableMask="true"
             :draggable="false"
-            @hide="closeEditLinkModal"
+            @hide="showEditLinkModal = false"
         >
             <div class="formgrid grid">
                 <div class="field col-6">
@@ -429,7 +429,7 @@
             :closeOnEscape="true"
             :dismissableMask="true"
             :draggable="false"
-            @hide="closeNewLinkModule"
+            @hide="showNewLinkModal = false"
         >
             <div class="formgrid grid">
                 <div class="field col-6">
@@ -517,7 +517,7 @@ export default defineComponent({
         },
     },
 
-    emits: ['refresh_data'],
+    emits: ['refresh_data', 'get_status'],
 
     setup(props, { emit }) {
         const route = useRoute()
@@ -645,9 +645,13 @@ export default defineComponent({
         }
 
         function deleteLink() {
-            showEditLinkModal.value = false
-            taskData.value.links?.splice(currIdx.value, 1)
+            if (taskData.value.links) {
+                taskData.value.links?.splice(currIdx.value, 1)
+                if (taskData.value.links.length <= 0) taskData.value.links = null
+            }
+
             saveTask('task')
+            showEditLinkModal.value = false
         }
 
         const showNewLinkModal = ref(false)
@@ -662,7 +666,8 @@ export default defineComponent({
             if (!newLink.value.url.includes('https://') && !newLink.value.url.includes('http://')) {
                 newLink.value.url = 'https://' + newLink.value.url
             }
-            taskData.value.links?.push(newLink.value)
+            if (taskData.value.links) taskData.value.links.push(newLink.value)
+            else taskData.value.links = [newLink.value]
             saveTask('link')
         }
 
@@ -696,6 +701,7 @@ export default defineComponent({
                         loading.value.splice(loading.value.findIndex((l) => { return l === field }), 1)
                         showEditLinkModal.value = false
                     }
+                    emit('get_status', taskData.value.status)
                 })
         }
         getTask(unformatTaskParam(route.params.task.toString()))
@@ -789,21 +795,6 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
-.task-content {
-    border-width: 2px;
-    border-style: solid;
-    border-radius: 0.25rem;
-
-    &.border-IC {
-        border-color: $error-lighten-1;
-    }
-    &.border-IP {
-        border-color: $info-lighten-1;
-    }
-    &.border-CP {
-        border-color: $success-lighten-1;
-    }
-}
 #bus-days {
     width: 4rem !important;
 }
