@@ -4,10 +4,10 @@
     </div>
     <div class="flex" v-if="!loading">
         <div class="contract-nav-wrapper">
-            <div class="contract-title">
-                <router-link :to="`/contracts/${contract.id.toString()}`">
-                    <h4>Contract ID: {{ contract.ucid }}</h4>
-                </router-link>
+            <div class="contract-title" @click="openOverview">
+                <!-- <router-link :to="`/contracts/${contract.id.toString()}`"> -->
+                <h4>Contract ID: {{ contract.ucid }}</h4>
+                <!-- </router-link> -->
             </div>
             <div
                 class="contract-nav-item-wrapper"
@@ -74,8 +74,8 @@
                 </template>
             </div>
         </div>
-        <div class="contract-content-wrapper grid justify-content-center w-full p-3" :class="`status-bg-${currentTaskStatus}`">
-            <router-view :pocs="contract.pocs" @refresh_data="refreshTaskData" @get_status="getStatus"></router-view>
+        <div class="contract-content-wrapper grid justify-content-center w-full p-3" :class="`status-bg-${currentStatus}`">
+            <router-view :pocs="contract.pocs" :tasks="contract.tasks" @refresh_data="refreshTaskData" @get_status="getStatus"></router-view>
         </div>
     </div>
 </template>
@@ -139,6 +139,14 @@ export default defineComponent({
                     // task: null,
                 },
             })
+            getStatus(task.status as StatusType)
+        }
+
+        function openOverview() {
+            router.push({
+                name: 'contract-overview',
+            })
+            getStatus(contract.value.status as StatusType)
         }
 
         function refreshTaskData(task: SimpleTask) {
@@ -166,10 +174,9 @@ export default defineComponent({
             }
         }
 
-        const currentTaskStatus = ref('' as StatusType)
+        const currentStatus = ref('IC' as StatusType)
         function getStatus(status: StatusType) {
-            console.log('getStatus', status)
-            currentTaskStatus.value = status
+            currentStatus.value = status
         }
 
         function getContract() {
@@ -178,6 +185,7 @@ export default defineComponent({
             ContractService.getOverview(props.contract_id)
                 .then((res) => {
                     contract.value = res.data
+                    getStatus(contract.value.status as StatusType)
                 })
                 .then(() => {
                     if (route.params.task) {
@@ -211,8 +219,9 @@ export default defineComponent({
             loading,
             contract,
             refreshTaskData,
-            currentTaskStatus,
+            currentStatus,
             getStatus,
+            openOverview,
             formatTaskParam,
             openTask,
             openTasks,
@@ -240,16 +249,21 @@ export default defineComponent({
     overflow-x: hidden;
     overflow-y: scroll;
 
+    @media only screen and (max-width: 1225px) {
+        width: 350px;
+        min-width: 250px;
+    }
+
     & .contract-title {
         padding: 1rem 0.75rem;
         background-color: $dark-grey;
 
-        & a {
-            text-decoration: none;
-        }
-
         & h4 {
             color: white;
+        }
+
+        &:hover {
+            cursor: pointer;
         }
     }
 

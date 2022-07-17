@@ -1,9 +1,5 @@
 <template>
-    <div
-        v-if="taskData.id"
-        class="task-content col-12 px-5 py-4 bg-white border-round"
-        :class="`border-${taskData.status}`"
-    >
+    <div v-if="!loading.includes('task')" class="task-content col-12 px-5 py-4 bg-white border-round">
         <div class="grid align-items-center">
             <div class="col-9">
                 <div class="flex align-items-center">
@@ -245,7 +241,7 @@
                             {{ dateString(formatDate(taskData.start_date)) }}
                         </span>
                     </p>
-                    <p class="text-large ml-3 w-6 pl-2">
+                    <p class="text-large ml-3 w-6">
                         End Date
                         <span class="border-round text-white surface-800 ml-3 mr-1 px-3 py-1">
                             {{ dateString(formatDate(taskData.end_date)) }}
@@ -461,6 +457,7 @@
             </template>
         </Dialog>
     </div>
+    <TaskSkeleton v-else/>
 </template>
 
 <script lang="ts">
@@ -494,6 +491,7 @@ import Dialog from 'primevue/dialog'
 import StatusIcon from '@/components/StatusIcon.vue'
 import DateRange from '@/components/DateRange.vue'
 import PaltChart from '@/components/PaltChart.vue'
+import TaskSkeleton from '@/components/TaskSkeleton.vue'
 
 export default defineComponent({
     name: 'TaskContent',
@@ -508,6 +506,7 @@ export default defineComponent({
         Dialog,
         DateRange,
         PaltChart,
+        TaskSkeleton,
     },
 
     props: {
@@ -696,11 +695,9 @@ export default defineComponent({
                     })
                 })
                 .finally(() => {
-                    if (field != 'task') {
-                        edit.value.splice(edit.value.findIndex((e) => { return e === field }), 1)
-                        loading.value.splice(loading.value.findIndex((l) => { return l === field }), 1)
-                        showEditLinkModal.value = false
-                    }
+                    edit.value.splice(edit.value.findIndex((e) => { return e === field }), 1)
+                    loading.value.splice(loading.value.findIndex((l) => { return l === field }), 1)
+                    showEditLinkModal.value = false
                     emit('get_status', taskData.value.status)
                 })
         }

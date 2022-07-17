@@ -95,6 +95,7 @@ export interface SimpleTask {
     contract_id: number
     order_id: number
     comments: string | null
+    status_updated: Date
     tasks: Task[] | null
     links: Link[] | null
 }
@@ -118,9 +119,9 @@ export interface Task {
     ssp_date: Date | null
     poc: PointOfContact | null
     comments: string | null
+    status_updated: Date
     links: Link[] | null
     tasks: Task[] | null
-    status_updated: Date | null
 }
 
 export interface SimpleContract {
@@ -160,6 +161,9 @@ export interface Contract {
     pocs: PointOfContact[]
     tasks: Task[]
     created: Date
+    ssa: PointOfContact,
+    caa: PointOfContact,
+    sdo: PointOfContact,
     pco: PointOfContact
     buyer: PointOfContact
     admin_pco: PointOfContact

@@ -6,7 +6,7 @@ interface Type {
 
 interface TypeValue {
     id: Number,
-    title: String,
+    code: String,
     sub_title: String | null,
     g_fr_o_p: Number,
     g_fr_t_p: Number,
@@ -33,7 +33,7 @@ const contractCycles: ContractCycles = {
             value: [
                 {
                     id: 1,
-                    title: "4",
+                    code: "4",
                     sub_title: "SAT",
                     g_fr_o_p: 20,
                     g_fr_t_p: 25,
@@ -43,7 +43,7 @@ const contractCycles: ContractCycles = {
                 },
                 {
                     id: 2,
-                    title: "6",
+                    code: "6",
                     sub_title: "SAT - TINA",
                     g_fr_o_p: 20,
                     g_fr_t_p: 45,
@@ -53,7 +53,7 @@ const contractCycles: ContractCycles = {
                 },
                 {
                     id: 3,
-                    title: "8",
+                    code: "8",
                     sub_title: ">TINA",
                     g_fr_o_p: 25,
                     g_fr_t_p: 45,
@@ -63,7 +63,7 @@ const contractCycles: ContractCycles = {
                 },
                 {
                     id: 4,
-                    title: "1",
+                    code: "1",
                     sub_title: "Sealed Bid",
                     g_fr_o_p: 25,
                     g_fr_t_p: 45,
@@ -79,7 +79,7 @@ const contractCycles: ContractCycles = {
             value: [
                 {
                     id: 1,
-                    title: "9",
+                    code: "9",
                     sub_title: "<$10M",
                     g_fr_o_p: 45,
                     g_fr_t_p: 60,
@@ -89,7 +89,7 @@ const contractCycles: ContractCycles = {
                 },
                 {
                     id: 2,
-                    title: "5",
+                    code: "5",
                     sub_title: "$10M - $100M",
                     g_fr_o_p: 60,
                     g_fr_t_p: 90,
@@ -99,7 +99,7 @@ const contractCycles: ContractCycles = {
                 },
                 {
                     id: 3,
-                    title: "3",
+                    code: "3",
                     sub_title: ">$100M",
                     g_fr_o_p: 60,
                     g_fr_t_p: 90,
@@ -115,7 +115,7 @@ const contractCycles: ContractCycles = {
             value: [
                 {
                     id: 1,
-                    title: "7",
+                    code: "7",
                     sub_title: "SAT",
                     g_fr_o_p: 20,
                     g_fr_t_p: 30,
@@ -125,7 +125,7 @@ const contractCycles: ContractCycles = {
                 },
                 {
                     id: 2,
-                    title: "D",
+                    code: "D",
                     sub_title: "SAT - TINA",
                     g_fr_o_p: 20,
                     g_fr_t_p: 45,
@@ -135,7 +135,7 @@ const contractCycles: ContractCycles = {
                 },
                 {
                     id: 3,
-                    title: "E",
+                    code: "E",
                     sub_title: null,
                     g_fr_o_p: 0,
                     g_fr_t_p: 0,
@@ -145,7 +145,7 @@ const contractCycles: ContractCycles = {
                 },
                 {
                     id: 4,
-                    title: "E1",
+                    code: "E1",
                     sub_title: "TINA - $10M",
                     g_fr_o_p: 45,
                     g_fr_t_p: 60,
@@ -155,7 +155,7 @@ const contractCycles: ContractCycles = {
                 },
                 {
                     id: 5,
-                    title: "E2",
+                    code: "E2",
                     sub_title: "$10M - <$500M",
                     g_fr_o_p: 45,
                     g_fr_t_p: 90,
@@ -165,7 +165,7 @@ const contractCycles: ContractCycles = {
                 },
                 {
                     id: 6,
-                    title: "E3",
+                    code: "E3",
                     sub_title: ">$500M",
                     g_fr_o_p: 60,
                     g_fr_t_p: 90,
@@ -181,7 +181,7 @@ const contractCycles: ContractCycles = {
             value: [
                 {
                     id: 1,
-                    title: "M",
+                    code: "M",
                     sub_title: "All $$ Values",
                     g_fr_o_p: 0,
                     g_fr_t_p: 0,
@@ -191,7 +191,7 @@ const contractCycles: ContractCycles = {
                 },
                 {
                     id: 2,
-                    title: "N",
+                    code: "N",
                     sub_title: "PR Gen Mod",
                     g_fr_o_p: 0,
                     g_fr_t_p: 0,
@@ -201,7 +201,7 @@ const contractCycles: ContractCycles = {
                 },
                 {
                     id: 3,
-                    title: "F",
+                    code: "F",
                     sub_title: "UCA",
                     g_fr_o_p: 10,
                     g_fr_t_p: 20,
@@ -211,7 +211,7 @@ const contractCycles: ContractCycles = {
                 },
                 {
                     id: 4,
-                    title: "W",
+                    code: "W",
                     sub_title: "UCA Defin",
                     g_fr_o_p: 20,
                     g_fr_t_p: 90,

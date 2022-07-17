@@ -134,7 +134,7 @@ export default defineComponent({
 
         function openContract(id: number) {
             router.push({
-                name: 'contract-detail',
+                name: 'contract-overview',
                 params: {
                     contract_id: id.toString(),
                 },

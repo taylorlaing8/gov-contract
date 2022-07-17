@@ -34,31 +34,37 @@ body {
             }
         }
     }
-}
 
-.hover-edit-btn {
-    padding: 0px 10px;
-    font-size: 10pt !important;
-    color: transparent;
-    transition: 0.2s;
+    .bg-secondary {
+        background: $secondary-color;
+    }
+    
+    .hover-edit-btn {
+        padding: 0px 10px;
+        font-size: 10pt !important;
+        color: transparent;
+        transition: 0.2s;
 
-    &:hover {
-        color: $info;
-        cursor: pointer;
+        &:hover {
+            color: $info;
+            cursor: pointer;
+        }
+    }
+
+    .grid {
+        margin: 0rem;
+    }
+
+    .p-menu {
+        height: fit-content;
+    }
+
+    a {
+        text-decoration: none;
     }
 }
 
-.grid {
-    margin: 0rem;
-}
 
-.p-menu {
-    height: fit-content;
-}
-
-a {
-    text-decoration: none;
-}
 
 // TABLES
 .p-datatable {
