@@ -111,16 +111,16 @@
                     <tfoot>
                         <tr>
                             <td width="25%">
-                                {{ contractStatusTotals[0] }}
+                                {{ contractStatusTotals.total }}
                             </td>
                             <td width="25%">
-                                {{ contractStatusTotals[1] }}
+                                {{ contractStatusTotals.plan }}
                             </td>
-                            <td width="25%" :class="contractStatusTotals[1] < contractStatusTotals[2] ? 'negative' : 'positive'">
-                                {{ contractStatusTotals[2] }}
+                            <td width="25%" :class="contractStatusTotals.plan < contractStatusTotals.actual ? 'negative' : 'positive'">
+                                {{ contractStatusTotals.actual }}
                             </td>
-                            <td width="25%" :class="contractStatusTotals[3] < 0 ? 'negative' : 'positive'">
-                                {{ contractStatusTotals[3] }}
+                            <td width="25%" :class="contractStatusTotals.difference < 0 ? 'negative' : 'positive'">
+                                {{ contractStatusTotals.difference }}
                             </td>
                         </tr>
                     </tfoot>
@@ -239,7 +239,7 @@ export default defineComponent({
 
         const contractSummary = ref([] as { id: number, title: string, value: string }[])
         const contractStatus = ref([] as { gate: number, palt_plan: number, palt_actual: number, difference: number }[])
-        const contractStatusTotals = ref([] as string[])
+        const contractStatusTotals = ref({} as { total: string, plan: number, actual: number, difference: number })
 
         const contract = ref({} as Contract)
         function getContract(field: string) {
@@ -336,12 +336,12 @@ export default defineComponent({
             const differenceTotal = gateOne.difference + gateTwo.difference + gateThree.difference + gateFour.difference
 
             contractStatus.value = [ gateOne, gateTwo, gateThree, gateFour ]
-            contractStatusTotals.value = [
-                'Total',
-                paltPlanTotal.toString(),
-                paltActualTotal.toString(),
-                differenceTotal.toString(),
-            ]
+            contractStatusTotals.value = {
+                total: 'Total',
+                plan: paltPlanTotal,
+                actual: paltActualTotal,
+                difference: differenceTotal,
+            }
         }
 
         function copyEmail() {
