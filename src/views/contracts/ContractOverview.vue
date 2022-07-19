@@ -16,78 +16,174 @@
                 </div>
             </div>
         </div>
-        <div class="grid">
-            <div class="col-5 mt-4">
+        <div class="grid mt-4">
+            <div class="col-12">
                 <h3>Background</h3>
-                <table class="contract-summary mt-3">
-                    <tr v-for="point in contractSummary" :key="point.key">
+                <table class="contract-summary mt-3 w-full">
+                    <tr>
+                        <td>Contract Value</td>
                         <td>
-                            <p class="text-large">{{ point.title }}</p>
+                            <span class="border-round bg-secondary text-white ml-3 mr-1 px-3 py-1">
+                                {{ `$${contract.value} M` }}
+                            </span>
                         </td>
+                        <td>Contract Type</td>
                         <td>
-                            <p class="text-large">
-                                <span class="border-round bg-secondary text-white ml-3 mr-1 px-3 py-1">
-                                    {{ point.value }}
-                                </span>
-                            </p>
+                            <span class="border-round bg-secondary text-white ml-3 mr-1 px-3 py-1">
+                                {{ contract.type }}
+                            </span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Need Date</td>
+                        <td>
+                            <span class="border-round bg-secondary text-white ml-3 mr-1 px-3 py-1">
+                                {{ dateString(formatDate(contract.need_date.toString())) }}
+                            </span>
+                        </td>
+                        <td>Award Date</td>
+                        <td>
+                            <span class="border-round bg-secondary text-white ml-3 mr-1 px-3 py-1">
+                                {{ dateString(formatDate(contract.award_date)) }}
+                            </span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>SSA</td>
+                        <td>
+                            <span class="border-round bg-secondary text-white ml-3 mr-1 px-3 py-1">
+                                {{ formatPOC(contract.ssa) }}
+                            </span>
+                        </td>
+                        <td>CAA</td>
+                        <td>
+                            <span class="border-round bg-secondary text-white ml-3 mr-1 px-3 py-1">
+                                {{ formatPOC(contract.caa) }}
+                            </span>
+                        </td>
+                        <td>SDO</td>
+                        <td>
+                            <span class="border-round bg-secondary text-white ml-3 mr-1 px-3 py-1">
+                                {{ formatPOC(contract.sdo) }}
+                            </span>
                         </td>
                     </tr>
                 </table>
             </div>
-            <div class="col-7 mt-4">
-                <h3>Contract Status</h3>
-                <DataTable :value="contractStatus" class="p-datatable-sm mt-3">
-                    <Column
-                        field="gate"
-                        header="Gate"
-                        style="width: 25%"
-                    ></Column>
-                    <Column
-                        field="palt_plan"
-                        header="Palt"
-                        style="width: 25%"
-                    ></Column>
-                    <Column
-                        field="palt_actual"
-                        header="Actual"
-                        style="width: 25%"
-                    ></Column>
-                    <Column
-                        field="difference"
-                        header="+/-"
-                        style="width: 25%"
-                    ></Column>
-                    <ColumnGroup type="footer">
-                        <Row>
-                            <Column footer="Total" />
-                            <Column :footer="contractStatus.reduce((accumulator, object) => {
-                                    return accumulator + object.palt_plan;
-                                }, 0)"
-                            />
-                            <Column :footer="contractStatus.reduce((accumulator, object) => {
-                                    return accumulator + object.palt_actual;
-                                }, 0)"
-                            />
-                            <Column :footer="contractStatus.reduce((accumulator, object) => {
-                                    return accumulator + object.difference;
-                                }, 0)"
-                            />
-                        </Row>
-                    </ColumnGroup>
-                </DataTable>
+        </div>
+        <div class="grid mt-6 align-items-center">
+            <div class="col-5 text-center border-round shadow-2 p-3">
+                <h3>Process / Milestone</h3>
+                <p class="m-0 text-sm">Cycle Code: {{ getCycleCode() }}</p>
+                <table class="contract-status-summary mt-3 w-full h-12rem">
+                    <thead>
+                        <tr>
+                            <td width="25%">
+                                Gate
+                            </td>
+                            <td width="25%">
+                                Palt Planned
+                            </td>
+                            <td width="25%">
+                                Palt Actual
+                            </td>
+                            <td width="25%">
+                                +/-
+                            </td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="(point, idx) in contractStatus" :key="idx">
+                            <td width="25%">
+                                {{ point.gate }}
+                            </td>
+                            <td width="25%">
+                                {{ point.palt_plan }}
+                            </td>
+                            <td width="25%" :class="point.palt_plan < point.palt_actual ? 'negative' : 'positive'">
+                                {{ point.palt_actual }}
+                            </td>
+                            <td width="25%" :class="point.difference < 0 ? 'negative' : 'positive'">
+                                {{ point.difference }}
+                            </td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td width="25%">
+                                {{ contractStatusTotals[0] }}
+                            </td>
+                            <td width="25%">
+                                {{ contractStatusTotals[1] }}
+                            </td>
+                            <td width="25%" :class="contractStatusTotals[1] < contractStatusTotals[2] ? 'negative' : 'positive'">
+                                {{ contractStatusTotals[2] }}
+                            </td>
+                            <td width="25%" :class="contractStatusTotals[3] < 0 ? 'negative' : 'positive'">
+                                {{ contractStatusTotals[3] }}
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+            <div class="col-1"></div>
+            <div class="col-6">
+                <h3>Points of Contact</h3>
+                <table class="points-of-contact mt-3 w-full">
+                    <tr>
+                        <td>PCO</td>
+                        <td class="flex align-items-center">
+                            <span class="border-round bg-primary text-white ml-3 mr-1 px-3 py-1">
+                                {{ formatPOC(contract.pco) }}
+                            </span>
+                            <a :href="`mailto:${contract.pco.email}`"><Button icon="pi pi-inbox" class="p-button-rounded p-button-text p-button-sm ml-2" /></a>
+                            <Button icon="pi pi-copy" class="p-button-rounded p-button-text p-button-sm ml-2" v-clipboard:copy="contract.pco.email" @click="copyEmail"/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Buyer</td>
+                        <td class="flex align-items-center">
+                            <span class="border-round bg-primary text-white ml-3 mr-1 px-3 py-1">
+                                {{ formatPOC(contract.buyer) }}
+                            </span>
+                            <a :href="`mailto:${contract.buyer.email}`"><Button icon="pi pi-inbox" class="p-button-rounded p-button-text p-button-sm ml-2" /></a>
+                            <Button icon="pi pi-copy" class="p-button-rounded p-button-text p-button-sm ml-2" v-clipboard:copy="contract.buyer.email" @click="copyEmail"/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Admin PCO</td>
+                        <td class="flex align-items-center">
+                            <span class="border-round bg-primary text-white ml-3 mr-1 px-3 py-1">
+                                {{ formatPOC(contract.admin_pco) }}
+                            </span>
+                            <a :href="`mailto:${contract.admin_pco.email}`"><Button icon="pi pi-inbox" class="p-button-rounded p-button-text p-button-sm ml-2" /></a>
+                            <Button icon="pi pi-copy" class="p-button-rounded p-button-text p-button-sm ml-2" v-clipboard:copy="contract.admin_pco.email" @click="copyEmail"/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Admin Buyer</td>
+                        <td class="flex align-items-center">
+                            <span class="border-round bg-primary text-white ml-3 mr-1 px-3 py-1">
+                                {{ formatPOC(contract.admin_buyer) }}
+                            </span>
+                            <a :href="`mailto:${contract.admin_buyer.email}`"><Button icon="pi pi-inbox" class="p-button-rounded p-button-text p-button-sm ml-2" /></a>
+                            <Button icon="pi pi-copy" class="p-button-rounded p-button-text p-button-sm ml-2" v-clipboard:copy="contract.admin_buyer.email" @click="copyEmail"/>
+                        </td>
+                    </tr>
+                </table>
             </div>
         </div>
-        <div class="grid">
-            <div class="col-4 mt-4">
-                <h3 class="mb-3">Upcoming Tasks</h3>
+        <div class="grid mt-6">
+            <div class="col-4">
+                <h3 class="mb-3">Upcoming Tasks <span class="text-sm font-normal ml-2">(2 Weeks)</span></h3>
                 <Button v-for="task in upcomingTasks" :key="task.id" class="text-sm px-3 w-full text-left p-button-danger p-button-outlined my-1" iconPos="right" :label="getShortString(task.title)" @click="openTask(task)" />
             </div>
-            <div class="col-4 mt-4">
+            <div class="col-4">
                 <h3 class="mb-3">In Progress Tasks</h3>
                 <Button v-for="task in currentTasks" :key="task.id" class="text-sm px-3 w-full text-left p-button-outlined my-1" iconPos="right" :label="getShortString(task.title)" @click="openTask(task)" />
             </div>
-            <div class="col-4 mt-4">
-                <h3 class="mb-3">Recently Completed Tasks</h3>
+            <div class="col-4">
+                <h3 class="mb-3">Previous <span class="text-sm font-normal ml-2">(2 Weeks)</span></h3>
                 <Button v-for="task in completedTasks" :key="task.id" class="text-sm px-3 w-full text-left p-button-success p-button-outlined my-1" iconPos="right" :label="getShortString(task.title)" @click="openTask(task)" />
             </div>
         </div>
@@ -106,16 +202,13 @@ import {
 } from '@/composables/ContractCalcs.composable'
 
 import Button from 'primevue/button'
-import DataTable from 'primevue/datatable'
-import Row from 'primevue/row'
-import ColumnGroup from 'primevue/columngroup'
-import Column from 'primevue/column'
-
 import TaskSkeleton from '@/components/TaskSkeleton.vue'
 import { Contract, StatusType, Task } from '@/types/ContractData.type'
 import { ContractService } from '@/api/ContractService'
+import contractCycles from '@/views/contracts/cTemplates/ContractCycles'
 import { useToast } from 'primevue/usetoast'
 import router from '@/router'
+import _ from 'lodash'
 
 export default defineComponent({
     name: 'ContractOverview',
@@ -123,10 +216,6 @@ export default defineComponent({
     components: {
         StatusIcon,
         Button,
-        DataTable,
-        Row,
-        ColumnGroup,
-        Column,
         TaskSkeleton,
     },
 
@@ -150,6 +239,7 @@ export default defineComponent({
 
         const contractSummary = ref([] as { id: number, title: string, value: string }[])
         const contractStatus = ref([] as { gate: number, palt_plan: number, palt_actual: number, difference: number }[])
+        const contractStatusTotals = ref([] as string[])
 
         const contract = ref({} as Contract)
         function getContract(field: string) {
@@ -165,8 +255,8 @@ export default defineComponent({
                     // })
                 })
                 .then(() => {
-                    setContractSummary()
                     setContractStatus()
+                    filterTasks()
                 })
                 .catch((err) => {
                     console.warn('Error Fetching Contract', err)
@@ -186,46 +276,6 @@ export default defineComponent({
                 })
         }
         getContract('contract')
-
-        function setContractSummary() {
-            contractSummary.value = [
-                {
-                    id: 1,
-                    title: 'Contract Value',
-                    value: `$${contract.value.value} M`,
-                },
-                {
-                    id: 2,
-                    title: 'Contract Type',
-                    value: contract.value.type,
-                },
-                {
-                    id: 3,
-                    title: 'SAA',
-                    value: formatPOC(contract.value.ssa),
-                },
-                {
-                    id: 4,
-                    title: 'CAA',
-                    value: formatPOC(contract.value.caa)
-                },
-                {
-                    id: 5,
-                    title: 'SDO',
-                    value: formatPOC(contract.value.sdo)
-                },
-                {
-                    id: 6,
-                    title: 'Need Date',
-                    value: dateString(formatDate(contract.value.need_date.toString()))
-                },
-                {
-                    id: 7,
-                    title: 'Award Date',
-                    value: dateString(formatDate(contract.value.award_date.toString()))
-                }
-            ]
-        }
 
         function setContractStatus() {
             let gateOne = {
@@ -253,6 +303,9 @@ export default defineComponent({
                 difference: 0,
             }
 
+            let paltPlan = [] as number[]
+            let paltActual = [] as number[]
+
             contract.value.tasks.forEach((task) => {
                 if (task.gate == 1) {
                     gateOne.palt_plan += task.palt_plan
@@ -274,16 +327,53 @@ export default defineComponent({
                     gateFour.palt_actual += task.palt_actual
                     gateFour.difference += task.palt_plan - task.palt_actual
                 }
+                paltPlan.push(task.palt_plan)
+                paltActual.push(task.palt_actual)
             })
-            
+
+            const paltPlanTotal = gateOne.palt_plan + gateTwo.palt_plan + gateThree.palt_plan + gateFour.palt_plan
+            const paltActualTotal = gateOne.palt_actual + gateTwo.palt_actual + gateThree.palt_actual + gateFour.palt_actual
+            const differenceTotal = gateOne.difference + gateTwo.difference + gateThree.difference + gateFour.difference
+
             contractStatus.value = [ gateOne, gateTwo, gateThree, gateFour ]
+            contractStatusTotals.value = [
+                'Total',
+                paltPlanTotal.toString(),
+                paltActualTotal.toString(),
+                differenceTotal.toString(),
+            ]
+        }
+
+        function copyEmail() {
+            toast.add({
+                severity: 'success',
+                summary: 'Copied!',
+                detail: `Email copied to clipboard`,
+                life: 3000,
+            })
+        }
+
+        function getCycleCode() {
+            let cycleType: string = ''
+            let cycleSubtitle: string = ''
+
+            contractCycles.types.forEach((type) => {
+                type.value.forEach((value) => {
+                    if (value.code == contract.value.cycle_code) {
+                        cycleType = type.title
+                        cycleSubtitle = value.sub_title
+                    }
+                })
+            })
+
+            return `${contract.value.cycle_code} (${cycleType} ${cycleSubtitle})`
         }
 
         const upcomingTasks = ref([] as Task[])
         const currentTasks = ref([] as Task[])
         const completedTasks = ref([] as Task[])
         function filterTasks() {
-            props.tasks.forEach((task) => {
+            contract.value.tasks.forEach((task) => {
                 if (task.tasks && task.tasks.length > 0) {
                     task.tasks.forEach((subtask) => {
                         if (subtask.status === StatusType.INPROGRESS) {
@@ -310,15 +400,41 @@ export default defineComponent({
                 }
             })
 
+            
             currentTasks.value.sort(
                 (tskA, tskB) => new Date(tskB.status_updated).getTime() - new Date(tskA.status_updated).getTime()
-            ).splice(5)
-            completedTasks.value.sort(
+            )
+
+            let compTwoWeeks = null as number|null
+            completedTasks.value = completedTasks.value.sort(
                 (tskA, tskB) => new Date(tskB.status_updated).getTime() - new Date(tskA.status_updated).getTime()
-            ).splice(5)
-            upcomingTasks.value.splice(5)
+            ).filter((task) => {
+                const taskDate = new Date(task.end_date)
+
+                if (compTwoWeeks === null) {
+                    compTwoWeeks = taskDate.setDate(taskDate.getDate() - 14)
+                    return true
+                }
+                else {
+                    const taskDateNumber = Number(taskDate)
+                    return taskDateNumber >= compTwoWeeks
+                }
+            }).splice(0, 9)
+
+            let upTwoWeeks = null as number|null
+            upcomingTasks.value = upcomingTasks.value.filter((task) => {
+                const taskDate = new Date(task.start_date)
+
+                if (upTwoWeeks === null) {
+                    upTwoWeeks = taskDate.setDate(taskDate.getDate() + 14)
+                    return true
+                }
+                else {
+                    const taskDateNumber = Number(taskDate)
+                    return taskDateNumber <= upTwoWeeks
+                }
+            }).splice(0, 9)
         }
-        filterTasks()
         
         function openTask(data: Task) {
             router.push({
@@ -345,6 +461,9 @@ export default defineComponent({
             contract,
             contractSummary,
             contractStatus,
+            contractStatusTotals,
+            copyEmail,
+            getCycleCode,
             upcomingTasks,
             currentTasks,
             completedTasks,
@@ -361,5 +480,50 @@ export default defineComponent({
     height: calc(100vh - 60px);
     overflow-y: scroll;
     overflow-x: hidden;
+}
+
+.p-datatable {
+    border: 0px !important;
+
+    & .p-datatable-thead > tr > th, .p-datatable-tfoot > tr > th {
+        border: 0px !important;
+        background: none !important;
+    }
+
+    & td {
+        color: black;
+    }
+}
+
+.contract-summary {
+    td {
+        padding: 0.5rem 0rem;
+    }
+}
+
+.contract-status-summary {
+    thead tr, tfoot tr {
+        font-weight: 500;
+    }
+
+    tbody tr, tfoot tr {
+        td.positive {
+            color: $success;
+        }
+        td.negative {
+            color: $error;
+        }
+    }
+}
+
+.points-of-contact {
+    td {
+        padding: 0.25rem 0rem;
+    }
+    .p-button.p-button-sm {
+        height: 1.5rem;
+        width: 1.5rem;
+        padding: 0.5rem;
+    }
 }
 </style>

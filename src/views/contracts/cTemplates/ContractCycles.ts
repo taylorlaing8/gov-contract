@@ -1,24 +1,24 @@
 interface Type {
-    id: Number,
-    title: String,
+    id: number,
+    title: string,
     value: TypeValue[],
 }
 
 interface TypeValue {
-    id: Number,
-    code: String,
-    sub_title: String | null,
-    g_fr_o_p: Number,
-    g_fr_t_p: Number,
-    g_fr_tr_p: Number,
-    g_fr_fr_p: Number,
-    g_fr_fv_p: Number,
+    id: number,
+    code: string,
+    sub_title: string,
+    g_fr_o_p: number,
+    g_fr_t_p: number,
+    g_fr_tr_p: number,
+    g_fr_fr_p: number,
+    g_fr_fv_p: number,
 }
 
 interface ContractCycles {
-    g_o_p: Number,
-    g_t_p: Number,
-    g_tr_p: Number,
+    g_o_p: number,
+    g_t_p: number,
+    g_tr_p: number,
     types: Type[],
 }
 
@@ -136,7 +136,7 @@ const contractCycles: ContractCycles = {
                 {
                     id: 3,
                     code: "E",
-                    sub_title: null,
+                    sub_title: '',
                     g_fr_o_p: 0,
                     g_fr_t_p: 0,
                     g_fr_tr_p: 0,
