@@ -36,6 +36,9 @@ app.use(ConfirmationService)
 import Calendar from 'primevue/calendar'
 app.component('p-calendar', Calendar)
 
+import Tooltip from 'primevue/tooltip'
+app.directive('tooltip', Tooltip)
+
 app.use(VueClipboard, {
     autoSetContainer: true,
     appendToBody: true,

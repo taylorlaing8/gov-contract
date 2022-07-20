@@ -208,6 +208,19 @@ export default defineComponent({
         }
         getContract()
 
+        watch(
+            () => route.params.task?.toString(),
+            (nTask: String) => {
+                if (route.params.task) {
+                    const task = findTask(unformatTaskParam(route.params.task.toString()))
+                    if (task && task.task_id) {
+                        const idx = openTasks.value.indexOf(task.task_id)
+                        if (idx < 0) openTasks.value.push(task.task_id)
+                    }
+                }
+            },
+        )
+
         function toggleSubtasks(id: Number) {
             const idx = openTasks.value.indexOf(id)
             if (idx >= 0) openTasks.value.splice(idx, 1)

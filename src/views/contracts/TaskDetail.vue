@@ -5,10 +5,7 @@
                 <div class="flex align-items-center">
                     <template v-if="!edit.includes('title')">
                         <h2 @click="edit.push('title')">{{ taskData.title }}</h2>
-                        <i
-                            class="pi pi-pencil hover-edit-btn"
-                            @click="edit.push('title')"
-                        ></i>
+                        <Button icon="pi pi-pencil" class="p-button-rounded p-button-text p-button-sm hover-edit-btn ml-1" @click="edit.push('title')"/>
                     </template>
                     <template v-else>
                         <InputText
@@ -36,10 +33,7 @@
                 <div class="flex align-items-center">
                     <template v-if="!edit.includes('sub_title')">
                         <p class="m-0" @click="edit.push('sub_title')">{{ taskData.sub_title || '-' }}</p>
-                        <i
-                            class="pi pi-pencil hover-edit-btn"
-                            @click="edit.push('sub_title')"
-                        ></i>
+                        <Button icon="pi pi-pencil" class="p-button-rounded p-button-text p-button-sm hover-edit-btn ml-1" @click="edit.push('sub_title')"/>
                     </template>
                     <template v-else>
                         <InputText
@@ -84,10 +78,7 @@
                                 :showTitle="true"
                                 @click="edit.push('status')"
                             ></StatusIcon>
-                            <i
-                                class="pi pi-pencil hover-edit-btn"
-                                @click="edit.push('status')"
-                            ></i>
+                            <Button icon="pi pi-pencil" class="p-button-rounded p-button-text p-button-sm hover-edit-btn ml-1" @click="edit.push('status')"/>
                         </template>
                         <template v-else>
                             <Dropdown
@@ -157,10 +148,7 @@
                                 {{ taskData.bus_days }}
                             </span>
                         </p>
-                        <i
-                            class="pi pi-pencil hover-edit-btn"
-                            @click="edit.push('bus_days')"
-                        ></i>
+                        <Button icon="pi pi-pencil" class="p-button-rounded p-button-text p-button-sm hover-edit-btn ml-1" @click="edit.push('bus_days')"/>
                     </template>
                     <template v-else>
                         <label for="bus-days" class="mr-3">Business Days</label>
@@ -264,13 +252,9 @@
                             {{ taskData.poc ? formatPOC(taskData.poc) : '-' }}
                         </span>
                         <template v-if="taskData.poc">
-                            <a :href="`mailto:${taskData.poc.email}`"><Button icon="pi pi-inbox" class="p-button-rounded p-button-outlined p-button-sm ml-2" /></a>
-                            <Button icon="pi pi-copy" class="p-button-rounded p-button-outlined p-button-sm ml-2" v-clipboard:copy="taskData.poc.email" @click="copyEmail"/>
+                            <Button icon="pi pi-copy" class="p-button-rounded p-button-text p-button-sm ml-2" v-clipboard:copy="taskData.poc.email" @click="copyEmail"/>
                         </template>
-                        <i
-                            class="pi pi-pencil hover-edit-btn ml-1"
-                            @click="edit.push('poc')"
-                        ></i>
+                        <Button icon="pi pi-pencil" class="p-button-rounded p-button-text p-button-sm hover-edit-btn ml-1" @click="edit.push('poc')"/>
                     </div>
                 </template>
                 <template v-else>
@@ -307,10 +291,7 @@
                 <template v-if="!edit.includes('comments')">
                     <div class="flex align-items-center">
                         <p class="text-large m-0">Comments</p>
-                        <i
-                            class="pi pi-pencil hover-edit-btn"
-                            @click="edit.push('comments')"
-                        ></i>
+                        <Button icon="pi pi-pencil" class="p-button-rounded p-button-text p-button-sm hover-edit-btn ml-1" @click="edit.push('comments')"/>
                     </div>
                     <p class="text-sm text-800 p-4 bg-blue-50 mb-0" @click="edit.push('comments')">
                         <template v-if="taskData.comments">

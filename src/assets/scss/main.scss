@@ -18,10 +18,12 @@ body {
             &:hover, &:focus {
                 background: #ffffff35;
             }
+
             &:active {
                 background: #ffffff55;
             }
         }
+
         &.p-button-secondary {
             background: $secondary-color;
             border: 1px solid $secondary-color !important;
@@ -29,26 +31,68 @@ body {
             &:hover, &:focus {
                 background: $secondary-lighten-1 !important;
             }
+
             &:active {
                 background: $secondary-darken-1 !important;
+            }
+        }
+
+        &.p-button-outlined.p-button-secondary {
+            background: none;
+            border: 1px solid $secondary-color !important;
+            color: $secondary-color;
+
+            &:hover, &:focus {
+                background: $secondary-lighten-2 !important;
+                color: $secondary-darken-1;
+            }
+
+            &:active {
+                background: $secondary-lighten-1 !important;
+                color: white;
+            }
+        }
+
+        &.p-button-text.p-button-secondary {
+            color: $secondary-color;
+            background: none;
+            border: 0px !important;
+
+            &:hover, &:focus {
+                color: white !important;
+                background: $secondary-color !important;
+            }
+
+            &:active {
+                color: white !important;
+                background: $secondary-darken-1 !important;
+            }
+        }
+
+        &.p-button-text.p-button-sm {
+            height: 1.5rem !important;
+            width: 1.5rem !important;
+            padding: 0.5rem !important;
+        }
+        
+        &.hover-edit-btn {
+            color: transparent;
+            transition: 0.2s;
+    
+            &:hover {
+                color: $info;
             }
         }
     }
 
     .bg-secondary {
         background: $secondary-color;
+        color: white;
     }
-    
-    .hover-edit-btn {
-        padding: 0px 10px;
-        font-size: 10pt !important;
-        color: transparent;
-        transition: 0.2s;
 
-        &:hover {
-            color: $info;
-            cursor: pointer;
-        }
+    .bg-secondary-outline {
+        border: 1px solid $secondary-color !important;
+        color: $secondary-color !important;
     }
 
     .grid {

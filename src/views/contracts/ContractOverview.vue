@@ -23,13 +23,13 @@
                     <tr>
                         <td>Contract Value</td>
                         <td>
-                            <span class="border-round bg-secondary text-white ml-3 mr-1 px-3 py-1">
+                            <span class="border-round surface-800 text-white ml-3 mr-1 px-3 py-1">
                                 {{ `$${contract.value} M` }}
                             </span>
                         </td>
                         <td>Contract Type</td>
                         <td>
-                            <span class="border-round bg-secondary text-white ml-3 mr-1 px-3 py-1">
+                            <span class="border-round surface-800 text-white ml-3 mr-1 px-3 py-1">
                                 {{ contract.type }}
                             </span>
                         </td>
@@ -37,34 +37,14 @@
                     <tr>
                         <td>Need Date</td>
                         <td>
-                            <span class="border-round bg-secondary text-white ml-3 mr-1 px-3 py-1">
+                            <span class="border-round surface-800 text-white ml-3 mr-1 px-3 py-1">
                                 {{ dateString(formatDate(contract.need_date.toString())) }}
                             </span>
                         </td>
                         <td>Award Date</td>
                         <td>
-                            <span class="border-round bg-secondary text-white ml-3 mr-1 px-3 py-1">
+                            <span class="border-round surface-800 text-white ml-3 mr-1 px-3 py-1">
                                 {{ dateString(formatDate(contract.award_date)) }}
-                            </span>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>SSA</td>
-                        <td>
-                            <span class="border-round bg-secondary text-white ml-3 mr-1 px-3 py-1">
-                                {{ formatPOC(contract.ssa) }}
-                            </span>
-                        </td>
-                        <td>CAA</td>
-                        <td>
-                            <span class="border-round bg-secondary text-white ml-3 mr-1 px-3 py-1">
-                                {{ formatPOC(contract.caa) }}
-                            </span>
-                        </td>
-                        <td>SDO</td>
-                        <td>
-                            <span class="border-round bg-secondary text-white ml-3 mr-1 px-3 py-1">
-                                {{ formatPOC(contract.sdo) }}
                             </span>
                         </td>
                     </tr>
@@ -72,6 +52,18 @@
             </div>
         </div>
         <div class="grid mt-6 align-items-center">
+            <div class="col-6">
+                <h3>Points of Contact</h3>
+                <table class="points-of-contact mt-3 w-full">
+                    <tr v-for="(cpoc, idx) in contractPocs" :key="idx">
+                        <td>{{ cpoc.title }}</td>
+                        <td>
+                            <Button class="px-3 w-full text-left p-button-secondary p-button-outlined my-1" icon="pi pi-copy" iconPos="right" :label="formatPOC(cpoc.value)" v-clipboard:copy="cpoc.value.email" @click="copyEmail" />
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div class="col-1"></div>
             <div class="col-5 text-center border-round shadow-2 p-3">
                 <h3>Process / Milestone</h3>
                 <p class="m-0 text-sm">Cycle Code: {{ getCycleCode() }}</p>
@@ -88,7 +80,7 @@
                                 Palt Actual
                             </td>
                             <td width="25%">
-                                +/-
+                                <span class="text-green-500">+</span>/<span class="text-red-500">&#8211;</span>
                             </td>
                         </tr>
                     </thead>
@@ -104,7 +96,7 @@
                                 {{ point.palt_actual }}
                             </td>
                             <td width="25%" :class="point.difference < 0 ? 'negative' : 'positive'">
-                                {{ point.difference }}
+                                {{ Math.abs(point.difference) }}
                             </td>
                         </tr>
                     </tbody>
@@ -120,71 +112,25 @@
                                 {{ contractStatusTotals.actual }}
                             </td>
                             <td width="25%" :class="contractStatusTotals.difference < 0 ? 'negative' : 'positive'">
-                                {{ contractStatusTotals.difference }}
+                                {{ Math.abs(contractStatusTotals.difference) }}
                             </td>
                         </tr>
                     </tfoot>
-                </table>
-            </div>
-            <div class="col-1"></div>
-            <div class="col-6">
-                <h3>Points of Contact</h3>
-                <table class="points-of-contact mt-3 w-full">
-                    <tr>
-                        <td>PCO</td>
-                        <td class="flex align-items-center">
-                            <span class="border-round bg-primary text-white ml-3 mr-1 px-3 py-1">
-                                {{ formatPOC(contract.pco) }}
-                            </span>
-                            <a :href="`mailto:${contract.pco.email}`"><Button icon="pi pi-inbox" class="p-button-rounded p-button-text p-button-sm ml-2" /></a>
-                            <Button icon="pi pi-copy" class="p-button-rounded p-button-text p-button-sm ml-2" v-clipboard:copy="contract.pco.email" @click="copyEmail"/>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Buyer</td>
-                        <td class="flex align-items-center">
-                            <span class="border-round bg-primary text-white ml-3 mr-1 px-3 py-1">
-                                {{ formatPOC(contract.buyer) }}
-                            </span>
-                            <a :href="`mailto:${contract.buyer.email}`"><Button icon="pi pi-inbox" class="p-button-rounded p-button-text p-button-sm ml-2" /></a>
-                            <Button icon="pi pi-copy" class="p-button-rounded p-button-text p-button-sm ml-2" v-clipboard:copy="contract.buyer.email" @click="copyEmail"/>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Admin PCO</td>
-                        <td class="flex align-items-center">
-                            <span class="border-round bg-primary text-white ml-3 mr-1 px-3 py-1">
-                                {{ formatPOC(contract.admin_pco) }}
-                            </span>
-                            <a :href="`mailto:${contract.admin_pco.email}`"><Button icon="pi pi-inbox" class="p-button-rounded p-button-text p-button-sm ml-2" /></a>
-                            <Button icon="pi pi-copy" class="p-button-rounded p-button-text p-button-sm ml-2" v-clipboard:copy="contract.admin_pco.email" @click="copyEmail"/>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Admin Buyer</td>
-                        <td class="flex align-items-center">
-                            <span class="border-round bg-primary text-white ml-3 mr-1 px-3 py-1">
-                                {{ formatPOC(contract.admin_buyer) }}
-                            </span>
-                            <a :href="`mailto:${contract.admin_buyer.email}`"><Button icon="pi pi-inbox" class="p-button-rounded p-button-text p-button-sm ml-2" /></a>
-                            <Button icon="pi pi-copy" class="p-button-rounded p-button-text p-button-sm ml-2" v-clipboard:copy="contract.admin_buyer.email" @click="copyEmail"/>
-                        </td>
-                    </tr>
                 </table>
             </div>
         </div>
         <div class="grid mt-6">
             <div class="col-4">
                 <h3 class="mb-3">Upcoming Tasks <span class="text-sm font-normal ml-2">(2 Weeks)</span></h3>
-                <Button v-for="task in upcomingTasks" :key="task.id" class="text-sm px-3 w-full text-left p-button-danger p-button-outlined my-1" iconPos="right" :label="getShortString(task.title)" @click="openTask(task)" />
+                <Button v-for="task in upcomingTasks" :key="task.id" class="text-sm px-3 w-full text-left p-button-danger p-button-outlined my-1" icon="pi pi-arrow-up-right" iconPos="right" :label="getShortString(task.title)" @click="openTask(task)" />
             </div>
             <div class="col-4">
                 <h3 class="mb-3">In Progress Tasks</h3>
-                <Button v-for="task in currentTasks" :key="task.id" class="text-sm px-3 w-full text-left p-button-outlined my-1" iconPos="right" :label="getShortString(task.title)" @click="openTask(task)" />
+                <Button v-for="task in currentTasks" :key="task.id" class="text-sm px-3 w-full text-left p-button-outlined my-1" icon="pi pi-arrow-up-right" iconPos="right" :label="getShortString(task.title)" @click="openTask(task)" />
             </div>
             <div class="col-4">
                 <h3 class="mb-3">Previous <span class="text-sm font-normal ml-2">(2 Weeks)</span></h3>
-                <Button v-for="task in completedTasks" :key="task.id" class="text-sm px-3 w-full text-left p-button-success p-button-outlined my-1" iconPos="right" :label="getShortString(task.title)" @click="openTask(task)" />
+                <Button v-for="task in completedTasks" :key="task.id" class="text-sm px-3 w-full text-left p-button-success p-button-outlined my-1" icon="pi pi-arrow-up-right" iconPos="right" :label="getShortString(task.title)" @click="openTask(task)" />
             </div>
         </div>
     </div>
@@ -203,7 +149,7 @@ import {
 
 import Button from 'primevue/button'
 import TaskSkeleton from '@/components/TaskSkeleton.vue'
-import { Contract, StatusType, Task } from '@/types/ContractData.type'
+import { Contract, PointOfContact, StatusType, Task } from '@/types/ContractData.type'
 import { ContractService } from '@/api/ContractService'
 import contractCycles from '@/views/contracts/cTemplates/ContractCycles'
 import { useToast } from 'primevue/usetoast'
@@ -241,6 +187,8 @@ export default defineComponent({
         const contractStatus = ref([] as { gate: number, palt_plan: number, palt_actual: number, difference: number }[])
         const contractStatusTotals = ref({} as { total: string, plan: number, actual: number, difference: number })
 
+        const contractPocs = ref([] as { title: string, value: PointOfContact}[])
+
         const contract = ref({} as Contract)
         function getContract(field: string) {
             loading.value.push(field)
@@ -257,6 +205,15 @@ export default defineComponent({
                 .then(() => {
                     setContractStatus()
                     filterTasks()
+                    contractPocs.value = [ 
+                        { title: 'SSA', value: contract.value.ssa },
+                        { title: 'CAA', value: contract.value.caa },
+                        { title: 'SDO', value: contract.value.sdo },
+                        { title: 'PCO', value: contract.value.pco },
+                        { title: 'Buyer', value: contract.value.buyer },
+                        { title: 'Admin PCO', value: contract.value.admin_pco },
+                        { title: 'Admin Buyer', value: contract.value.admin_buyer },
+                    ]
                 })
                 .catch((err) => {
                     console.warn('Error Fetching Contract', err)
@@ -464,6 +421,7 @@ export default defineComponent({
             contractStatusTotals,
             copyEmail,
             getCycleCode,
+            contractPocs,
             upcomingTasks,
             currentTasks,
             completedTasks,
@@ -516,14 +474,9 @@ export default defineComponent({
     }
 }
 
-.points-of-contact {
-    td {
-        padding: 0.25rem 0rem;
-    }
-    .p-button.p-button-sm {
-        height: 1.5rem;
-        width: 1.5rem;
-        padding: 0.5rem;
-    }
+.p-button.p-button-sm {
+    height: 1.5rem !important;
+    width: 1.5rem !important;
+    padding: 0.5rem !important;
 }
 </style>
