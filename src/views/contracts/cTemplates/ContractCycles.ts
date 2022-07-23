@@ -23,7 +23,7 @@ interface ContractCycles {
 }
 
 const contractCycles: ContractCycles = {
-    g_o_p: 5,
+    g_o_p: 60,
     g_t_p: 15,
     g_tr_p: 577,
     types: [

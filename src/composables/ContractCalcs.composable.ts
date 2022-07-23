@@ -1,4 +1,5 @@
-import type { Holiday, PointOfContact, SimpleTask, Task } from '@/types/ContractData.type'
+import type { ContractBuild, Holiday, PointOfContact, SimpleTask, Task } from '@/types/ContractData.type'
+import contractCycles from '@/views/contracts/cTemplates/ContractCycles'
 
 export function formatDate(date: string) {
     return new Date(date.replace(/-/g, '/'))
@@ -8,8 +9,10 @@ export function dateString(date: Date) {
     return date.toLocaleDateString('en-us', { weekday:"short", year:"numeric", month:"short", day:"numeric"})
 }
 
-export function ymdDateFormat(date: Date) {
-    return date.toISOString().slice(0, 10)
+export function ymdDateFormat(date: Date | string | null) {
+    if (typeof date === 'string') return (new Date(date)).toISOString().slice(0, 10)
+    else if (date === null) return new Date().toISOString().slice(0, 10)
+    else return date.toISOString().slice(0, 10)
   }
 
 export function formatPOC(poc: PointOfContact | null) {
@@ -41,4 +44,16 @@ export function generateSlug(text: string) {
     let slug = text.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '').replace(/--/g, '-').replace(/---/g, '-')
     if (slug.charAt(slug.length - 1) === '-') slug = slug.substring(0, slug.length - 1)
     return slug
+}
+
+export function cycleCodeString(details: ContractBuild, code: string) {
+    let ccstring = ''
+    contractCycles.types.forEach((type) => {
+        if (type.title === details.type) {
+            type.value.forEach((val) => {
+                if (val.code === code) ccstring = `${val.code} (${val.sub_title})`
+            })
+        }
+    })
+    return ccstring
 }

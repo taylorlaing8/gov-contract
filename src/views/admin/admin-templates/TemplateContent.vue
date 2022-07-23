@@ -4,7 +4,7 @@
             <div class="flex align-items-center">
                 <template v-if="!editTitle">
                     <h2 class="">{{ template.title }}</h2>
-                    <i class="pi pi-pencil hover-edit-btn" @click="editTitle = true"></i>
+                    <Button icon="pi pi-pencil" class="p-button-rounded p-button-text p-button-sm hover-edit-btn ml-1" @click="editTitle = true"/>
                 </template>
                 <template v-else>
                     <InputText id="title" class="p-inputtext-lg" v-model="template.title" />
@@ -29,7 +29,7 @@
              <div class="flex align-items-center">
                 <template  v-if="!editSubtitle">
                     <p class="m-0">{{ template.sub_title ? template.sub_title : '-' }}</p>
-                    <i class="pi pi-pencil hover-edit-btn" @click="editSubtitle = true"></i>
+                    <Button icon="pi pi-pencil" class="p-button-rounded p-button-text p-button-sm hover-edit-btn ml-1" @click="editSubtitle = true"/>
                 </template>
                 <template v-else>
                     <InputText id="title" class="p-inputtext-sm" v-model="template.sub_title" />
@@ -201,11 +201,11 @@
             </div>
             <div class="field col-6">
                 <label for="palt-plan">Palt Planned</label>
-                <InputNumber id="palt-plan" v-model="modalTask.palt_plan" :maxFractionDigits="1" showButtons mode="decimal" :step="0.50" :disabled="modalTask.tasks && modalTask.tasks.length > 0"/>
+                <InputNumber id="palt-plan" v-model="modalTask.palt_plan" :maxFractionDigits="1" showButtons mode="decimal" :min="0" :step="0.50" :disabled="modalTask.tasks && modalTask.tasks.length > 0"/>
             </div>
             <div class="field col-6">
                 <label for="bus-days">Business Days</label>
-                <InputNumber id="bus-days" v-model="modalTask.bus_days" :maxFractionDigits="1" showButtons mode="decimal" :step="0.50" :disabled="modalTask.tasks && modalTask.tasks.length > 0"/>
+                <InputNumber id="bus-days" v-model="modalTask.bus_days" :maxFractionDigits="1" showButtons mode="decimal" :min="0" :step="0.50" :disabled="modalTask.tasks && modalTask.tasks.length > 0"/>
             </div>
             <div class="field col-12">
                 <p>Quick Links</p>

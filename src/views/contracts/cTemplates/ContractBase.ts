@@ -1,18 +1,19 @@
 import type {
+    ContractBuild,
     PointOfContact,
     StatusType,
     TaskBuild,
 } from '@/types/ContractData.type'
 
-export const contractBase = {
+export const contractBase: ContractBuild = {
     title: '',
     sub_title: '',
     slug: '',
     type: '',
     ucid: '',
-    cycle_code: null,
-    value: 0,
     status: 'IC',
+    value: 0,
+    cycle_code: null,
     need_date: null,
     award_date: null,
     start_date: null,
@@ -25,8 +26,11 @@ export const contractBase = {
     g_fr_tr_p: 0,
     g_fr_fr_p: 0,
     g_fr_fv_p: 0,
-    pocs: [] as Number[],
-    ss_leads: [] as Number[],
+    pocs: [] as number[],
+    ss_leads: [] as number[],
+    ssa: null,
+    caa: null,
+    sdo: null,
     pco: null,
     buyer: null,
     admin_pco: null,

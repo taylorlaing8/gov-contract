@@ -4,7 +4,7 @@
     </div>
     <div class="flex" v-if="!loading">
         <div class="contract-nav-wrapper">
-            <div class="contract-title" @click="openOverview">
+            <div class="contract-title shadow-2" @click="openOverview">
                 <!-- <router-link :to="`/contracts/${contract.id.toString()}`"> -->
                 <h4>Contract ID: {{ contract.ucid }}</h4>
                 <!-- </router-link> -->
@@ -256,20 +256,18 @@ export default defineComponent({
 }
 
 .contract-nav-wrapper {
-    width: 375px;
-    min-width: 375px;
+    width: 350px;
+    min-width: 350px;
     height: calc(100vh - 75.5px);
     overflow-x: hidden;
     overflow-y: scroll;
 
-    @media only screen and (max-width: 1225px) {
-        width: 350px;
-        min-width: 250px;
-    }
-
     & .contract-title {
         padding: 1rem 0.75rem;
         background-color: $dark-grey;
+        position: absolute;
+        width: 350px;
+        min-width: 350px;
 
         & h4 {
             color: white;
@@ -281,7 +279,7 @@ export default defineComponent({
     }
 
     & .contract-nav-item-wrapper {
-        padding: 0.5rem;
+        padding: 4rem 0.5rem 0.5rem;
         min-height: 100%;
         background: $med-grey;
 

@@ -33,8 +33,6 @@ app.use(ConfirmationService)
 // app.component('p-data-table', DataTable)
 // import Column from 'primevue/column'
 // app.component('p-column', Column)
-import Calendar from 'primevue/calendar'
-app.component('p-calendar', Calendar)
 
 import Tooltip from 'primevue/tooltip'
 app.directive('tooltip', Tooltip)

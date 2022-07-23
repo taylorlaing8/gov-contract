@@ -12,13 +12,13 @@
             />
         </div>
         <div class="col-12 mt-4">
-            <Calendar
+            <VCalendar
                 :columns="4"
                 :rows="1"
                 :is-expanded="true"
                 :attributes="calHolidays"
                 class="mb-5"
-            ></Calendar>
+            ></VCalendar>
             <DataTable
                 :value="holidays"
                 removableSort
@@ -101,11 +101,11 @@
                 </div>
                 <div class="field col-6">
                     <label for="date">Date</label>
-                    <p-calendar id="date" v-model="selectedRow.date" :showIcon="true" />
+                    <Calendar id="date" v-model="selectedRow.date" :showIcon="true" />
                 </div>
                 <div class="field col-6">
                     <label for="observed">Observed</label>
-                    <p-calendar id="observed" v-model="selectedRow.observed" :showIcon="true"/>
+                    <Calendar id="observed" v-model="selectedRow.observed" :showIcon="true"/>
                 </div>
             </div>
             <template #footer>
@@ -153,11 +153,11 @@
                 </div>
                 <div class="field col-6">
                     <label for="date">Date</label>
-                    <p-calendar id="date" v-model="newHoliday.date" :showIcon="true" />
+                    <Calendar id="date" v-model="newHoliday.date" :showIcon="true" />
                 </div>
                 <div class="field col-6">
                     <label for="observed">Observed</label>
-                    <p-calendar id="observed" v-model="newHoliday.observed" :showIcon="true"/>
+                    <Calendar id="observed" v-model="newHoliday.observed" :showIcon="true"/>
                 </div>
             </div>
             <template #footer>
@@ -182,7 +182,7 @@
 import { HolidayService } from '@/api/ContractService'
 import type { Holiday, HolidayBuild } from '@/types/ContractData.type'
 import { defineComponent, nextTick, ref } from 'vue'
-import { Calendar } from 'v-calendar'
+import { Calendar as VCalendar } from 'v-calendar'
 import { formatDate, dateString, ymdDateFormat } from '@/composables/ContractCalcs.composable'
 
 import Button from 'primevue/button'
@@ -190,6 +190,7 @@ import Dialog from 'primevue/dialog'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import InputText from 'primevue/inputtext'
+import Calendar from 'primevue/calendar'
 
 import { useToast } from 'primevue/usetoast'
 import ConfirmDialog from 'primevue/confirmdialog'
@@ -199,12 +200,13 @@ export default defineComponent({
     name: 'HolidayList',
 
     components: {
-        Calendar,
+        VCalendar,
         Button,
         Dialog,
         DataTable,
         Column,
         InputText,
+        Calendar,
         ConfirmDialog,
     },
 

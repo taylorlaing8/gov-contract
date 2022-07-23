@@ -5,7 +5,13 @@ import LoginView from '@/views/LoginView.vue'
 
 import ContractWrapper from '@/views/contracts/ContractWrapper.vue'
 import ContractList from '@/views/contracts/ContractList.vue'
-import ContractBuilder from '@/views/contracts/ContractBuilder.vue'
+
+import BuildWrapper from '@/views/contracts/contract-build/BuildWrapper.vue'
+import BuildDetails from '@/views/contracts/contract-build/BuildDetails.vue'
+import BuildPocs from '@/views/contracts/contract-build/BuildPocs.vue'
+import BuildSchedule from '@/views/contracts/contract-build/BuildSchedule.vue'
+import BuildConfirm from '@/views/contracts/contract-build/BuildConfirm.vue'
+
 import ContractNavigation from '@/views/contracts/ContractNavigation.vue'
 import ContractOverview from '@/views/contracts/ContractOverview.vue'
 import TaskDetail from '@/views/contracts/TaskDetail.vue'
@@ -48,8 +54,30 @@ const routes = [
             },
             {
                 path: 'create',
-                name: 'contract-create',
-                component: ContractBuilder,
+                name: 'contract-build',
+                component: BuildWrapper,
+                children: [
+                    {
+                        path: '',
+                        name: 'build-details',
+                        component: BuildDetails,
+                    },
+                    {
+                        path: 'pocs',
+                        name: 'build-pocs',
+                        component: BuildPocs,
+                    },
+                    {
+                        path: 'schedule',
+                        name: 'build-schedule',
+                        component: BuildSchedule,
+                    },
+                    {
+                        path: 'confirm',
+                        name: 'build-confirm',
+                        component: BuildConfirm,
+                    },
+                ]
             },
             {
                 path: ':contract_id',
@@ -75,24 +103,9 @@ const routes = [
                         path: ':task',
                         name: 'contract-task-detail',
                         component: TaskDetail,
-                        // props(route) {
-                        //     return {
-                        //         task_id: parseInt(route.params.task_id)
-                        //     }
-                        // },
                     },
                 ]
             },
-            // {
-            //   path: ':contract_id/:task?',
-            //   component: ContractNavigation,
-            //   name: 'contract-view',
-            //   props(route) {
-            //     return {
-            //         contract_id: parseInt(route.params.contract_id)
-            //     }
-            //   },
-            // },
         ],
         beforeEnter: [verifyAuthorization],
     },
@@ -101,11 +114,6 @@ const routes = [
         name: 'admin',
         component: AdminNav,
         children: [
-            // {
-            //     path: '',
-            //     component: AdminDashboard,
-            //     name: 'admin-dashboard'
-            // },
             {
                 path: 'pocs',
                 component: PocList,
@@ -145,12 +153,6 @@ const routes = [
                     },
                 ],
             },
-            // {
-            //     path: 'templates',
-            //     component: TemplateList,
-            //     name: 'admin-templates',
-            //     props: true,
-            // },
             {
                 path: 'holidays',
                 component: HolidayList,
@@ -160,29 +162,6 @@ const routes = [
         ],
         beforeEnter: [verifyAuthorization],
     },
-    // {
-    //     path: '/template',
-    //     name: 'template',
-    //     component: TemplateWrapper,
-    //     children: [
-    //         {
-    //             path: 'create',
-    //             component: TemplateBuilder,
-    //             name: 'template-create'
-    //         },
-    //         {
-    //           path: ':template_id',
-    //           component: TemplateContent,
-    //           name: 'template-content',
-    //           props(route) {
-    //             return {
-    //                 template_id: parseInt(route.params.template_id)
-    //             }
-    //           },
-    //         },
-    //     ],
-    //     beforeEnter: [verifyAuthorization],
-    // },
     {
         path: '/template/build',
         component: TemplateBuilder,
@@ -226,9 +205,5 @@ function verifyAuthorization(to: any, from: any, next: any) {
         next()
     }
 }
-
-// router.beforeEach((to, from, next) => {
-
-// })
 
 export default router

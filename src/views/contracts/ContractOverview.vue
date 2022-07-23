@@ -58,7 +58,7 @@
                     <tr v-for="(cpoc, idx) in contractPocs" :key="idx">
                         <td>{{ cpoc.title }}</td>
                         <td>
-                            <Button class="px-3 w-full text-left p-button-secondary p-button-outlined my-1" icon="pi pi-copy" iconPos="right" :label="formatPOC(cpoc.value)" v-clipboard:copy="cpoc.value.email" @click="copyEmail" />
+                            <Button class="px-3 w-full text-sm text-left p-button-secondary p-button-outlined my-1" icon="pi pi-copy" iconPos="right" :label="formatPOC(cpoc.value)" v-clipboard:copy="cpoc.value.email" @click="copyEmail" />
                         </td>
                     </tr>
                 </table>
@@ -80,7 +80,7 @@
                                 Palt Actual
                             </td>
                             <td width="25%">
-                                <span class="text-green-500">+</span>/<span class="text-red-500">&#8211;</span>
+                                <span class="text-green-600">+</span>/<span class="text-red-600">&#8211;</span>
                             </td>
                         </tr>
                     </thead>

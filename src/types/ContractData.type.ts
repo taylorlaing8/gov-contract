@@ -124,6 +124,40 @@ export interface Task {
     tasks: Task[] | null
 }
 
+
+export interface ContractBuild {
+    title: string
+    sub_title: string
+    slug: string
+    type: string
+    ucid: string
+    status: Status
+    value: number
+    cycle_code: string | null
+    need_date: Date | string | null
+    award_date: Date | string | null
+    start_date: Date | string | null
+    pop_date: Date | string | null
+    g_o_p: number
+    g_t_p: number
+    g_tr_p: number
+    g_fr_o_p: number
+    g_fr_t_p: number
+    g_fr_tr_p: number
+    g_fr_fr_p: number
+    g_fr_fv_p: number
+    pocs: number[]
+    ss_leads: number[]
+    ssa: number|null
+    caa: number|null
+    sdo: number|null
+    pco: number|null
+    buyer: number|null
+    admin_pco: number|null
+    admin_buyer: number|null
+    tasks: TaskBuild[]
+}
+
 export interface SimpleContract {
     id: number
     title: string
@@ -141,7 +175,7 @@ export interface Contract {
     sub_title: string
     slug: string
     type: string
-    ucid: string // Unique Contract ID
+    ucid: string
     status: Status
     value: number
     ss_leads: PointOfContact[]
@@ -149,7 +183,7 @@ export interface Contract {
     award_date: Date
     start_date: Date
     cycle_code: string
-    pop_date: Date // When current contract ends
+    pop_date: Date
     g_o_p: number
     g_t_p: number
     g_tr_p: number

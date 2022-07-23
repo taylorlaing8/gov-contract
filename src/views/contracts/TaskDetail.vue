@@ -159,6 +159,7 @@
                             showButtons
                             mode="decimal"
                             :step="0.5"
+                            :min="0"
                             :disabled="taskData.tasks && taskData.tasks.length > 0"
                             :autofocus="true"
                         />
@@ -222,19 +223,23 @@
                 <PaltChart :task_id="taskData.id" :palt_plan="taskData.palt_plan" :palt_actual="taskData.palt_actual"></PaltChart>
             </div>
             <div class="col-8">
-                <div class="flex align-items-center pb-2">
-                    <p class="text-large w-6">
-                        Start Date
-                        <span class="border-round text-white surface-800 ml-3 mr-1 px-3 py-1">
-                            {{ dateString(formatDate(taskData.start_date)) }}
-                        </span>
-                    </p>
-                    <p class="text-large ml-3 w-6">
-                        End Date
-                        <span class="border-round text-white surface-800 ml-3 mr-1 px-3 py-1">
-                            {{ dateString(formatDate(taskData.end_date)) }}
-                        </span>
-                    </p>
+                <div class="grid">
+                    <div class="col-6 p-0 pr-6">
+                        <div class="flex align-items-center mr-1">
+                            <p class="text-large w-6">Start Date</p>
+                            <p class="text-large w-10 border-round text-white surface-800 ml-2 px-3 py-1">
+                                {{ dateString(formatDate(taskData.start_date)) }}
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col-6 p-0 pr-6">
+                        <div class="flex align-items-center mr-1">
+                            <p class="text-large w-6">End Date</p>
+                            <p class="text-large w-10 border-round text-white surface-800 ml-2 px-3 py-1">
+                                {{ dateString(formatDate(taskData.end_date)) }}
+                            </p>
+                        </div>
+                    </div>
                 </div>
                 <DateRange
                     :startDate="formatDate(taskData.start_date)"
@@ -570,19 +575,19 @@ export default defineComponent({
                 if (returnType == 'text') {
                     return 'EARLY'
                 }
-                else return 'bg-green-500'
+                else return 'bg-green-600'
             }
             else if (plan < actual) {
                 if (returnType == 'text') {
                     return 'LATE'
                 }
-                else return 'bg-red-500'
+                else return 'bg-red-600'
             }
             else {
                 if (returnType == 'text') {
                     return 'ON TIME'
                 }
-                else return 'bg-blue-500'
+                else return 'bg-blue-600'
             }
         }
 
@@ -773,6 +778,9 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
+.task-content {
+    max-width: 1100px;
+}
 #bus-days {
     width: 4rem !important;
 }
