@@ -1,5 +1,5 @@
 import { govHttp } from './http'
-import type { Holiday, PointOfContact, Position, Task, Contract, Template, PointOfContactBuild, PositionBuild, HolidayBuild, ContractBuild } from '@/types/ContractData.type'
+import type { Holiday, PointOfContact, Position, Task, Contract, Template, PointOfContactBuild, PositionBuild, HolidayBuild, ContractBuild, ContractUpdate } from '@/types/ContractData.type'
 
 export class HolidayService {
     static get(id: Number) {
@@ -99,7 +99,7 @@ export class ContractService {
     static create(data: ContractBuild) {
         return govHttp.post('/contracts/', data)
     }
-    static update(id: Number, data: Contract) {
+    static update(id: Number, data: ContractUpdate) {
         return govHttp.put(`/contracts/${id}/`, data)
     }
     static delete(id: Number) {

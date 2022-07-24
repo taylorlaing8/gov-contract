@@ -155,7 +155,44 @@ export interface ContractBuild {
     buyer: number|null
     admin_pco: number|null
     admin_buyer: number|null
+    comments: string | null
     tasks: TaskBuild[]
+}
+
+export interface ContractUpdate {
+    id: number
+    title: string
+    sub_title: string
+    slug: string
+    type: string
+    ucid: string
+    status: Status
+    value: number
+    ss_leads: number[]
+    need_date: Date
+    award_date: Date
+    start_date: Date
+    cycle_code: string
+    pop_date: Date
+    g_o_p: number
+    g_t_p: number
+    g_tr_p: number
+    g_fr_o_p: number
+    g_fr_t_p: number
+    g_fr_tr_p: number
+    g_fr_fr_p: number
+    g_fr_fv_p: number
+    pocs: number[]
+    tasks: Task[]
+    created: Date
+    ssa: number,
+    caa: number,
+    sdo: number,
+    pco: number
+    buyer: number
+    admin_pco: number
+    admin_buyer: number
+    comments: string | null
 }
 
 export interface SimpleContract {
@@ -166,6 +203,7 @@ export interface SimpleContract {
     ucid: string
     status: Status
     tasks: SimpleTask[]
+    comments: string | null
     pocs: PointOfContact[]
 }
 
@@ -202,4 +240,5 @@ export interface Contract {
     buyer: PointOfContact
     admin_pco: PointOfContact
     admin_buyer: PointOfContact
+    comments: string | null
 }

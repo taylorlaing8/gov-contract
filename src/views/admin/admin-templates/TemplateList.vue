@@ -126,9 +126,19 @@ export default defineComponent({
 
         function duplicateTemplate() {
             const data = _.cloneDeep(selectedRow.value)
-            const lastNum = Number(data.title.charAt(data.title.length - 1))
-            if (!Number.isNaN(lastNum)) data.title = data.title.substring(0, data.title.length - 1) + (lastNum + 1)
+
+            let lastNum = Number(data.title.charAt(data.title.length - 1))
+            if (!Number.isNaN(lastNum)) {
+                lastNum += 1
+                data.title = data.title.substring(0, data.title.length - 1) + lastNum
+            }
             else data.title = data.title + ' 1'
+
+            while (templates.value.findIndex((template) => template.title === data.title) >= 0) {
+                lastNum = !Number.isNaN(lastNum) ? lastNum + 1 : Number(data.title.charAt(data.title.length - 1)) + 1
+                data.title = data.title.substring(0, data.title.length - 1) + lastNum
+            }
+            
             TemplateService.create(data)
                 .then((res) => {
                     templates.value.push(res.data)

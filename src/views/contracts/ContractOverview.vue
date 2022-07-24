@@ -134,6 +134,46 @@
             </div>
         </div>
         <div class="grid mt-6">
+            <div class="col-12">
+                <template v-if="!edit.includes('comments')">
+                    <div class="flex align-items-center">
+                        <h3>Comments</h3>
+                        <Button icon="pi pi-pencil" class="p-button-rounded p-button-text p-button-sm hover-edit-btn ml-1" @click="edit.push('comments')"/>
+                    </div>
+                    <p class="text-sm text-800 p-4 bg-blue-50 mb-0" @click="edit.push('comments')">
+                        <template v-if="commentData">
+                            {{ commentData }}
+                        </template>
+                        <template v-else>
+                            <span class="text-500"><em>Click to add comments...</em></span>
+                        </template>
+                    </p>
+                </template>
+                <template v-else>
+                    <div class="flex align-items-center">
+                        <h3>Comments</h3>
+                        <div class="flex-auto"></div>
+                        <template v-if="!loading.includes('comments')">
+                            <Button
+                                icon="pi pi-times"
+                                class="p-button-rounded p-button-text"
+                                @click="cancelEdit('comments')"
+                            />
+                            <Button
+                                icon="pi pi-check"
+                                class="p-button-rounded p-button-success p-button-text"
+                                @click="saveContract('comments')"
+                            />
+                        </template>
+                        <template v-else>
+                            <i class="pi pi-spin pi-spinner mx-3"></i>
+                        </template>
+                    </div>
+                    <Textarea v-model="commentData" :autoResize="true" class="w-full" rows="5" :autofocus="true"/>
+                </template>
+            </div>
+        </div>
+        <div class="grid mt-6">
             <div class="col-4">
                 <h3 class="mb-3">Upcoming Tasks <span class="text-sm font-normal ml-2">(2 Weeks)</span></h3>
                 <Button v-for="task in upcomingTasks" :key="task.id" class="text-sm px-3 w-full text-left p-button-danger p-button-outlined my-1" icon="pi pi-arrow-up-right" iconPos="right" :label="getShortString(task.title)" @click="openTask(task)" />
@@ -161,14 +201,16 @@ import {
 	formatTaskParam,
 } from '@/composables/ContractCalcs.composable'
 
-import Button from 'primevue/button'
-import TaskSkeleton from '@/components/TaskSkeleton.vue'
-import { Contract, PointOfContact, StatusType, Task } from '@/types/ContractData.type'
+import { Contract, ContractUpdate, PointOfContact, StatusType, Task } from '@/types/ContractData.type'
 import { ContractService } from '@/api/ContractService'
 import contractCycles from '@/views/contracts/cTemplates/ContractCycles'
 import { useToast } from 'primevue/usetoast'
 import router from '@/router'
 import _ from 'lodash'
+
+import Button from 'primevue/button'
+import Textarea from 'primevue/textarea'
+import TaskSkeleton from '@/components/TaskSkeleton.vue'
 
 export default defineComponent({
     name: 'ContractOverview',
@@ -176,6 +218,7 @@ export default defineComponent({
     components: {
         StatusIcon,
         Button,
+        Textarea,
         TaskSkeleton,
     },
 
@@ -202,19 +245,26 @@ export default defineComponent({
         const contractStatusTotals = ref({} as { total: string, plan: number, actual: number, difference: number })
 
         const contractPocs = ref([] as { title: string, value: PointOfContact}[])
+        const commentData = ref('' as string|null)
+
+        function cancelEdit(field: string) {
+            edit.value.splice(edit.value.findIndex((e) => { return e === field }), 1)
+            
+            switch(field) {
+                case 'comments':
+                    commentData.value = _.cloneDeep(contract.value.comments)
+                    break
+            }
+        }
 
         const contract = ref({} as Contract)
-        function getContract(field: string) {
-            loading.value.push(field)
+        function getContract() {
+            loading.value.push('contract')
+
             ContractService.get(props.contract_id)
                 .then((res) => {
                     contract.value = res.data
-                    // toast.add({
-                    //     severity: 'info',
-                    //     summary: 'Fetched',
-                    //     detail: 'Task Data Retrieved',
-                    //     life: 3000,
-                    // })
+                    commentData.value = _.cloneDeep(contract.value.comments)
                 })
                 .then(() => {
                     setContractStatus()
@@ -239,14 +289,48 @@ export default defineComponent({
                     })
                 })
                 .finally(() => {
-                    if (field != 'task') {
-                        // edit.value.splice(edit.value.findIndex((e) => { return e === field }), 1)
-                        loading.value.splice(loading.value.findIndex((l) => { return l === field }), 1)
-                    }
+                    loading.value.splice(loading.value.findIndex((l) => { return l === 'contract' }), 1)
                     emit('get_status', contract.value.status)
                 })
         }
-        getContract('contract')
+        getContract()
+        
+        function saveContract(field: string) {
+            loading.value.push(field)
+
+            const data: ContractUpdate = {
+                ...contract.value,
+                pocs: contract.value.pocs.map((poc) => poc.id),
+                ss_leads: contract.value.ss_leads.map((lead) => lead.id),
+                buyer: contract.value.buyer.id,
+                admin_buyer: contract.value.admin_buyer.id,
+                pco: contract.value.pco.id,
+                admin_pco: contract.value.admin_pco.id,
+                caa: contract.value.caa.id,
+                sdo: contract.value.sdo.id,
+                ssa: contract.value.ssa.id,
+                comments: field === 'comments' ? commentData.value : contract.value.comments,
+            }
+
+            ContractService.update(props.contract_id, data)
+                .then((res) => {
+                    contract.value = res.data
+                    commentData.value = _.cloneDeep(contract.value.comments)
+                })
+                .catch((err) => {
+                    console.warn('Error Updating Contract', err)
+                    toast.add({
+                        severity: 'error',
+                        summary: 'Error',
+                        detail: 'Error Updating Contract',
+                        life: 3000,
+                    })
+                })
+                .finally(() => {
+                    cancelEdit(field)
+                    loading.value.splice(loading.value.findIndex((l) => { return l === field }), 1)
+                })
+        }
 
         function setContractStatus() {
             let gateOne = {
@@ -433,6 +517,9 @@ export default defineComponent({
             contractSummary,
             contractStatus,
             contractStatusTotals,
+            commentData,
+            cancelEdit,
+            saveContract,
             copyEmail,
             getCycleCode,
             contractPocs,
