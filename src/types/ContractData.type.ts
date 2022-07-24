@@ -26,9 +26,9 @@ interface TemplateData {
 }
 
 export interface Template {
-    id: number
+    id?: number
     title: string
-    subtitle: string | null
+    sub_title: string | null
     data: TemplateData
 }
 

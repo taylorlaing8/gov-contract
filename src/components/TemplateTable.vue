@@ -12,12 +12,12 @@
         @rowReorder="onTaskReorder"
         @row-click="openTaskModal()"
     >
-        <Column :rowReorder="true" style="min-width: 2rem; width: 5%; text-align: center" :reorderableColumn="false" v-if="canEdit"/>
-        <Column :expander="true" style="min-width: 2rem; width: 5%" />
+        <Column v-if="canEdit" :rowReorder="true" style="min-width: 2rem; width: 5%; text-align: center" :reorderableColumn="false" />
+        <Column v-if="!expandLoad" :expander="true" style="min-width: 2rem; width: 5%" />
         <Column
             field="title"
             header="Title / Subtitle"
-            style="width: 50%"
+            style="width: 45%"
         >
             <template #body="slotProps">
                 <h5 class="text-lg font-normal">
@@ -44,22 +44,30 @@
             header="Business Days"
             style="width: 10%"
         ></Column>
-        <template #expansion="slotProps">
+        <Column
+            v-if="canEdit"
+            style="width: 5%"
+        >
+            <template #body="slotProps">
+                <Button icon="pi pi-ellipsis-h" class="p-button-rounded p-button-text p-button-sm" @click="openEditMenu($event, slotProps)"/>
+            </template>
+        </Column>
+        <template #expansion="parentTask">
             <div class="subtasks-table">
                 <DataTable
-                    :value="slotProps.data.tasks"
+                    :value="parentTask.data.tasks"
                     v-model:selection="selectedSubtask"
                     class="p-datatable-sm"
                     stripedRows
                     :selectionMode="canEdit ? 'single' : null"
-                    @rowReorder="onSubtaskReorder(slotProps.data.slug, $event)"
-                    @row-click="openTaskModal(slotProps.data)"
+                    @rowReorder="onSubtaskReorder(parentTask.data.slug, $event)"
+                    @row-click="openTaskModal(parentTask.data)"
                 >
-                    <Column :rowReorder="true" style="margin-left: 5%; min-width: 2rem; width: 5%; text-align: center" :reorderableColumn="false" v-if="canEdit"/>
+                    <Column v-if="canEdit" :rowReorder="true" style="margin-left: 5%; min-width: 2rem; width: 5%; text-align: center" :reorderableColumn="false" />
                     <Column
                         field="title"
                         header="Title / Subtitle"
-                        style="width: 50%"
+                        style="width: 45%"
                     >
                         <template #body="slotProps">
                             <h5 class="text-lg font-normal">
@@ -90,6 +98,14 @@
                         header="Business Days"
                         style="width: 10%"
                     ></Column>
+                    <Column
+                        v-if="canEdit"
+                        style="width: 5%"
+                    >
+                        <template #body="slotProps">
+                            <Button icon="pi pi-ellipsis-h" class="p-button-rounded p-button-text p-button-sm" @click="openEditMenu($event, slotProps, parentTask.data)"/>
+                        </template>
+                    </Column>
                 </DataTable>
             </div>
         </template>
@@ -100,6 +116,7 @@
             <Button icon="pi pi-cloud" class="p-button-text" />
         </template> -->
     </DataTable>
+    <ContextMenu :model="editMenu" ref="eMenu" />
     <Dialog
         v-model:visible="showTaskModal"
         :style="{ width: '800px' }"
@@ -122,7 +139,7 @@
             </div>
             <div class="field col-6">
                 <label for="gate">Gate</label>
-                <InputNumber id="gate" v-model="modalTask.gate" showButtons :min="0" :max="4" />
+                <InputNumber id="gate" v-model="modalTask.gate" showButtons :min="1" :max="4" />
             </div>
             <div class="field col-6">
                 <label for="sub-gate">Sub Gate</label>
@@ -199,8 +216,10 @@ import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import InputText from 'primevue/inputtext'
 import InputNumber from 'primevue/inputnumber'
+import ContextMenu from 'primevue/contextmenu'
 
 import { useToast } from 'primevue/usetoast'
+import { generateSlug } from '@/composables/ContractCalcs.composable'
 
 export default defineComponent({
     name: 'TemplateContent',
@@ -224,27 +243,132 @@ export default defineComponent({
         Column,
         InputText,
         InputNumber,
+        ContextMenu,
     },
 
     emits: ['update_tasks'],
 
     setup(props, { emit }) {
+        const toast = useToast()
         const taskData = ref(props.templateTasks)
 
         const selectedTask = ref({} as TaskBuild)
         const selectedSubtask = ref({} as TaskBuild)
         const modalTask = ref({} as TaskBuild)
+
+        const expandLoad = ref(false)
         const expandedRows = ref([])
 
         const loading = ref(false)
         const changeDetected = ref(false)
 
-        const editTitle = ref(false)
-        const editSubtitle = ref(false)
-
         const subtaskParent = ref({} as TaskBuild)
         const isSubtask = ref(false)
         const showTaskModal = ref(false)
+
+        const blankTask: TaskBuild = {
+            bus_days: 0,
+            comments: null,
+            gate: 1,
+            links: null,
+            palt_plan: 0,
+            poc: null,
+            slug: 'new-task',
+            ssp_date: null,
+            status: 'IC',
+            sub_gate: 0,
+            sub_title: null,
+            title: 'NEW TASK',
+            tasks: null,
+        }
+
+        const eMenu = ref()
+        const editMenu = ref([
+            { label: 'Add Task', icon: 'pi pi-fw pi-plus', command: () => insertTask() },
+            { label: 'Add Subtask', icon: 'pi pi-fw pi-arrow-right', command: () => insertSubtask() },
+            { separator:true },
+            { label: 'Delete', icon: 'pi pi-fw pi-trash', command: () => deleteTask() }
+        ])
+        
+        const editMenuTask = ref({} as {index: number, data: TaskBuild})
+        const editMenuParent = ref(undefined as TaskBuild | undefined)
+
+        function openEditMenu(event, context, parentTask?: TaskBuild) {
+            editMenuTask.value = {index: context.index, data: context.data}
+            editMenuParent.value = parentTask
+            eMenu.value.show(event)
+        }
+
+        function insertTask() {
+            const newTask = {
+                ...blankTask,
+                gate: editMenuTask.value.data.gate,
+                sub_gate: editMenuTask.value.data.sub_gate,
+            }
+
+            if (editMenuParent.value && editMenuParent.value.tasks) {
+                editMenuParent.value.tasks.splice(editMenuTask.value.index, 0, newTask)
+                if (editMenuParent.value.tasks.length === 0) editMenuParent.value.tasks = null
+            }
+            else {
+                taskData.value.splice(editMenuTask.value.index, 0, newTask)
+                if (taskData.value.length === 0) taskData.value.push(newTask)
+            }
+
+            changeDetected.value = true
+            emit('update_tasks', taskData.value, changeDetected.value)
+        }
+
+        function insertSubtask() {
+            const newTask = {
+                ...blankTask,
+                gate: editMenuTask.value.data.gate,
+                sub_gate: editMenuTask.value.data.sub_gate,
+            }
+
+            if (editMenuParent.value && editMenuParent.value.tasks) {
+                toast.add({
+                    severity: 'warn',
+                    summary: 'Invalid Command',
+                    detail: 'Max Levels Reached (2)',
+                    life: 3000,
+                })
+            }
+            else {
+                expandLoad.value = true
+
+                if (editMenuTask.value.data.tasks && editMenuTask.value.data.tasks.length > 0) editMenuTask.value.data.tasks.push(newTask)
+                else editMenuTask.value.data.tasks = [newTask]
+
+                changeDetected.value = true
+                expandLoad.value = false
+                emit('update_tasks', taskData.value, changeDetected.value)
+            }
+        }
+
+        function deleteTask() {
+            expandLoad.value = true
+
+            if (editMenuParent.value && editMenuParent.value.tasks) {
+                editMenuParent.value.tasks.splice(editMenuTask.value.index, 1)
+                if (editMenuParent.value.tasks.length === 0) {
+                    editMenuParent.value.tasks = null
+                    expandedRows.value = [] // TODO : Don't close all expansion panels just because one panel is now empty
+                }
+            }
+            else {
+                taskData.value.splice(editMenuTask.value.index, 1)
+                if (taskData.value.length === 0) taskData.value.push(blankTask)
+            }
+
+            changeDetected.value = true
+            expandLoad.value = false
+            emit('update_tasks', taskData.value, changeDetected.value)
+        }
+
+        watch(() => props.templateTasks, (newTasks, oldTasks) => {
+            taskData.value = newTasks
+        }, { deep: true })
 
         function openTaskModal(data?: TaskBuild) {
             if (props.canEdit) {
@@ -314,6 +438,7 @@ export default defineComponent({
         function saveTask() {
             if (typeof modalTask.value.sub_title === 'string' && modalTask.value.sub_title.length <= 0) modalTask.value.sub_title = null
             modalTask.value = formatLinks(modalTask.value)
+            modalTask.value.slug = generateSlug(modalTask.value.title.toString())
             
             if (isSubtask.value) {
                 if (!_.isEqual(modalTask.value, selectedSubtask.value)) {
@@ -356,13 +481,15 @@ export default defineComponent({
         return {
             loading,
             changeDetected,
-            editTitle,
-            editSubtitle,
+            eMenu,
+            editMenu,
+            openEditMenu,
             taskData,
             selectedTask,
             selectedSubtask,
             modalTask,
             expandedRows,
+            expandLoad,
             showTaskModal,
             openTaskModal,
             closeTaskModal,

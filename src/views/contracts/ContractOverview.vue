@@ -35,16 +35,30 @@
                         </td>
                     </tr>
                     <tr>
-                        <td>Need Date</td>
+                        <td>Start Date</td>
                         <td>
                             <span class="border-round surface-800 text-white ml-3 mr-1 px-3 py-1">
-                                {{ dateString(formatDate(contract.need_date.toString())) }}
+                                {{ dateString(formatDate(contract.start_date.toString())) }}
                             </span>
                         </td>
                         <td>Award Date</td>
                         <td>
                             <span class="border-round surface-800 text-white ml-3 mr-1 px-3 py-1">
                                 {{ dateString(formatDate(contract.award_date)) }}
+                            </span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Need Date</td>
+                        <td>
+                            <span class="border-round surface-800 text-white ml-3 mr-1 px-3 py-1">
+                                {{ dateString(formatDate(contract.need_date.toString())) }}
+                            </span>
+                        </td>
+                        <td>POP Date</td>
+                        <td>
+                            <span class="border-round surface-800 text-white ml-3 mr-1 px-3 py-1">
+                                {{ dateString(formatDate(contract.pop_date)) }}
                             </span>
                         </td>
                     </tr>
