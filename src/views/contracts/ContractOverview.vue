@@ -309,7 +309,7 @@ export default defineComponent({
                 caa: contract.value.caa.id,
                 sdo: contract.value.sdo.id,
                 ssa: contract.value.ssa.id,
-                comments: field === 'comments' ? commentData.value : contract.value.comments,
+                comments: field === 'comments' ? (commentData.value && commentData.value.length > 0 ? commentData.value : null) : contract.value.comments,
             }
 
             ContractService.update(props.contract_id, data)

@@ -7,7 +7,14 @@
                 :options="templates"
                 :filter="true"
                 optionLabel="title"
-            ></Dropdown>
+            >
+                <template #option="slotProps">
+                    <div class="flex justify-content-between">
+                        <p class="m-0">{{ slotProps.option.title }}</p>
+                        <p class="m-0">{{ slotProps.option.sub_title }}</p>
+                    </div>
+                </template>
+            </Dropdown>
         </div>
     </div>
     <div class="p-fluid formgrid grid mb-6">
